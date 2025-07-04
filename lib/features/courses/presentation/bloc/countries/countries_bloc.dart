@@ -1,0 +1,20 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:skills_xorijdaish/features/courses/domain/usecase/country_use_case.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/countries/countries_state.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses_event.dart';
+
+class CountriesBloc extends Bloc<CoursesEvent, CountriesState> {
+  final CountryUseCase usecase;
+
+  CountriesBloc(this.usecase) : super(CountriesInitial()) {
+    on<GetCountriesEvent>((event, emit) async {
+      emit(CountriesLoading());
+      try {
+        final result = await usecase.call();
+        emit(CountriesLoaded(result));
+      } catch (e) {
+        emit(CountriesError(e.toString()));
+      }
+    });
+  }
+}
