@@ -37,7 +37,7 @@ class _SignInPageState extends State<SignInPage> {
             Text(
               AppStrings.lorem,
               style: AppTextStyles.source.regular(
-                color: AppColors.greyScale500,
+                color: AppColors.greyScale.grey500,
                 fontSize: 16,
               ),
             ),

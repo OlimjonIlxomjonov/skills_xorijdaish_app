@@ -6,7 +6,7 @@ import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart'
 import 'package:skills_xorijdaish/features/courses/presentation/screens/courses_page.dart';
 import 'package:skills_xorijdaish/features/home/presentation/screens/home/home_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/profile_page.dart';
-import 'package:skills_xorijdaish/features/reels/presentation/screens/reels_page.dart';
+import 'package:skills_xorijdaish/features/reels/presentation/screens/reels_screen.dart';
 import 'package:skills_xorijdaish/features/statistics/presentation/screens/statistic_page.dart';
 
 class AppBottomNav extends StatefulWidget {
@@ -25,7 +25,7 @@ class _AppBottomNavState extends State<AppBottomNav> {
     HomePage(),
     StatisticPage(),
     CoursesPage(),
-    ReelsPage(),
+    ReelsScreen(),
     ProfilePage(),
   ];
 
@@ -54,9 +54,15 @@ class _AppBottomNavState extends State<AppBottomNav> {
               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
             ),
             child: GNav(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              // FIX 1
               gap: 8,
-              iconSize: appH(26),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              iconSize: appH(24),
+              // FIX 2: slightly smaller to prevent overflow
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              // FIX 3
+              tabMargin: const EdgeInsets.symmetric(horizontal: 4),
+              // FIX 4
               backgroundColor: AppColors.white,
               activeColor: AppColors.textBlue,
               color: Colors.black,
@@ -75,8 +81,8 @@ class _AppBottomNavState extends State<AppBottomNav> {
                 GButton(
                   icon: IconlyBold.document,
                   leading: Container(
-                    width: appW(48),
-                    height: appH(48),
+                    width: appW(44), // FIX 5: slight shrink to prevent overflow
+                    height: appH(44),
                     decoration: BoxDecoration(
                       color: AppColors.appBg,
                       shape: BoxShape.circle,

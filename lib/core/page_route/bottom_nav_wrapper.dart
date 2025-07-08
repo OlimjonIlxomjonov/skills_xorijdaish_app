@@ -10,11 +10,11 @@ class BottomNavWrapper extends StatefulWidget {
   final int initialIndex;
 
   const BottomNavWrapper({
-    Key? key,
+    super.key,
     required this.child,
     this.initialIndex = 0,
     this.appBar,
-  }) : super(key: key);
+  });
 
   @override
   _BottomNavWrapperState createState() => _BottomNavWrapperState();

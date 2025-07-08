@@ -24,8 +24,8 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(left: 20, top: 20),
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      width: appW(230),
+      margin: EdgeInsets.only(left: appW(20), top: appH(10), bottom: appH(10)),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(24),
@@ -43,43 +43,70 @@ class CourseCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Image.asset(AppImages.rusTiliKursi),
-          SizedBox(height: appH(12)),
-          Text(
-            text,
-            style: AppTextStyles.source.medium(
-              color: AppColors.black,
-              fontSize: 15,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.asset(
+                AppImages.rusTiliKursi,
+                height: appH(110),
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          SizedBox(height: appH(17)),
-          RichText(
-            text: TextSpan(
-              text: richTextRate,
+            SizedBox(height: appH(12)),
+            Text(
+              text,
               style: AppTextStyles.source.medium(
-                color: Color(0xff0C1221),
+                color: AppColors.black,
                 fontSize: 15,
               ),
-              children: [TextSpan(text: richTextHours)],
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          SizedBox(height: appH(18)),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.appBg,
-              foregroundColor: AppColors.white,
-              minimumSize: Size(appW(200), appH(40)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(13),
+            SizedBox(height: appH(10)),
+            RichText(
+              text: TextSpan(
+                text: richTextRate,
+                style: AppTextStyles.source.medium(
+                  color: Color(0xff0C1221),
+                  fontSize: 14,
+                ),
+                children: [
+                  TextSpan(
+                    text: '  $richTextHours',
+                    style: AppTextStyles.source.medium(
+                      color: Color(0xff0C1221),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Text(AppStrings.kursniBoshlash),
-          ),
-        ],
+            const Spacer(),
+            ElevatedButton(
+              onPressed: onTap,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.appBg,
+                foregroundColor: AppColors.white,
+                minimumSize: Size(double.infinity, appH(40)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(13),
+                ),
+              ),
+              child: Text(
+                AppStrings.kursniBoshlash,
+                style: AppTextStyles.source.semiBold(
+                  fontSize: 14,
+                  color: AppColors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

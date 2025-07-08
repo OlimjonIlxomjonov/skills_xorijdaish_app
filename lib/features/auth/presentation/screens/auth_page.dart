@@ -7,6 +7,8 @@ import 'package:skills_xorijdaish/core/configs/assets/app_vectors.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
 import 'package:skills_xorijdaish/features/one_id_web_view.dart';
 
+import '../../../../core/utils/logger/logger.dart';
+
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
 
@@ -90,7 +92,7 @@ class _AuthPageState extends State<AuthPage> {
                           MaterialPageRoute(builder: (_) => OneIDLoginPage2()),
                         );
                         if (token != null) {
-                          print('Access token: $token');
+                          logger.i('Access token: $token');
                         }
                       },
                       child: Row(

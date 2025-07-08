@@ -14,14 +14,14 @@ class CountryModel extends CountryEnt {
 
   factory CountryModel.fromJson(Map<String, dynamic> json) {
     return CountryModel(
-      id: json['id'] ?? 0,
-      title: json['title'] ?? '',
-      icon: json['icon'] ?? '',
-      iconUrl: json['icon_url'] ?? '',
-      language: json['language'] ?? '',
-      isActive: json['is_active'] ?? false,
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
+      id: json['id'],
+      title: json['title'],
+      icon: json['icon'],
+      iconUrl: "https://skills.avacoder.uz/storage/${json['icon']}",
+      language: json['language'],
+      isActive: json['is_active'],
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
     );
   }
 

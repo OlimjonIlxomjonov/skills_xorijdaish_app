@@ -17,7 +17,11 @@ class CustomBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+      padding: EdgeInsets.only(
+        bottom: appH(20),
+        left: appW(10),
+        right: appW(10),
+      ),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: const BorderRadius.only(

@@ -28,8 +28,8 @@ class OneIDLoginPage2State extends State<OneIDLoginPage2> {
     final String authUrl =
         'https://sso.egov.uz/sso/oauth/Authorization.do'
         '?response_type=one_code'
-        '&client_id=centrbt_uz'
-        '&redirect_uri=https://centrbt.avacoder.uz/one-id/login'
+        '&client_id=skills_xorijdaish'
+        '&redirect_uri=https://skills.avacoder.uz/one-id/login'
         '&scope=skills_xorijdaish'
         '&state=testState';
 
@@ -49,7 +49,7 @@ class OneIDLoginPage2State extends State<OneIDLoginPage2> {
                   if (token != null && token.isNotEmpty) {
                     await TokenStorageServiceImpl().saveAccessToken(token);
                     DioClient().setToken(token);
-                    AppRoute.open(const AppBottomNav());
+                    AppRoute.open(AppBottomNav());
                   }
                   return NavigationDecision.prevent;
                 }

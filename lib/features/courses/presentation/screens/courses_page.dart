@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
 import 'package:skills_xorijdaish/core/configs/assets/app_images.dart';
@@ -13,6 +14,7 @@ import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses/cou
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses_event.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/country/choose_country_lessons.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/country/choose_country_page.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/soft_skills_page.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/tests/tests_page.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
@@ -129,7 +131,34 @@ class _CoursesPageState extends State<CoursesPage>
         BlocBuilder<CourseBloc, CourseState>(
           builder: (context, state) {
             if (state is CourseLoading) {
-              return CircularProgressIndicator();
+              return Expanded(
+                child: GridView.builder(
+                  itemCount: 4,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: .8,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                  ),
+                  itemBuilder: (context, index) {
+                    return Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: appH(10),
+                          horizontal: appW(16),
+                        ),
+                        height: appH(64),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
             } else if (state is CourseLoaded) {
               final courses = state.response.data.toList();
               return Expanded(
@@ -149,12 +178,11 @@ class _CoursesPageState extends State<CoursesPage>
                     return GestureDetector(
                       onTap: () {
                         if (index == 0) {
-                          final xorijTillari = courses[0];
                           AppRoute.replace(ChooseCountryPage());
                         } else if (index == 1) {
                           AppRoute.replace(ChooseCountryLessons());
                         } else if (index == 2) {
-                          AppRoute.go(TestsPage());
+                          AppRoute.go(SoftSkillsPage(query: 'soft-skills'));
                         }
                       },
                       child: Container(
@@ -205,8 +233,6 @@ class _CoursesPageState extends State<CoursesPage>
       ],
     );
   }
-
-
 
   Widget _buildMyCourses() {
     return ListView.builder(

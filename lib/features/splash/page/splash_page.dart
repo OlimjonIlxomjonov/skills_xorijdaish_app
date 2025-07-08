@@ -40,33 +40,44 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.appBg,
-      body: Padding(
-        padding: const EdgeInsets.only(bottom: 50, top: 55),
-        child: Column(
-          children: [
-            SizedBox(
-              height: appH(176),
-              child: Image.asset(AppImages.iomLogo),
-            ).animate().slideX(begin: -1, end: 0, delay: 2.seconds),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 50, top: 55),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: appH(176),
+                  child: Image.asset(AppImages.iomLogo),
+                ).animate().slideX(begin: -1, end: 0, delay: 2.seconds),
 
-            Container(
-              height: appH(176),
-              color: AppColors.white,
-              child: Image.asset(AppImages.swidLogo, width: double.infinity),
-            ).animate().slideX(begin: 1, end: 0, delay: 2.seconds),
+                Container(
+                  height: appH(176),
+                  color: AppColors.white,
+                  child: Image.asset(
+                    AppImages.swidLogo,
+                    width: double.infinity,
+                  ),
+                ).animate().slideX(begin: 1, end: 0, delay: 2.seconds),
 
-            Container(
-              height: appW(176),
-              color: AppColors.white,
-              child: Image.asset(AppImages.complexLogo, width: double.infinity),
-            ).animate().slideX(begin: -1, end: 0, delay: 2.seconds),
+                Container(
+                  height: appW(176),
+                  color: AppColors.white,
+                  child: Image.asset(
+                    AppImages.complexLogo,
+                    width: double.infinity,
+                  ),
+                ).animate().slideX(begin: -1, end: 0, delay: 2.seconds),
 
-            SizedBox(
-              height: appH(176),
-              child: SvgPicture.asset(AppVectors.logo).animate(),
-            ).animate().slideX(begin: 2, end: 0, delay: 2.seconds),
-            Image.asset(AppImages.poweredBy),
-          ],
+                SizedBox(
+                  height: appH(176),
+                  child: SvgPicture.asset(AppVectors.logo).animate(),
+                ).animate().slideX(begin: 2, end: 0, delay: 2.seconds),
+
+                Image.asset(AppImages.poweredBy),
+              ],
+            ),
+          ),
         ),
       ),
     );

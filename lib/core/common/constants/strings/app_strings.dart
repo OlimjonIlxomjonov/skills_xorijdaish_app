@@ -47,7 +47,7 @@ abstract class AppStrings {
 
   /// Statistiks
   static const String activeSessions = 'Faol holatlar';
-  static const String dailyMidActive = "kuniga o'rtacha faillik";
+  static const String dailyMidActive = "kuniga o'rtacha faollik";
 
   /// Profile
   static const String myProfile = 'Mening Profilim';
@@ -69,3 +69,4 @@ abstract class AppStrings {
       "Kechirasiz, siz kiritgan kalit soʻz topilmadi. Iltimos, yana tekshiring yoki boshqa kalit soʻz bilan qidiring.";
   static const String result = 'Natija';
 }
+

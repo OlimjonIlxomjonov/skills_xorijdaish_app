@@ -7,6 +7,7 @@ import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/countries/countries_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/countries/countries_state.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses_event.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/foreign_languages_page.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/single_course/single_course_page.dart';
 
 import '../../../../../core/common/constants/colors/app_colors.dart';
@@ -24,7 +25,8 @@ class ChooseCountryPage extends StatefulWidget {
 }
 
 class _ChooseCountryPageState extends State<ChooseCountryPage> {
-  int itemSelected = 0;
+  int itemSelected = -1;
+  int? selectedCount;
 
   @override
   void initState() {
@@ -148,6 +150,7 @@ class _ChooseCountryPageState extends State<ChooseCountryPage> {
                               onTap: () {
                                 setState(() {
                                   itemSelected = index;
+                                  selectedCount = country.id;
                                 });
                               },
                               contentPadding: EdgeInsets.zero,
@@ -166,13 +169,14 @@ class _ChooseCountryPageState extends State<ChooseCountryPage> {
                                   fontSize: 16,
                                 ),
                               ),
-                              trailing: Icon(
-                                country.isActive
-                                    ? IconlyBold.tick_square
-                                    : null,
-                                color: AppColors.white,
-                                size: appH(24),
-                              ),
+                              trailing:
+                                  isSelected
+                                      ? Icon(
+                                        IconlyBold.tick_square,
+                                        color: AppColors.white,
+                                        size: appH(24),
+                                      )
+                                      : null,
                             ),
                           ),
                         );
@@ -204,8 +208,11 @@ class _ChooseCountryPageState extends State<ChooseCountryPage> {
         ),
         child: BasicButtonWg(
           text: AppStrings.contunie,
+          isEnabled: selectedCount != null,
           onTap: () {
-            AppRoute.go(SingleCoursePage());
+            if (selectedCount != null) {
+              AppRoute.go(ForeignLanguagesPage(cardTitle: 'foreign-languages'));
+            }
           },
         ),
       ),

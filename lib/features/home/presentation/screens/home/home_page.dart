@@ -7,6 +7,7 @@ import 'package:skills_xorijdaish/core/common/textstyles/sans_text_style.dart';
 import 'package:skills_xorijdaish/core/configs/assets/app_images.dart';
 import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/courses_page.dart';
+import 'package:skills_xorijdaish/features/home/presentation/screens/home/notifications/app_notifications.dart';
 import 'package:skills_xorijdaish/features/home/presentation/screens/search/search_page.dart';
 import 'package:skills_xorijdaish/features/one_id_web_view.dart';
 
@@ -69,12 +70,10 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: Icon(IconlyLight.notification, size: appH(28)),
-            onPressed: () {},
+            onPressed: () {
+              AppRoute.go(AppNotifications());
+            },
           ),
-          // IconButton(
-          //   icon: Icon(IconlyLight.bookmark, size: appH(28)),
-          //
-          // ),
         ],
       ),
       body: SingleChildScrollView(
@@ -221,7 +220,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(
-                  height: appH(290),
+                  height: appH(295),
                   child: ListView.builder(
                     itemCount: 3,
                     scrollDirection: Axis.horizontal,

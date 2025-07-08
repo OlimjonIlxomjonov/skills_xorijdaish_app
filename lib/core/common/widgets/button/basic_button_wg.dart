@@ -6,8 +6,14 @@ import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart'
 class BasicButtonWg extends StatelessWidget {
   final String text;
   final VoidCallback onTap;
+  final bool isEnabled;
 
-  const BasicButtonWg({super.key, required this.text, required this.onTap});
+  const BasicButtonWg({
+    super.key,
+    required this.text,
+    required this.onTap,
+    this.isEnabled = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +22,13 @@ class BasicButtonWg extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 15),
         minimumSize: Size(double.infinity, appH(51)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        backgroundColor: AppColors.appBg,
+        backgroundColor: isEnabled ? AppColors.appBg : Colors.grey.shade300,
       ),
-      onPressed: onTap,
+      onPressed: isEnabled ? onTap : null,
       child: Text(
         text,
         style: AppTextStyles.source.medium(
-          color: AppColors.white,
+          color: isEnabled ? AppColors.white : Colors.black45,
           fontSize: 16,
         ),
       ),
