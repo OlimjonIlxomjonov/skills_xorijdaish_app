@@ -49,22 +49,37 @@ class _ReelsScreenState extends State<ReelsScreen> {
             final reels = state.response.data;
             return Stack(
               children: [
-                NotificationListener<ScrollNotification>(
-                  onNotification: (scrollNotification) {
-                    print("Scrolled: \${scrollNotification.metrics.pixels}");
-                    return false;
+                PageView.builder(
+                  controller: _pageController,
+                  scrollDirection: Axis.vertical,
+                  itemCount: reels.isEmpty ? 1 : reels.length,
+                  physics:
+                      reels.length <= 1
+                          ? const NeverScrollableScrollPhysics()
+                          : const BouncingScrollPhysics(),
+                  onPageChanged: (index) {
+                    setState(() => currentPage = index.toDouble());
                   },
-                  child: PageView.builder(
-                    controller: _pageController,
-                    scrollDirection: Axis.vertical,
-                    itemCount: reels.length,
-                    itemBuilder: (context, index) {
-                      final item = reels[index];
-                      final double distance = (currentPage - index).abs();
-                      final double opacity = (1.0 - distance).clamp(0.0, 1.0);
-                      return ReelItem(reel: item, opacity: opacity);
-                    },
-                  ),
+                  itemBuilder: (context, index) {
+                    if (reels.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'No videos available',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    }
+
+                    final item = reels[index];
+                    final double distance = (currentPage - index).abs();
+                    final double opacity = (1.0 - distance).clamp(0.0, 1.0);
+
+                    return ReelItem(
+                      reel: item,
+                      opacity: opacity,
+                      isVisible: index == currentPage.floor(),
+                    );
+                  },
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 30),

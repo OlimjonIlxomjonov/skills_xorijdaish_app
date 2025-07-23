@@ -21,7 +21,7 @@ class ForeignLanguageModel extends ForeignLanguageEntity {
   factory ForeignLanguageModel.fromJson(Map<String, dynamic> json) {
     return ForeignLanguageModel(
       id: json['id'],
-      title: json['title'],
+      title: json['title'] ?? '',
       isStarted: json['is_started'],
       filesCount: json['files_count'],
       lessonsCount: json['lessons_count'],

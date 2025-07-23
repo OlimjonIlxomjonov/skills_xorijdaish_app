@@ -7,6 +7,7 @@ class SelfProfileEntity {
   final String passportData;
   final String? birthDate;
   final String pinfl;
+  final bool isVerified;
   final String avatar;
   final String? phoneNumber;
 
@@ -17,11 +18,10 @@ class SelfProfileEntity {
     this.lastName,
     this.middleName,
     required this.passportData,
-    required this.birthDate,
+    this.birthDate,
     required this.pinfl,
+    required this.isVerified,
     required this.avatar,
     this.phoneNumber,
   });
-
-
 }

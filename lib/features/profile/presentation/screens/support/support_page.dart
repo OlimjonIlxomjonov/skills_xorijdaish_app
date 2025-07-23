@@ -4,13 +4,20 @@ import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
 import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/user_info_storage.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/screens/support/create_ticket.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/support/tickets_page.dart';
 import '../../../../../core/common/widgets/button/basic_button_wg.dart';
 import 'no_tickets_page.dart';
 
-class SupportPage extends StatelessWidget {
+class SupportPage extends StatefulWidget {
   const SupportPage({super.key});
 
+  @override
+  State<SupportPage> createState() => _SupportPageState();
+}
+
+class _SupportPageState extends State<SupportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +41,7 @@ class SupportPage extends StatelessWidget {
               ),
             ),
             SizedBox(height: appH(20)),
-            TicketsPage(),
+            userInfo.response == true ? NoTicketsPage() : TicketsPage(),
           ],
         ),
       ),
@@ -54,7 +61,12 @@ class SupportPage extends StatelessWidget {
             topRight: Radius.circular(24),
           ),
         ),
-        child: BasicButtonWg(text: '+ Yangi tikket yaratish', onTap: () {}),
+        child: BasicButtonWg(
+          text: '+ Yangi tikket yaratish',
+          onTap: () {
+            AppRoute.go(CreateTicket());
+          },
+        ),
       ),
     );
   }

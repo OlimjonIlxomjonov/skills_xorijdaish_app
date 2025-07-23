@@ -1,4 +1,3 @@
-import '../../../../data/models/countries_model.dart';
 import '../../countries_entity.dart';
 
 class ForeignLanguageEntity {
@@ -29,6 +28,4 @@ class ForeignLanguageEntity {
     required this.imageUrl,
     required this.country,
   });
-
-
 }

@@ -4,6 +4,8 @@ import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
 
+import '../screens/statistic_page.dart';
+
 class WeeklyBarChart extends StatelessWidget {
   final Map<String, double> data;
 
@@ -15,16 +17,8 @@ class WeeklyBarChart extends StatelessWidget {
     final maxY =
         entries.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.2;
 
-    final todayIndex =
-        <int, int>{
-          DateTime.monday: 0, // Du
-          DateTime.tuesday: 1, // Se
-          DateTime.wednesday: 2, // Cho
-          DateTime.thursday: 3, // Pa
-          DateTime.friday: 4, // Ju
-          DateTime.saturday: 5, // Sha
-          DateTime.sunday: 6, // Bugun
-        }[DateTime.now().weekday]!;
+    final todayLabel = getWeekdayLabel(DateTime.now().weekday % 7);
+    final todayIndex = entries.indexWhere((e) => e.key == todayLabel);
 
     return AspectRatio(
       aspectRatio: 1.7,

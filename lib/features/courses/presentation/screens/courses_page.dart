@@ -4,6 +4,7 @@ import 'package:iconly/iconly.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
+import 'package:skills_xorijdaish/core/common/widgets/flush_bar/flush_bar_wg.dart';
 import 'package:skills_xorijdaish/core/configs/assets/app_images.dart';
 import 'package:skills_xorijdaish/core/common/constants/strings/app_strings.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
@@ -12,10 +13,13 @@ import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart'
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses/course_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses/course_state.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses_event.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/screens/country/choose_country_lessons.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/screens/country/choose_country_page.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/soft_skills_page.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/screens/tests/tests_page.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/my_courses/my_course_bloc.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/my_courses/my_course_state.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/courses/foreign_languages_page.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/courses/pretrip_courses.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/courses/skill_test.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/courses/soft_skills_page.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/single_course/single_course_page.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class CoursesPage extends StatefulWidget {
@@ -34,6 +38,7 @@ class _CoursesPageState extends State<CoursesPage>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     context.read<CourseBloc>().add(getCoursesEvent());
+    context.read<MyCourseBloc>().add(MyCoursesEvent());
   }
 
   @override
@@ -46,24 +51,21 @@ class _CoursesPageState extends State<CoursesPage>
     'Xorij tillari',
     "Safar oldi ko'niktirish",
     'Soft skills',
+    'Skill test',
   ];
 
   List coursePic = [
     AppImages.grandHat,
     AppImages.courseGlobe,
     AppImages.courseBook,
+    AppImages.skillTest,
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: CustomAppBar(
-        titleText: 'Kurslarimiz',
-        onTap: () {
-          AppRoute.close();
-        },
-      ),
+      appBar: CustomAppBar(titleText: 'Kurslarimiz'),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
@@ -178,11 +180,17 @@ class _CoursesPageState extends State<CoursesPage>
                     return GestureDetector(
                       onTap: () {
                         if (index == 0) {
-                          AppRoute.replace(ChooseCountryPage());
+                          AppRoute.go(
+                            ForeignLanguagesPage(
+                              cardTitle: 'foreign-languages',
+                            ),
+                          );
                         } else if (index == 1) {
-                          AppRoute.replace(ChooseCountryLessons());
+                          AppRoute.go(LessonsPage(query: 'pre-trip-courses'));
                         } else if (index == 2) {
                           AppRoute.go(SoftSkillsPage(query: 'soft-skills'));
+                        } else if (index == 3) {
+                          AppRoute.go(SkillTestPage());
                         }
                       },
                       child: Container(
@@ -225,9 +233,9 @@ class _CoursesPageState extends State<CoursesPage>
                 ),
               );
             } else if (state is CourseError) {
-              return Text(state.message);
+              return Text('Error');
             }
-            return Text('Token Expired!');
+            return SizedBox.shrink();
           },
         ),
       ],
@@ -235,72 +243,97 @@ class _CoursesPageState extends State<CoursesPage>
   }
 
   Widget _buildMyCourses() {
-    return ListView.builder(
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return Container(
-          margin: EdgeInsets.only(bottom: 20, left: 2, right: 2, top: 2),
-          padding: EdgeInsets.symmetric(
-            horizontal: appW(16),
-            vertical: appH(15),
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: AppColors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade100,
-                spreadRadius: 1,
-                blurRadius: 3,
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Rus Tili (Potent)',
-                    style: AppTextStyles.source.semiBold(
-                      color: AppColors.black,
-                      fontSize: 18,
-                    ),
+    return BlocConsumer<MyCourseBloc, MyCourseState>(
+      builder: (context, state) {
+        if (state is MyCourseLoading) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is MyCourseLoaded) {
+          return ListView.builder(
+            itemCount: state.response.data.length,
+            itemBuilder: (context, index) {
+              final my = state.response.data[index];
+              return GestureDetector(
+                onTap: () {
+                  AppRoute.go(SingleCoursePage(courseId: my.id));
+                },
+                child: Container(
+                  margin: EdgeInsets.only(
+                    bottom: 20,
+                    left: 2,
+                    right: 2,
+                    top: 2,
                   ),
-                  Text(
-                    '2 soat 25 daqiqa',
-                    style: AppTextStyles.source.medium(
-                      color: AppColors.textGrey,
-                      fontSize: 14,
-                    ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: appW(16),
+                    vertical: appH(15),
                   ),
-                ],
-              ),
-              CircularStepProgressIndicator(
-                totalSteps: 100,
-                currentStep: 50,
-                stepSize: 10,
-                selectedColor: AppColors.secondBlue,
-                unselectedColor: Colors.grey[200],
-                padding: 0,
-                width: appW(80),
-                height: appH(80),
-                selectedStepSize: 10,
-                roundedCap: (_, __) => true,
-                child: Center(
-                  child: Text(
-                    '50%',
-                    style: AppTextStyles.source.bold(
-                      color: AppColors.black,
-                      fontSize: 18,
-                    ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: AppColors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade100,
+                        spreadRadius: 1,
+                        blurRadius: 3,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            my.title,
+                            style: AppTextStyles.source.semiBold(
+                              color: AppColors.black,
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(
+                            my.humanSeconds,
+                            style: AppTextStyles.source.medium(
+                              color: AppColors.textGrey,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                      CircularStepProgressIndicator(
+                        totalSteps: 100,
+                        currentStep: my.progress,
+                        stepSize: 10,
+                        selectedColor: AppColors.secondBlue,
+                        unselectedColor: Colors.grey[200],
+                        padding: 0,
+                        width: appW(80),
+                        height: appH(80),
+                        selectedStepSize: 10,
+                        roundedCap: (_, __) => true,
+                        child: Center(
+                          child: Text(
+                            '${my.progress}%',
+                            style: AppTextStyles.source.bold(
+                              color: AppColors.black,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-        );
+              );
+            },
+          );
+        }
+        return SizedBox.shrink();
+      },
+      listener: (context, state) {
+        if (state is MyCourseError) {
+          showErrorFlushbar(context, 'Xato!');
+        }
       },
     );
   }

@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/constants/strings/app_strings.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
+import 'package:skills_xorijdaish/features/statistics/presentation/bloc/average/average_bloc.dart';
+import 'package:skills_xorijdaish/features/statistics/presentation/bloc/average/average_state.dart';
+import 'package:skills_xorijdaish/features/statistics/presentation/bloc/course/course_time_bloc.dart';
+import 'package:skills_xorijdaish/features/statistics/presentation/bloc/course/course_time_state.dart';
+import 'package:skills_xorijdaish/features/statistics/presentation/bloc/stats_event.dart';
+import 'package:skills_xorijdaish/features/statistics/presentation/bloc/weekly/week_bloc.dart';
+import 'package:skills_xorijdaish/features/statistics/presentation/bloc/weekly/week_stats.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 import '../widget/weekly_bar_chart_wg.dart';
 
@@ -15,16 +24,6 @@ class StatisticPage extends StatefulWidget {
 }
 
 class _StatisticPageState extends State<StatisticPage> {
-  final Map<String, double> _weeklyData = {
-    'Du': 1.2,
-    'Se': 2.5,
-    'Cho': 0.8,
-    'Pa': 3.0,
-    'Ju': 2.2,
-    'Sha': 1.1,
-    'Ya': 1.35,
-  };
-
   DateTime selectedDate = DateTime.now();
   DateTime currentWeekStart = DateTime.now().subtract(
     Duration(days: DateTime.now().weekday - 1),
@@ -53,19 +52,6 @@ class _StatisticPageState extends State<StatisticPage> {
     return months[month - 1];
   }
 
-  String getWeekdayLabel(int weekday) {
-    const labels = {
-      DateTime.monday: 'Du',
-      DateTime.tuesday: 'Se',
-      DateTime.wednesday: 'Cho',
-      DateTime.thursday: 'Pa',
-      DateTime.friday: 'Ju',
-      DateTime.saturday: 'Sha',
-      DateTime.sunday: 'Ya',
-    };
-    return labels[weekday]!;
-  }
-
   void goToPreviousWeek() {
     setState(() {
       currentWeekStart = currentWeekStart.subtract(const Duration(days: 7));
@@ -78,6 +64,14 @@ class _StatisticPageState extends State<StatisticPage> {
       currentWeekStart = currentWeekStart.add(const Duration(days: 7));
       visibleStartIndex = 0;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<AverageBloc>().add(AverageEvent());
+    context.read<WeekBloc>().add(WeekEvent());
+    context.read<CourseTimeBloc>().add(CourseTimeEvent(selectedDate));
   }
 
   @override
@@ -103,12 +97,37 @@ class _StatisticPageState extends State<StatisticPage> {
                   fontSize: 18,
                 ),
               ),
-              Text(
-                '3 soat 58 daqiqa',
-                style: AppTextStyles.source.semiBold(
-                  color: AppColors.black,
-                  fontSize: 28,
-                ),
+              BlocBuilder<AverageBloc, AverageState>(
+                builder: (context, state) {
+                  if (state is AverageLoading) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 20),
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: appH(10),
+                            horizontal: appW(16),
+                          ),
+                          height: appH(35),
+                          decoration: BoxDecoration(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  } else if (state is AverageError) {
+                    return Text('Error');
+                  } else if (state is AverageLoaded) {
+                    return Text(
+                      state.response.data.activeTimesInHumanReadable,
+                      style: AppTextStyles.source.semiBold(
+                        color: AppColors.black,
+                        fontSize: 28,
+                      ),
+                    );
+                  }
+                  return SizedBox.shrink();
+                },
               ),
               const SizedBox(height: 8),
               Text(
@@ -118,7 +137,42 @@ class _StatisticPageState extends State<StatisticPage> {
                   fontSize: 16,
                 ),
               ),
-              WeeklyBarChart(data: _weeklyData),
+              BlocBuilder<WeekBloc, WeekStats>(
+                builder: (context, state) {
+                  if (state is WeekStatsLoading) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 20),
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            vertical: appH(10),
+                            horizontal: appW(16),
+                          ),
+                          height: appH(160),
+                          decoration: BoxDecoration(color: Colors.white),
+                        ),
+                      ),
+                    );
+                    ;
+                  } else if (state is WeekStatsError) {
+                    return Text("Xatolik: ${state.message}");
+                  } else if (state is WeekStatsLoaded) {
+                    final dataList = state.response.data;
+                    final Map<String, double> chartData = {
+                      for (var item in dataList)
+                        getWeekdayLabel(item.weekday):
+                            item.activeTimesInSeconds.toDouble() / 60,
+                    };
+                    return WeeklyBarChart(data: chartData);
+                    // return Text('Test');
+                  }
+
+                  return const SizedBox.shrink();
+                },
+              ),
+
               const SizedBox(height: 24),
               Text(
                 'Kurslar uchun ajratilgan vaqt',
@@ -138,75 +192,147 @@ class _StatisticPageState extends State<StatisticPage> {
     );
   }
 
-  ListView courseTime() {
-    return ListView.builder(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: 3,
-      itemBuilder: (context, index) {
-        return Container(
-          margin: EdgeInsets.only(bottom: 20, left: 2, right: 2, top: 2),
-          padding: EdgeInsets.symmetric(
-            horizontal: appW(16),
-            vertical: appH(15),
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: AppColors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade100,
-                spreadRadius: 1,
-                blurRadius: 3,
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Rus Tili (Potent)',
-                    style: AppTextStyles.source.semiBold(
-                      color: AppColors.black,
-                      fontSize: 18,
+  Widget courseTime() {
+    return BlocBuilder<CourseTimeBloc, CourseTimeState>(
+      builder: (context, state) {
+        if (state is CourseTimeStateLoading) {
+          return SizedBox(
+            height: appH(300),
+            child: ListView.builder(
+              itemCount: 3,
+              itemBuilder: (_, __) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 20),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.textGrey, width: 0.3),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            spacing: 10,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: appH(10),
+                                  horizontal: appW(16),
+                                ),
+                                width: appH(155),
+                                decoration: BoxDecoration(color: Colors.white),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: appH(10),
+                                  horizontal: appW(16),
+                                ),
+                                width: appH(55),
+                                decoration: BoxDecoration(color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          Expanded(child: Container()),
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: appH(40),
+                              horizontal: appW(46),
+                            ),
+                            height: appH(80),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Text(
-                    '2 soat 25 daqiqa',
-                    style: AppTextStyles.source.medium(
-                      color: AppColors.textGrey,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-              CircularStepProgressIndicator(
-                totalSteps: 100,
-                currentStep: 50,
-                stepSize: 10,
-                selectedColor: AppColors.secondBlue,
-                unselectedColor: Colors.grey[200],
-                padding: 0,
-                width: appW(80),
-                height: appH(80),
-                selectedStepSize: 10,
-                roundedCap: (_, __) => true,
-                child: Center(
-                  child: Text(
-                    '50%',
-                    style: AppTextStyles.source.bold(
-                      color: AppColors.black,
-                      fontSize: 18,
-                    ),
-                  ),
+                );
+              },
+            ),
+          );
+        } else if (state is CourseTimeStateError) {
+          return Text('Error');
+        } else if (state is CourseTimeStateLoaded) {
+          return ListView.builder(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: state.response.data.length,
+            itemBuilder: (context, index) {
+              final time = state.response.data[index];
+              return Container(
+                margin: EdgeInsets.only(bottom: 20, left: 2, right: 2, top: 2),
+                padding: EdgeInsets.symmetric(
+                  horizontal: appW(16),
+                  vertical: appH(15),
                 ),
-              ),
-            ],
-          ),
-        );
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  color: AppColors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade100,
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          time.title,
+                          style: AppTextStyles.source.semiBold(
+                            color: AppColors.black,
+                            fontSize: 18,
+                          ),
+                        ),
+                        Text(
+                          time.activeTimesInHumanReadable,
+                          style: AppTextStyles.source.medium(
+                            color: AppColors.textGrey,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    CircularStepProgressIndicator(
+                      totalSteps: 100,
+                      currentStep: time.progress,
+                      stepSize: 10,
+                      selectedColor: AppColors.secondBlue,
+                      unselectedColor: Colors.grey[200],
+                      padding: 0,
+                      width: appW(80),
+                      height: appH(80),
+                      selectedStepSize: 10,
+                      roundedCap: (_, __) => true,
+                      child: Center(
+                        child: Text(
+                          "${time.progress}%",
+                          style: AppTextStyles.source.bold(
+                            color: AppColors.black,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+        return SizedBox.shrink();
       },
     );
   }
@@ -268,7 +394,6 @@ class _StatisticPageState extends State<StatisticPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Left arrow inside week
               if (visibleStartIndex > 0)
                 GestureDetector(
                   onTap: () {
@@ -302,17 +427,14 @@ class _StatisticPageState extends State<StatisticPage> {
                         date.day == selectedDate.day &&
                         date.month == selectedDate.month &&
                         date.year == selectedDate.year;
-
-                    // final isToday =
-                    //     DateTime.now().day == date.day &&
-                    //     DateTime.now().month == date.month &&
-                    //     DateTime.now().year == date.year;
-
                     return GestureDetector(
                       onTap: () {
                         setState(() {
                           selectedDate = date;
                         });
+                        context.read<CourseTimeBloc>().add(
+                          CourseTimeEvent(selectedDate),
+                        );
                       },
                       child: Container(
                         // width: appW(45),
@@ -381,4 +503,17 @@ class _StatisticPageState extends State<StatisticPage> {
       ),
     );
   }
+}
+
+String getWeekdayLabel(int weekday) {
+  const labels = {
+    1: 'Du',
+    2: 'Se',
+    3: 'Cho',
+    4: 'Pa',
+    5: 'Ju',
+    6: 'Sha',
+    0: 'Ya',
+  };
+  return labels[weekday] ?? 'Ya';
 }

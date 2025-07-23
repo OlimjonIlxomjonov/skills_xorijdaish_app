@@ -3,7 +3,14 @@ import 'package:skills_xorijdaish/features/courses/domain/entities/courses/cours
 class CoursesCategoryModel extends CourseCategory {
   CoursesCategoryModel({required super.stars, required super.count});
 
-  factory CoursesCategoryModel.fromJson(Map<String, dynamic> json) {
-    return CoursesCategoryModel(stars: json['stars'], count: json['count']);
+  factory CoursesCategoryModel.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return CoursesCategoryModel(stars: '0', count: 0);
+    }
+
+    return CoursesCategoryModel(
+      stars: json['stars']?.toString() ?? '0',
+      count: json['count'] ?? 0,
+    );
   }
 }

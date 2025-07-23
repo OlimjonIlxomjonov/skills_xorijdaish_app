@@ -25,8 +25,7 @@ class ReelsModel extends ReelsEntity {
       isLiked: json['is_liked'] ?? false,
       likes: json['likes'] ?? 0,
       views: json['views'] ?? 0,
-        url: json['url'] ?? 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4',
-
+      url: json['url'] ?? '',
     );
   }
 

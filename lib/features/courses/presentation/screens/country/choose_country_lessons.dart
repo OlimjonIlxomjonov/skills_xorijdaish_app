@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
@@ -7,9 +8,8 @@ import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/countries/countries_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/countries/countries_state.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses_event.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/foreign_languages_page.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/pretrip_courses.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/screens/single_course/single_course_page.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/courses/pretrip_courses.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/user_info_storage.dart';
 
 import '../../../../../core/common/constants/colors/app_colors.dart';
 import '../../../../../core/common/constants/strings/app_strings.dart';
@@ -62,7 +62,7 @@ class _ChooseCountryLessonsState extends State<ChooseCountryLessons> {
                 ),
                 SizedBox(height: appH(10)),
                 Text(
-                  'Afzal Pulatov',
+                  userInfo.fullName ?? '',
                   style: SansTextStyle().semiBold(
                     color: AppColors.black,
                     fontSize: 16,
@@ -157,10 +157,13 @@ class _ChooseCountryLessonsState extends State<ChooseCountryLessons> {
 
                               contentPadding: EdgeInsets.zero,
                               leading: CircleAvatar(
-                                // backgroundColor: AppColors.grey,
-                                backgroundImage: NetworkImage(country.iconUrl),
                                 radius: 25,
+                                backgroundColor: Colors.grey.shade100,
+                                child: ClipOval(
+                                  child: buildCountryIcon(country.icon),
+                                ),
                               ),
+
                               title: Text(
                                 country.title,
                                 style: AppTextStyles.source.medium(
@@ -213,15 +216,32 @@ class _ChooseCountryLessonsState extends State<ChooseCountryLessons> {
           isEnabled: selectedCount != null,
           onTap: () {
             if (selectedCount != null) {
-              AppRoute.go(
-                LessonsPage(
-                  query: 'pre-trip-courses',
-                  countryId: selectedCount!,
-                ),
-              );
+              AppRoute.go(LessonsPage(query: 'pre-trip-courses'));
             }
           },
         ),
+      ),
+    );
+  }
+
+  Widget buildCountryIcon(String rawUrlOrPath) {
+    final fullUrl =
+        rawUrlOrPath.startsWith('http')
+            ? rawUrlOrPath
+            : 'https://api-skills.xorijdaish.uz/storage/$rawUrlOrPath';
+
+    return ClipOval(
+      child: CachedNetworkImage(
+        imageUrl: fullUrl,
+        width: 50,
+        height: 50,
+        fit: BoxFit.cover,
+        placeholder:
+            (context, url) => const CircularProgressIndicator(strokeWidth: 2),
+        errorWidget: (context, url, error) {
+          debugPrint('⚠️ Image failed to load: $url\nError: $error');
+          return const Icon(Icons.flag, size: 32, color: Colors.grey);
+        },
       ),
     );
   }

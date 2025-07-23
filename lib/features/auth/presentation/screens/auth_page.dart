@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/constants/strings/app_strings.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
+import 'package:skills_xorijdaish/core/configs/assets/app_images.dart';
 import 'package:skills_xorijdaish/core/configs/assets/app_vectors.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
 import 'package:skills_xorijdaish/features/one_id_web_view.dart';
@@ -86,15 +87,29 @@ class _AuthPageState extends State<AuthPage> {
                         ),
                         backgroundColor: AppColors.appBg,
                       ),
-                      onPressed: () async {
-                        final token = await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => OneIDLoginPage2()),
-                        );
-                        if (token != null) {
-                          logger.i('Access token: $token');
-                        }
-                      },
+                      onPressed:
+                          isChecked
+                              ? () async {
+                                final token = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => OneIDLoginPage2(),
+                                  ),
+                                );
+                                if (token != null) {
+                                  logger.i('Access token: $token');
+                                }
+                                if (!isChecked) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Maxfiylik siyosatimizni qabul qiling',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                              : null,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         spacing: 12,
@@ -111,6 +126,9 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                     ),
                   ),
+                  Spacer(),
+                  Image.asset(AppImages.migration),
+                  SizedBox(height: appH(30)),
                 ],
               ),
             ),

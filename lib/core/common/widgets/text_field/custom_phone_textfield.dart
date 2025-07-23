@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
+import '../../constants/colors/app_colors.dart';
+
 class CustomPhoneTextField extends StatefulWidget {
-  const CustomPhoneTextField({super.key});
+  final TextEditingController controller;
+
+  const CustomPhoneTextField({super.key, required this.controller});
 
   @override
   State<CustomPhoneTextField> createState() => _CustomPhoneTextFieldState();
@@ -30,27 +34,36 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return IntlPhoneField(
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.white,
-        hintText: 'Raqamni kirting',
-        contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 2),
+      decoration: BoxDecoration(
+        border: Border.all(color: AppColors.inputGreyColor, width: 2),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: IntlPhoneField(
+        controller: widget.controller,
+        decoration: InputDecoration(
+          filled: true,
+          fillColor: Colors.white,
+          hintText: '000-00-00',
+          contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+          // border: OutlineInputBorder(
+          //   borderRadius: BorderRadius.circular(10),
+          //   borderSide: BorderSide(color: AppColors.textGrey),
+          // ),
+          border: InputBorder.none,
         ),
+        initialCountryCode: 'UZ',
+        disableLengthCheck: true,
+        showDropdownIcon: true,
+        dropdownIcon: Icon(
+          Icons.arrow_drop_down,
+          color: Colors.transparent,
+          size: 10,
+        ),
+        keyboardType: TextInputType.number,
+        style: TextStyle(fontSize: 16),
       ),
-      initialCountryCode: 'UZ',
-      disableLengthCheck: true,
-      showDropdownIcon: true,
-      dropdownIcon: Icon(
-        Icons.arrow_drop_down,
-        color: Colors.transparent,
-        size: 10,
-      ),
-      keyboardType: TextInputType.number,
-      style: TextStyle(fontSize: 16),
     );
   }
 }

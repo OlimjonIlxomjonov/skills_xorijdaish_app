@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:skills_xorijdaish/core/common/constants/api_urls.dart';
-import 'package:skills_xorijdaish/core/services/token_storage/token_storage_service_impl.dart'; // Assuming you're using this Hive wrapper
+import 'package:skills_xorijdaish/core/services/token_storage/token_storage_service_impl.dart';
 
 class DioClient {
   final Dio _dio;
@@ -11,10 +11,7 @@ class DioClient {
           baseUrl: ApiUrls.baseUrl,
           connectTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
+          headers: {'Accept': 'application/json'},
         ),
       ) {
     // Logging

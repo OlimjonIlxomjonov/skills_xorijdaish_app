@@ -23,13 +23,11 @@ class OneIDLoginPage2State extends State<OneIDLoginPage2> {
   void initState() {
     super.initState();
 
-    _clearWebViewCookies();
-
     final String authUrl =
         'https://sso.egov.uz/sso/oauth/Authorization.do'
         '?response_type=one_code'
         '&client_id=skills_xorijdaish'
-        '&redirect_uri=https://skills.avacoder.uz/one-id/login'
+        '&redirect_uri=https://admin-skills.xorijdaish.uz/one-id/login'
         '&scope=skills_xorijdaish'
         '&state=testState';
 
@@ -39,32 +37,26 @@ class OneIDLoginPage2State extends State<OneIDLoginPage2> {
           ..setNavigationDelegate(
             NavigationDelegate(
               onNavigationRequest: (request) async {
-                logger.i("💡 Navigating to: ${request.url}");
+                final url = request.url;
+                logger.i("💡 Navigating to: $url");
 
-                if (request.url.contains('access_token=')) {
-                  final uri = Uri.parse(request.url);
-                  final token = uri.queryParameters['access_token'];
-                  logger.i("Extracted access token: $token");
+                if (url.contains('/one-id/success/')) {
+                  final uri = Uri.parse(url);
+                  final token = uri.pathSegments.last;
+                  logger.i("✅ Token from success path: $token");
 
-                  if (token != null && token.isNotEmpty) {
+                  if (token.isNotEmpty) {
                     await TokenStorageServiceImpl().saveAccessToken(token);
                     DioClient().setToken(token);
                     AppRoute.open(AppBottomNav());
                   }
-                  return NavigationDecision.prevent;
-                }
 
-                if (request.url.startsWith(
-                  'https://admin-skills.xorijdaish.uz/one-id/login',
-                )) {
-                  final uri = Uri.parse(request.url);
-                  final code = uri.queryParameters['code'];
-                  logger.i("Extracted code: $code");
                   return NavigationDecision.prevent;
                 }
 
                 return NavigationDecision.navigate;
               },
+
               onPageStarted: (_) {
                 setState(() {
                   isLoading = true;
@@ -78,11 +70,6 @@ class OneIDLoginPage2State extends State<OneIDLoginPage2> {
             ),
           )
           ..loadRequest(Uri.parse(authUrl));
-  }
-
-  Future<void> _clearWebViewCookies() async {
-    final cookieManager = WebViewCookieManager();
-    await cookieManager.clearCookies();
   }
 
   @override

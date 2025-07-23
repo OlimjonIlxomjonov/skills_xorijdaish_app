@@ -39,14 +39,16 @@ class _AppBottomNavState extends State<AppBottomNav> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(color: Colors.white),
+        Container(
+          color: _currentIndex == 3 ? Color(0xff1C1C25) : AppColors.white,
+        ),
         Scaffold(
           backgroundColor: Colors.transparent,
           body: pages[_currentIndex],
           bottomNavigationBar: Container(
             padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: _currentIndex == 3 ? Color(0xff1C1C25) : AppColors.white,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
@@ -55,17 +57,14 @@ class _AppBottomNavState extends State<AppBottomNav> {
             ),
             child: GNav(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              // FIX 1
               gap: 8,
               iconSize: appH(24),
-              // FIX 2: slightly smaller to prevent overflow
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              // FIX 3
               tabMargin: const EdgeInsets.symmetric(horizontal: 4),
-              // FIX 4
-              backgroundColor: AppColors.white,
+              backgroundColor:
+                  _currentIndex == 3 ? Color(0xff1C1C25) : AppColors.white,
               activeColor: AppColors.textBlue,
-              color: Colors.black,
+              color: _currentIndex == 3 ? Color(0xff9E9E9E) : AppColors.black,
               selectedIndex: _currentIndex,
               onTabChange: (index) {
                 setState(() => _currentIndex = index);
@@ -81,7 +80,7 @@ class _AppBottomNavState extends State<AppBottomNav> {
                 GButton(
                   icon: IconlyBold.document,
                   leading: Container(
-                    width: appW(44), // FIX 5: slight shrink to prevent overflow
+                    width: appW(44),
                     height: appH(44),
                     decoration: BoxDecoration(
                       color: AppColors.appBg,

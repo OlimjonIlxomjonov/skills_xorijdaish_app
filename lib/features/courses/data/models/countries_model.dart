@@ -13,15 +13,16 @@ class CountryModel extends CountryEnt {
   });
 
   factory CountryModel.fromJson(Map<String, dynamic> json) {
+    final iconValue = json['icon'] ?? '';
     return CountryModel(
-      id: json['id'],
-      title: json['title'],
-      icon: json['icon'],
-      iconUrl: "https://skills.avacoder.uz/storage/${json['icon']}",
-      language: json['language'],
-      isActive: json['is_active'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      icon: iconValue,
+      iconUrl: "https://skills.avacoder.uz/storage/$iconValue",
+      language: json['language'] ?? '',
+      isActive: json['is_active'] ?? false,
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
     );
   }
 
@@ -36,5 +37,18 @@ class CountryModel extends CountryEnt {
       'created_at': createdAt,
       'updated_at': updatedAt,
     };
+  }
+
+  factory CountryModel.empty() {
+    return CountryModel(
+      id: 0,
+      title: '',
+      language: '',
+      icon: '',
+      isActive: false,
+      createdAt: '',
+      updatedAt: '',
+      iconUrl: '',
+    );
   }
 }

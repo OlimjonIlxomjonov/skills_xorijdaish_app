@@ -14,10 +14,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.white,
-        // leading: IconButton(
-        //   onPressed: onTap,
-        //   icon: Icon(IconlyLight.arrow_left),
-        // ),
         title: Text(
           titleText,
           style: AppTextStyles.source.semiBold(

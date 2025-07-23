@@ -17,33 +17,17 @@ class SoftSkillsModel extends SoftSkillsEntity {
 
   factory SoftSkillsModel.fromJson(Map<String, dynamic> json) {
     return SoftSkillsModel(
-      id: json['id'] as int,
-      title: json['title'] as String,
-      isStarted: json['is_started'] as bool,
-      filesCount: json['files_count'] as int,
-      lessonsCount: json['lessons_count'] as int,
-      stars: json['stars'] as String,
-      videosDurationInSeconds: json['videos_duration_in_seconds'] as int,
-      videosDuration: json['videos_duration'] as String,
-      createdAt: json['created_at'] as String,
-      updatedAt: json['updated_at'] as String,
-      imageUrl: json['image_url'] as String,
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      isStarted: json['is_started'] ?? false,
+      filesCount: json['files_count'] ?? 0,
+      lessonsCount: json['lessons_count'] ?? 0,
+      stars: json['stars'] ?? '',
+      videosDurationInSeconds: json['videos_duration_in_seconds'] ?? 0,
+      videosDuration: json['videos_duration'] ?? '',
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+      imageUrl: json['image_url'] ?? '',
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'is_started': isStarted,
-      'files_count': filesCount,
-      'lessons_count': lessonsCount,
-      'stars': stars,
-      'videos_duration_in_seconds': videosDurationInSeconds,
-      'videos_duration': videosDuration,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-      'image_url': imageUrl,
-    };
   }
 }

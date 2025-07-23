@@ -1,0 +1,63 @@
+import 'package:skills_xorijdaish/features/profile/domain/entity/support/support_user.dart';
+
+class SupportUserModel extends SupportUser {
+  SupportUserModel({
+    required super.id,
+    required super.name,
+    required super.email,
+    required super.createdAt,
+    required super.updatedAt,
+    required super.isAdmin,
+    required emailVerifiedAt,
+    required phoneNumber,
+    required surName,
+    required pin,
+    required userId,
+    required pportNo,
+    required midName,
+    required userType,
+    required firstName,
+    required fullName,
+    required gender,
+    required nationality,
+    required birthDate,
+    required citizenship,
+    required pportIssuedBy,
+    required pportIssuedDate,
+    required pportExpiryDate,
+    required image,
+    required fcmToken,
+    required avatar,
+  });
+
+  factory SupportUserModel.fromJson(Map<String, dynamic> json) {
+    return SupportUserModel(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      emailVerifiedAt: json['email_verified_at'],
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+      isAdmin: json['is_admin'] ?? false,
+      phoneNumber: json['phone_number'],
+      surName: json['sur_name'],
+      pin: json['pin'],
+      userId: json['user_id'],
+      pportNo: json['pport_no'],
+      midName: json['mid_name'],
+      userType: json['user_type'],
+      firstName: json['first_name'],
+      fullName: json['full_name'],
+      gender: json['gender'],
+      nationality: json['nationality'],
+      birthDate: json['birth_date'],
+      citizenship: json['citizenship'],
+      pportIssuedBy: json['pport_issued_by'],
+      pportIssuedDate: json['pport_issued_date'],
+      pportExpiryDate: json['pport_expiry_date'],
+      image: json['image'],
+      fcmToken: json['fcm_token'],
+      avatar: json['avatar'],
+    );
+  }
+}

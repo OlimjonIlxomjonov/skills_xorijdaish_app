@@ -1,47 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
+import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/profile_event.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/support/support_bloc.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/support/support_state.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/user_info_storage.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/screens/support/create_ticket.dart';
 
-class TicketsPage extends StatelessWidget {
+class TicketsPage extends StatefulWidget {
   const TicketsPage({super.key});
 
-  final List<Map<String, dynamic>> tickets = const [
-    {
-      'title': 'Pullik kurslar bo’yicha savollarim',
-      'date': '12.02.2025',
-      'status': 'approved',
-    },
-    {
-      'title': 'Rossiyaga ketish oldidan',
-      'date': '12.02.2025',
-      'status': 'pending',
-    },
-    {
-      'title': 'Ingliz tili kurslari uchun',
-      'date': '12.02.2025',
-      'status': 'rejected',
-    },
-    {
-      'title': 'Pullik kurslar bo’yicha savollarim',
-      'date': '12.02.2025',
-      'status': 'approved',
-    },
-  ];
+  @override
+  State<TicketsPage> createState() => _TicketsPageState();
+}
+
+class _TicketsPageState extends State<TicketsPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<SupportBloc>().add(SupportEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children:
-          tickets.map((ticket) {
-            return _buildTicket(
-              title: ticket['title'],
-              date: ticket['date'],
-              status: ticket['status'],
-              onTap: () {},
-            );
-          }).toList(),
+    return BlocBuilder<SupportBloc, SupportState>(
+      builder: (context, state) {
+        if (state is SupportLoading) {
+          return Center(child: CircularProgressIndicator());
+        } else if (state is SupportError) {
+          return Text('Error');
+        } else if (state is SupportLoaded) {
+          return Expanded(
+            child: ListView.builder(
+              itemCount: state.response.data.length,
+              itemBuilder: (context, index) {
+                userInfo.response = state.response.data.isEmpty;
+                final support = state.response.data[index];
+                return _buildTicket(
+                  title: support.title,
+                  date: support.createdAt,
+                  status: support.status,
+                  onTap: () {},
+                );
+              },
+            ),
+          );
+        }
+        return SizedBox.shrink();
+      },
     );
   }
 
@@ -57,13 +67,13 @@ class TicketsPage extends StatelessWidget {
     String statusText;
 
     switch (status) {
-      case 'approved':
+      case 'finished':
         bgColor = const Color(0xffE0FAEC);
         textColor = const Color(0xff1FC16B);
         icon = Icons.check_circle;
         statusText = 'Tasdiqlangan';
         break;
-      case 'pending':
+      case 'new':
         bgColor = const Color(0xffFFF4E7);
         textColor = const Color(0xffF7931E);
         icon = Icons.warning_amber_rounded;
@@ -95,7 +105,6 @@ class TicketsPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Left section (Title + Date)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -120,7 +129,6 @@ class TicketsPage extends StatelessWidget {
                 ),
               ],
             ),
-            // Right section (Status + Arrow)
             Row(
               children: [
                 Container(

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../../../features/courses/presentation/screens/single_course/single_course_buy.dart';
+import 'package:skills_xorijdaish/core/configs/assets/app_vectors.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses_event.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/get_courses_by_id/course_by_id_bloc.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/single_course/single_course_page.dart';
 import '../../../page_route/route_generator.dart';
 import '../../../utils/responsiveness/app_responsive.dart';
 import '../../constants/colors/app_colors.dart';
@@ -9,19 +14,25 @@ import '../../textstyles/app_text_styles.dart';
 import '../button/basic_button_wg.dart';
 
 class LessonsListWg extends StatelessWidget {
-  final String title;
-  final int fileCount;
-  final String stars;
+  final int courseId;
   final String image;
+  final String title;
+  final String stars;
   final int videoCount;
+  final int fileCount;
+  final String? language;
+  final bool isStarted;
 
   const LessonsListWg({
     super.key,
-    required this.title,
-    required this.fileCount,
-    required this.stars,
+    required this.courseId,
     required this.image,
+    required this.title,
+    required this.stars,
     required this.videoCount,
+    required this.fileCount,
+    this.language,
+    required this.isStarted,
   });
 
   @override
@@ -92,19 +103,40 @@ class LessonsListWg extends StatelessWidget {
             ),
           ),
           Text(
-            // 'Til (Basic)',
             title,
             style: AppTextStyles.source.semiBold(
               color: AppColors.black,
               fontSize: 16,
             ),
           ),
-          Text(
-            '⭐ $stars    📄 $fileCount fayl    ▶ ️${videoCount}ta video',
-            style: AppTextStyles.source.medium(
-              color: AppColors.black,
-              fontSize: 13,
-            ),
+          Row(
+            spacing: 10,
+            children: [
+              SvgPicture.asset(AppVectors.star),
+              Text(
+                stars,
+                style: AppTextStyles.source.medium(
+                  color: AppColors.black,
+                  fontSize: 13,
+                ),
+              ),
+              SvgPicture.asset(AppVectors.documentText),
+              Text(
+                "$fileCount ta fayl",
+                style: AppTextStyles.source.medium(
+                  color: AppColors.black,
+                  fontSize: 13,
+                ),
+              ),
+              SvgPicture.asset(AppVectors.play),
+              Text(
+                "$videoCount ta video",
+                style: AppTextStyles.source.medium(
+                  color: AppColors.black,
+                  fontSize: 13,
+                ),
+              ),
+            ],
           ),
           Container(
             margin: EdgeInsets.symmetric(vertical: 10),
@@ -126,7 +158,7 @@ class LessonsListWg extends StatelessWidget {
           BasicButtonWg(
             text: AppStrings.start,
             onTap: () {
-              AppRoute.go(SingleCourseBuy());
+              AppRoute.go(SingleCoursePage(courseId: courseId));
             },
           ),
         ],

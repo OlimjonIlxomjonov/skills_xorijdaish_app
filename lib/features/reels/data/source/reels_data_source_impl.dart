@@ -22,4 +22,21 @@ class ReelsDataSourceImpl implements ReelsDataSource {
       rethrow;
     }
   }
+
+  @override
+  Future<void> sendReelId({required int reelId}) async {
+    try {
+      final response = await dioClient.post("${ApiUrls.reelsLike}$reelId/like");
+      if (response.statusCode == 200 ||
+          response.statusCode == 201 ||
+          response.data['ok'] == true) {
+        logger.i('Liked!');
+      } else {
+        throw Exception('Could not liked! ${response.statusCode}');
+      }
+    } catch (e) {
+      logger.e('Error occured while liking the vid: $e');
+      rethrow;
+    }
+  }
 }

@@ -28,4 +28,8 @@ class AppImages {
 
   static const String sertifikatPagePaper = "${baseUrl}complate_paper$format";
   static const String certificate = '${baseUrl}real_certificate$format';
+
+  static const String migration = "${baseUrl}migration$format";
+  static const String skillTest = "${baseUrl}skill_test$format";
+  static const String paymentClick = "${baseUrl}click$format";
 }

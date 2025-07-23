@@ -5,9 +5,11 @@ import '../../constants/colors/app_colors.dart';
 class CustomTextfield extends StatefulWidget {
   final String hintText;
   final bool isPassword;
+  final TextEditingController? controller;
 
   const CustomTextfield({
     super.key,
+    this.controller,
     required this.hintText,
     this.isPassword = false,
   });
@@ -51,6 +53,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: TextField(
+        controller: widget.controller,
         focusNode: _focusNode,
         obscureText: widget.isPassword ? isObscured : false,
         decoration: InputDecoration(

@@ -4,6 +4,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
+import 'package:skills_xorijdaish/core/utils/logger/logger.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/profile_event.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/self_info/self_info_bloc.dart';
@@ -24,30 +25,28 @@ class SelfInformationPage extends StatelessWidget {
         child: BlocBuilder<SelfInfoBloc, SelfInfoState>(
           builder: (context, state) {
             if (state is SelfInfoLoading) {
-              return Expanded(
-                child: ListView.builder(
-                  itemCount: 4,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 20),
-                      child: Shimmer.fromColors(
-                        baseColor: Colors.grey.shade300,
-                        highlightColor: Colors.grey.shade100,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: appH(10),
-                            horizontal: appW(16),
-                          ),
-                          height: appH(64),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+              return ListView.builder(
+                itemCount: 4,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.only(bottom: 20),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey.shade300,
+                      highlightColor: Colors.grey.shade100,
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: appH(10),
+                          horizontal: appW(16),
+                        ),
+                        height: appH(64),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  );
+                },
               );
             } else if (state is SelfInfoError) {
               return Text(state.message);
@@ -55,6 +54,8 @@ class SelfInformationPage extends StatelessWidget {
               final info = state.entity;
               userInfo.fullName = info.name ?? '';
               userInfo.phoneNumber = info.phoneNumber ?? '';
+              userInfo.isVerified = info.isVerified;
+              logger.w(userInfo.isVerified);
 
               return Column(
                 spacing: 15,

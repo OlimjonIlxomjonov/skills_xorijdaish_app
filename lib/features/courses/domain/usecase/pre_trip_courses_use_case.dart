@@ -6,10 +6,7 @@ class PreTripCoursesUseCase {
 
   PreTripCoursesUseCase(this.repository);
 
-  Future<PreTripResponse> call({
-    required String query,
-    required int countryId,
-  }) {
-    return repository.fetchPreTripCourses(query: query, countryId: countryId);
+  Future<PreTripResponse> call({required String query}) {
+    return repository.fetchPreTripCourses(query: query);
   }
 }

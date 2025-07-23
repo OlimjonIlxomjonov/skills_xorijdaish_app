@@ -24,7 +24,7 @@ class PreTripModel extends PreTripEntity {
   factory PreTripModel.fromJson(Map<String, dynamic> json) {
     return PreTripModel(
       id: json['id'],
-      title: json['title'],
+      title: json['title'] ?? '',
       isStarted: json['is_started'],
       isBlocked: json['is_blocked'],
       filesCount: json['files_count'],

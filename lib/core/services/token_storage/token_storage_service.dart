@@ -4,4 +4,10 @@ abstract class TokenStorageService {
   String? getAccessToken();
 
   Future<void> deleteAccessToken();
+
+  Future<void> saveSessionId(String sessionId);
+
+  String? getSessionId();
+
+  Future<void> deleteSessionId();
 }

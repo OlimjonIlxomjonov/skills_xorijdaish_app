@@ -9,12 +9,16 @@ import 'package:skills_xorijdaish/core/common/constants/strings/app_strings.dart
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
 import 'package:skills_xorijdaish/core/common/widgets/button/basic_button_wg.dart';
+import 'package:skills_xorijdaish/core/common/widgets/flush_bar/flush_bar_wg.dart';
+import 'package:skills_xorijdaish/core/common/widgets/flush_bar/sucess_flesh_bar_wg.dart';
 import 'package:skills_xorijdaish/core/configs/assets/app_images.dart';
 import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
 import 'package:skills_xorijdaish/features/auth/presentation/screens/auth_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/profile_event.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/revoke_session/revoke_session_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/self_info/self_info_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/self_info/self_info_state.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/screens/active_sessions/active_session_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/certificates/certificates_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/notifications/notifications_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/self_information_page.dart';
@@ -23,6 +27,7 @@ import 'package:skills_xorijdaish/features/profile/presentation/screens/support/
 
 import '../../../../core/utils/logger/logger.dart';
 import '../../../../core/utils/responsiveness/app_responsive.dart';
+import '../bloc/sessions/session_bloc.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -70,12 +75,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
-  void initState() {
-    context.read<SelfInfoBloc>().add(SelfInfoEvent());
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -120,32 +119,68 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
             SizedBox(height: appH(12)),
-            BlocBuilder<SelfInfoBloc, SelfInfoState>(
-              builder: (context, state) {
-                if (state is SelfInfoLoaded) {
-                  return Column(
-                    children: [
-                      Text(
-                        state.entity.name,
-                        style: AppTextStyles.source.semiBold(
-                          color: AppColors.black,
-                          fontSize: 20,
+            Column(
+              children: [
+                userInfo.isVerified == true
+                    ? Row(
+                      spacing: 10,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          userInfo.fullName ?? 'Label',
+                          style: AppTextStyles.source.semiBold(
+                            color: AppColors.black,
+                            fontSize: 20,
+                          ),
+                        ),
+                        Icon(
+                          Icons.verified_rounded,
+                          color: AppColors.secondBlue,
+                        ),
+                      ],
+                    )
+                    : Text(
+                      userInfo.fullName ?? 'Label',
+                      style: AppTextStyles.source.semiBold(
+                        color: AppColors.black,
+                        fontSize: 20,
+                      ),
+                    ),
+                SizedBox(height: appH(8)),
+                userInfo.isVerified == true
+                    ? Text(userInfo.phoneNumber ?? '')
+                    : Center(
+                      child: Container(
+                        width: appW(200),
+                        padding: EdgeInsets.symmetric(
+                          vertical: appH(3),
+                          horizontal: appW(5),
+                        ),
+                        decoration: BoxDecoration(
+                          color: Color(0xffFC7B06),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          spacing: 10,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Shaxsingizni tasdiqlang',
+                              style: AppTextStyles.source.medium(
+                                color: AppColors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Icon(
+                              IconlyLight.arrow_right_2,
+                              color: AppColors.white,
+                              size: appW(15),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: appH(8)),
-                      Text(
-                        // userInfo.phoneNumber ?? "",
-                        state.entity.phoneNumber ?? '',
-                        style: AppTextStyles.source.medium(
-                          color: AppColors.black,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  );
-                }
-                return SizedBox(height: appH(59));
-              },
+                    ),
+              ],
             ),
             SizedBox(height: appH(10)),
             Divider(color: AppColors.greyScale.grey200),
@@ -179,7 +214,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 buildRow(
                   IconlyLight.more_square,
-                  () {},
+                  () {
+                    AppRoute.go(ActiveSessionPage());
+                  },
                   AppStrings.faolSeanslar,
                   optionalIcon: IconlyLight.arrow_right_2,
                 ),
@@ -192,13 +229,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   optionalIcon: IconlyLight.arrow_right_2,
                 ),
                 buildRow(
-                  IconlyLight.category,
+                  IconlyLight.info_square,
                   () {},
-                  AppStrings.ilovaTili,
-                  optionText: "O'zbek (UZ)",
+                  AppStrings.faq,
                   optionalIcon: IconlyLight.arrow_right_2,
                 ),
-                buildRow(IconlyLight.info_square, () {}, AppStrings.faq),
                 buildRow(
                   IconlyLight.logout,
                   () {
@@ -291,7 +326,16 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: BasicButtonWg(
                         text: 'Tasdiqlash',
                         onTap: () {
-                          AppRoute.open(AuthPage());
+                          if (userInfo.sessionId != null) {
+                            context.read<RevokeSessionBloc>().add(
+                              RevokeSessionEvent(userInfo.sessionId ?? ''),
+                            );
+                            logger.f(userInfo.sessionId ?? '');
+                            AppRoute.open(AuthPage());
+                            successFlushBar(context, 'Muvaffaqiyat!');
+                          } else {
+                            showErrorFlushbar(context, 'Xato!');
+                          }
                         },
                       ),
                     ),
@@ -309,7 +353,6 @@ class _ProfilePageState extends State<ProfilePage> {
     IconData icon,
     VoidCallback onTap,
     String text, {
-    String optionText = '',
     IconData? optionalIcon,
     Color appColor = AppColors.black,
     Color iconColor = AppColors.black,
@@ -332,19 +375,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-            if (optionText.isNotEmpty)
-              Text(
-                optionText,
-                style: AppTextStyles.source.medium(
-                  color: AppColors.black,
-                  fontSize: 18,
-                ),
-              ),
-            if (optionalIcon != null)
-              Padding(
-                padding: EdgeInsets.only(left: appW(8)),
-                child: Icon(optionalIcon, size: appH(20)),
-              ),
+            Padding(
+              padding: EdgeInsets.only(left: appW(8)),
+              child: Icon(optionalIcon, size: appH(20)),
+            ),
           ],
         ),
       ),

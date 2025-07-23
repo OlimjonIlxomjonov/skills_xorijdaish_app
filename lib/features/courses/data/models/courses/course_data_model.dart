@@ -7,6 +7,7 @@ class CoursesDataModel extends CourseData {
     required super.foreignCourses,
     required super.pretripCourses,
     required super.softSkillCourses,
+    required super.skillTestCourses,
   });
 
   factory CoursesDataModel.fromJson(Map<String, dynamic> json) {
@@ -16,7 +17,9 @@ class CoursesDataModel extends CourseData {
       softSkillCourses: CoursesCategoryModel.fromJson(
         json['soft_skill_courses'],
       ),
+      skillTestCourses: CoursesCategoryModel.fromJson(
+        json['skill_test_courses'],
+      ),
     );
   }
-
 }

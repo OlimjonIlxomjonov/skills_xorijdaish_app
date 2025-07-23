@@ -12,4 +12,9 @@ class ReelsRepoImpl extends ReelsRepository {
   Future<ReelsResponse> fetchAllReels() {
     return dataSource.getReels();
   }
+
+  @override
+  Future<void> postALike({required int reelId}) {
+    return dataSource.sendReelId(reelId: reelId);
+  }
 }
