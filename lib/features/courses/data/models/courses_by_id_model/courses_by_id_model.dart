@@ -24,6 +24,7 @@ class CoursesByIdModel extends CourseByIdEntity {
     required super.imageUrl,
     required super.isBlocked,
     required super.priceInfo,
+    required super.videosDuration,
   });
 
   factory CoursesByIdModel.fromJson(Map<String, dynamic> json) {
@@ -39,11 +40,12 @@ class CoursesByIdModel extends CourseByIdEntity {
       description: json['description'] ?? '',
       progress: json['progress'] ?? 0,
       isStarted: json['is_started'] ?? false,
-      videosDurationInSeconds: json['videos_duration_in_seconds'] ?? 0,
+      videosDurationInSeconds:
+          (json['videos_duration_in_seconds'] as num?)?.toInt() ?? 0,
       videos: json['videos'] ?? 0,
       filesCount: json['files_count'] ?? 0,
       lessonsCount: json['lessons_count'] ?? 0,
-      stars: json['stars'] ?? 0,
+      stars: (json['stars'] as num?)?.toInt() ?? 0,
       hasCertificate: json['has_certificate'] ?? false,
       certificateUrl: json['certificate_url'] ?? '',
       createdAt: json['created_at'] ?? '',
@@ -51,6 +53,7 @@ class CoursesByIdModel extends CourseByIdEntity {
       imageUrl: json['image_url'] ?? '',
       isBlocked: json['is_blocked'] ?? false,
       priceInfo: json['price_info'] ?? 0,
+      videosDuration: json['videos_duration'] ?? '',
     );
   }
 }

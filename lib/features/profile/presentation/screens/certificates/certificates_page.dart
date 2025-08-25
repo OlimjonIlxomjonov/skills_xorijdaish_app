@@ -34,6 +34,7 @@ class CertificatesPage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final cert = state.response.data[index];
                   return Container(
+                    margin: EdgeInsets.only(bottom: appH(20)),
                     padding: EdgeInsets.symmetric(
                       vertical: 2,
                       horizontal: appW(12),
@@ -43,9 +44,9 @@ class CertificatesPage extends StatelessWidget {
                       color: AppColors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.greyScale.grey200,
+                          color: AppColors.greyScale.grey100,
                           spreadRadius: 1,
-                          blurRadius: 5,
+                          blurRadius: 1,
                         ),
                       ],
                     ),

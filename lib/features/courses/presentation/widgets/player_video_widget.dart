@@ -1,6 +1,9 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
+import 'package:skills_xorijdaish/core/configs/assets/app_vectors.dart';
 import 'package:video_player/video_player.dart';
 import 'package:skills_xorijdaish/core/services/token_storage/token_storage_service_impl.dart';
 
@@ -9,11 +12,13 @@ import '../../../../core/utils/responsiveness/app_responsive.dart';
 class M3u8VideoPlayer extends StatefulWidget {
   final String videoUrl;
   final VoidCallback onVideoEnd;
+  final String imageUrl;
 
   const M3u8VideoPlayer({
     super.key,
     required this.videoUrl,
     required this.onVideoEnd,
+    required this.imageUrl,
   });
 
   @override
@@ -24,6 +29,7 @@ class _M3u8VideoPlayerState extends State<M3u8VideoPlayer> {
   VideoPlayerController? _videoController;
   ChewieController? _chewieController;
   bool _isInitialized = false;
+  bool _hasStarted = false;
 
   @override
   void initState() {
@@ -66,17 +72,18 @@ class _M3u8VideoPlayerState extends State<M3u8VideoPlayer> {
         showOptions: false,
         allowPlaybackSpeedChanging: false,
         allowMuting: false,
-        customControls: const MaterialDesktopControls(showPlayButton: true),
+        customControls: MaterialDesktopControls(showPlayButton: false),
       );
 
       setState(() => _isInitialized = true);
     } catch (e) {
-      debugPrint('❌ Video init error: $e');
+      debugPrint('Video init error: $e');
     }
   }
 
   @override
   void dispose() {
+    _videoController?.pause();
     _chewieController?.dispose();
     _videoController?.dispose();
     super.dispose();
@@ -91,9 +98,9 @@ class _M3u8VideoPlayerState extends State<M3u8VideoPlayer> {
         child: Container(
           padding: EdgeInsets.symmetric(
             vertical: appH(10),
-            horizontal: appW(16),
+            horizontal: appW(20),
           ),
-          height: appH(188),
+          height: appH(200),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
@@ -101,10 +108,54 @@ class _M3u8VideoPlayerState extends State<M3u8VideoPlayer> {
         ),
       );
     }
+
+    if (!_hasStarted) {
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            _hasStarted = true;
+            _chewieController?.play();
+          });
+        },
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AspectRatio(
+              aspectRatio: _videoController!.value.aspectRatio,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  widget.imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder:
+                      (_, __, ___) => Container(
+                        color: Colors.black12,
+                        child: Icon(Icons.broken_image, size: 40),
+                      ),
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.black54,
+              ),
+              padding: const EdgeInsets.all(12),
+              child: SvgPicture.asset(
+                AppVectors.play,
+                color: AppColors.white,
+                width: appW(20),
+                height: appH(20),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return AspectRatio(
       aspectRatio: _videoController!.value.aspectRatio,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(10),
         child: Chewie(controller: _chewieController!),
       ),
     );

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:skills_xorijdaish/core/common/constants/api_urls.dart';
 import 'package:skills_xorijdaish/core/netwrok/dio_client.dart';
@@ -8,6 +7,7 @@ import 'package:skills_xorijdaish/features/profile/data/model/certificate/certif
 import 'package:skills_xorijdaish/features/profile/data/model/self_profile_model.dart';
 import 'package:skills_xorijdaish/features/profile/data/model/session/session_response_model.dart';
 import 'package:skills_xorijdaish/features/profile/data/model/support/support_response_model.dart';
+import 'package:skills_xorijdaish/features/profile/data/model/tickets_message/tickets_message_response_model.dart';
 import 'package:skills_xorijdaish/features/profile/data/source/profile_remote_data_source.dart';
 
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
@@ -63,11 +63,11 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   }
 
   @override
-  Future<SupportResponseModel> getSupport() async {
+  Future<SupportResponseModel> getSupport({required int page}) async {
     try {
-      final response = await dioClient.get(ApiUrls.support);
+      final response = await dioClient.get("${ApiUrls.support}?page=$page");
       if (response.statusCode == 200 || response.statusCode == 201) {
-        logger.i('Success: ${response.statusCode}');
+        logger.i('Success: ${response.statusCode}: ${response.data}');
         return SupportResponseModel.fromJson(response.data);
       } else {
         throw Exception('Error: ${response.data}');
@@ -83,19 +83,29 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     required String title,
     required String text,
     required String phoneNumber,
-    required File? file,
+    required List<File> file,
   }) async {
     try {
-      final formMap = {
+      final Map<String, dynamic> formMap = {
         'title': title,
         'text': text,
         'phone_number': phoneNumber,
-        if (file != null)
-          'file': await MultipartFile.fromFile(
-            file.path,
-            filename: file.path.split('/').last,
+        'files': await Future.wait(
+          file.map(
+            (f) async => await MultipartFile.fromFile(
+              f.path,
+              filename: f.path.split('/').last,
+            ),
           ),
+        ),
       };
+
+      for (int i = 0; i < file.length; i++) {
+        formMap['files[$i]'] = await MultipartFile.fromFile(
+          file[i].path,
+          filename: file[i].path.split('/').last,
+        );
+      }
 
       final formData = FormData.fromMap(formMap);
 
@@ -103,6 +113,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         ApiUrls.createTicket,
         data: formData,
       );
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         logger.i('Success: ${response.statusCode}');
       } else {
@@ -121,6 +132,108 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       if (response.statusCode == 200 || response.statusCode == 201) {
         logger.i('Success: ${response.statusCode}');
         return CertificateResponseModel.fromJson(response.data);
+      } else {
+        throw Exception('Error: ${response.data}');
+      }
+    } catch (e) {
+      logger.e('Error catch $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateAvatar({required File avatar}) async {
+    try {
+      String fileName = avatar.path.split('/').last;
+
+      FormData formData = FormData.fromMap({
+        'avatar': await MultipartFile.fromFile(avatar.path, filename: fileName),
+      });
+
+      final response = await dioClient.post(
+        ApiUrls.updateAvatar,
+        data: formData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        logger.i('Success: ${response.data}');
+      } else {
+        throw Exception('Error: ${response.data}');
+      }
+    } catch (e) {
+      logger.e('Error catch $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<TicketsMessageResponseModel> getTicketsMessage({
+    required int ticketId,
+  }) async {
+    try {
+      final response = await dioClient.get(
+        "${ApiUrls.ticketsMessage}$ticketId/messages",
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        logger.i('Success: ${response.data}');
+        return TicketsMessageResponseModel.fromJson(response.data);
+      } else {
+        throw Exception('Error: ${response.data}');
+      }
+    } catch (e) {
+      logger.e('Error catch $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> getSendMessage({
+    required int ticketId,
+    required String text,
+    required List<File> files,
+  }) async {
+    try {
+      final formData = FormData()..fields.add(MapEntry('text', text));
+
+      for (var i = 0; i < files.length; i++) {
+        formData.files.add(
+          MapEntry(
+            'files[$i]',
+            await MultipartFile.fromFile(
+              files[i].path,
+              filename: files[i].path.split('/').last,
+            ),
+          ),
+        );
+      }
+
+      final response = await dioClient.post(
+        "${ApiUrls.sendMessage}$ticketId/messages/send",
+        data: formData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        logger.i('Success: ${response.data}');
+      } else {
+        throw Exception('Error: ${response.data}');
+      }
+    } catch (e) {
+      logger.e('Error catch $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> getDownloadImage({
+    required int ticketId,
+    required int fileId,
+  }) async {
+    try {
+      final response = await dioClient.get(
+        "${ApiUrls.downloadImage}$ticketId/messages/files/$fileId/download",
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        logger.i('Success: ${response.data}');
       } else {
         throw Exception('Error: ${response.data}');
       }

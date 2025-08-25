@@ -16,6 +16,7 @@ class ForeignLanguageModel extends ForeignLanguageEntity {
     required super.updatedAt,
     required super.imageUrl,
     required super.country,
+    required super.isDone,
   });
 
   factory ForeignLanguageModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +33,7 @@ class ForeignLanguageModel extends ForeignLanguageEntity {
       updatedAt: json['updated_at'],
       imageUrl: json['image_url'],
       country: CountryModel.fromJson(json['country']),
+      isDone: json['is_done'] == true,
     );
   }
 }

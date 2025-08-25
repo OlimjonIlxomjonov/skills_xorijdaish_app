@@ -11,13 +11,15 @@ class TestByIdModel extends TestByIdEntity {
 
   factory TestByIdModel.fromJson(Map<String, dynamic> json) {
     return TestByIdModel(
-      id: json['id'],
-      task: json['task'],
-      question: json['question'],
+      id: json['id'] ?? 0,
+      task: json['task'] ?? '',
+      question: json['question'] ?? '',
       options:
-          (json['options'] as List)
-              .map((option) => TestByIdOptionModel.fromJson(option))
-              .toList(),
+          (json['options'] != null)
+              ? (json['options'] as List)
+                  .map((option) => TestByIdOptionModel.fromJson(option))
+                  .toList()
+              : [],
     );
   }
 }

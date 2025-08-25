@@ -17,9 +17,7 @@ class CoursesDataModel extends CourseData {
       softSkillCourses: CoursesCategoryModel.fromJson(
         json['soft_skill_courses'],
       ),
-      skillTestCourses: CoursesCategoryModel.fromJson(
-        json['skill_test_courses'],
-      ),
+      skillTestCourses: CoursesCategoryModel.fromJson(json['skill_test']),
     );
   }
 }

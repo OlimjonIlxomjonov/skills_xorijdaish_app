@@ -12,14 +12,25 @@ import 'package:skills_xorijdaish/core/common/widgets/flush_bar/flush_bar_wg.dar
 import 'package:skills_xorijdaish/core/configs/assets/app_images.dart';
 import 'package:skills_xorijdaish/core/configs/assets/app_vectors.dart';
 import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
+import 'package:skills_xorijdaish/core/utils/logger/logger.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/all_courses/buy_course/buy_course_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses_event.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/finish_final_test/finish_final_test_bloc.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/finish_final_test/finish_final_test_state.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/get_courses_by_id/course_by_id_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/get_courses_by_id/course_by_id_state.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/lesson_tests/final_test_course/final_test_bloc.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/lesson_tests/final_test_course/final_test_state.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/lessons/lesson_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/lessons/lessons_state.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/start_course/start_course_bloc.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/final_test/final_test_page.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/single_lesson_video.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../../core/common/widgets/flush_bar/warning_bar_wg.dart';
+import '../../bloc/all_courses/buy_course/buy_course_state.dart';
 
 class SingleCoursePage extends StatefulWidget {
   final int courseId;
@@ -40,6 +51,10 @@ class _SingleCoursePageState extends State<SingleCoursePage>
     _tabController = TabController(length: 2, vsync: this);
     context.read<LessonsBloc>().add(LessonsEvent(widget.courseId));
     context.read<CourseByIdBloc>().add(CourseByIdEvent(widget.courseId));
+    context.read<FinalTestBloc>().add(FinalTestCourseEvent(widget.courseId));
+    context.read<FinishFinalTestBloc>().add(
+      FinishFinalTestEvent(widget.courseId),
+    );
   }
 
   @override
@@ -47,10 +62,6 @@ class _SingleCoursePageState extends State<SingleCoursePage>
     _tabController.dispose();
     super.dispose();
   }
-
-  int pageIndex = 0;
-
-  final Set<int> doneLessonIds = {};
 
   String sanitizeHtml(String html) {
     return html
@@ -66,6 +77,24 @@ class _SingleCoursePageState extends State<SingleCoursePage>
         .replaceAll(RegExp(r'<[^>]*>'), '')
         .replaceAll(RegExp(r'\s+'), ' ')
         .trim();
+  }
+
+  String formatDuration(int seconds) {
+    final duration = Duration(seconds: seconds);
+
+    final weeks = duration.inDays ~/ 7;
+    if (weeks > 0) return "$weeks hafta";
+
+    final days = duration.inDays;
+    if (days > 0) return "$days kun";
+
+    final hours = duration.inHours;
+    if (hours > 0) return "$hours soat";
+
+    final minutes = duration.inMinutes;
+    if (minutes > 0) return "$minutes daqiqa";
+
+    return "${duration.inSeconds} soniya";
   }
 
   @override
@@ -110,96 +139,103 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                 ),
               ),
               Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: appW(24),
-                    right: appW(24),
-                    top: appH(20),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        course.title,
-                        style: AppTextStyles.source.medium(
-                          color: AppColors.black,
-                          fontSize: 18,
-                        ),
-                      ),
-                      SizedBox(height: appH(12)),
-                      Row(
-                        spacing: appW(18),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: appW(20)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildText(AppVectors.star, course.stars.toString()),
-                          buildText(AppVectors.clock, '20 Soat'),
-                          buildText(
-                            AppVectors.video,
-                            '${course.videos} ta video',
+                          SizedBox(height: appH(10)),
+                          Text(
+                            course.title,
+                            style: AppTextStyles.source.medium(
+                              color: AppColors.black,
+                              fontSize: 18,
+                            ),
                           ),
-                          buildText(AppVectors.global, course.country.language),
-                        ],
-                      ),
-                      SizedBox(height: appH(16)),
-                      (state.entity.priceInfo != null &&
-                              state.entity.priceInfo is Map &&
-                              state.entity.priceInfo.containsKey('price'))
-                          ? Row(
-                            spacing: appW(12),
+                          SizedBox(height: appH(12)),
+                          Row(
+                            spacing: appW(18),
                             children: [
-                              Text(
-                                "${state.entity.priceInfo['price']} UZS",
-                                style: AppTextStyles.source.bold(
-                                  color: AppColors.secondBlue,
-                                  fontSize: 28,
-                                ),
+                              buildText(
+                                AppVectors.star,
+                                course.stars.toString(),
                               ),
-                              state.entity.priceInfo['discount'] != 0
-                                  ? Text(
-                                    "${state.entity.priceInfo['discount']} UZS",
-                                    style: AppTextStyles.source.semiBold(
-                                      color: AppColors.textGrey,
-                                      fontSize: 18,
-                                    ),
-                                  )
-                                  : SizedBox.shrink(),
+                              buildText(
+                                AppVectors.clock,
+                                formatDuration(course.videosDurationInSeconds),
+                              ),
+                              buildText(
+                                AppVectors.video,
+                                '${course.videos} ta video',
+                              ),
+                              buildText(
+                                AppVectors.global,
+                                course.country.language,
+                              ),
                             ],
-                          )
-                          : const SizedBox.shrink(),
-
-                      TabBar(
-                        controller: _tabController,
-                        indicator: UnderlineTabIndicator(
-                          borderRadius: BorderRadius.circular(100),
-                          borderSide: BorderSide(
-                            width: 4.0,
-                            color: AppColors.textBlue,
                           ),
-                          insets: EdgeInsets.symmetric(horizontal: 0),
-                        ),
-                        labelColor: AppColors.textBlue,
-                        unselectedLabelColor: Colors.grey,
-                        labelStyle: AppTextStyles.source.semiBold(
-                          fontSize: 16,
-                          color: AppColors.grey,
-                        ),
-                        unselectedLabelStyle: AppTextStyles.source.regular(
-                          fontSize: 16,
-                          color: AppColors.appBg,
-                        ),
-                        tabs: const [
-                          Tab(text: "Ma'lumot"),
-                          Tab(text: 'Darslar'),
+                          SizedBox(height: appH(16)),
+                          (state.entity.priceInfo != null &&
+                                  state.entity.priceInfo is Map &&
+                                  state.entity.priceInfo.containsKey('price'))
+                              ? Row(
+                                spacing: appW(12),
+                                children: [
+                                  Text(
+                                    "${state.entity.priceInfo['price']} UZS",
+                                    style: AppTextStyles.source.bold(
+                                      color: AppColors.secondBlue,
+                                      fontSize: 28,
+                                    ),
+                                  ),
+                                  state.entity.priceInfo['discount'] != 0
+                                      ? Text(
+                                        "${state.entity.priceInfo['discount']} UZS",
+                                        style: AppTextStyles.source.semiBold(
+                                          color: AppColors.textGrey,
+                                          fontSize: 18,
+                                        ),
+                                      )
+                                      : SizedBox.shrink(),
+                                ],
+                              )
+                              : const SizedBox.shrink(),
                         ],
                       ),
-                      SizedBox(height: appH(20)),
-                      Expanded(
-                        child: TabBarView(
-                          controller: _tabController,
-                          children: [_informationTab(), _lessonsTab()],
+                    ),
+                    TabBar(
+                      controller: _tabController,
+                      indicator: UnderlineTabIndicator(
+                        borderRadius: BorderRadius.circular(100),
+                        borderSide: BorderSide(
+                          width: 4.0,
+                          color: AppColors.textBlue,
                         ),
+                        insets: EdgeInsets.symmetric(horizontal: 0),
                       ),
-                    ],
-                  ),
+                      labelColor: AppColors.textBlue,
+                      unselectedLabelColor: Colors.grey,
+                      labelStyle: AppTextStyles.source.semiBold(
+                        fontSize: 16,
+                        color: AppColors.grey,
+                      ),
+                      unselectedLabelStyle: AppTextStyles.source.regular(
+                        fontSize: 16,
+                        color: AppColors.appBg,
+                      ),
+                      tabs: const [Tab(text: "Ma'lumot"), Tab(text: 'Darslar')],
+                    ),
+                    SizedBox(height: appH(20)),
+                    Expanded(
+                      child: TabBarView(
+                        controller: _tabController,
+                        children: [_informationTab(), _lessonsTab()],
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -235,11 +271,12 @@ class _SingleCoursePageState extends State<SingleCoursePage>
           return CircularProgressIndicator();
         } else if (state is CourseByIdLoaded) {
           final course = state.entity;
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: appH(10)),
+          logger.f(state.entity.videosDuration);
+          return Padding(
+            padding: EdgeInsets.only(left: appW(20), right: appW(20)),
+            child: Stack(
+              children: [
+                SingleChildScrollView(
                   child: Column(
                     spacing: appH(18),
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,33 +301,18 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                           color: AppColors.secondBlue,
                         ),
                       ),
-                      Text(
-                        "Bu kurs o'z ichiga oladi",
-                        style: AppTextStyles.source.semiBold(
-                          color: AppColors.black,
-                          fontSize: 20,
-                        ),
-                      ),
-                      customListTile(
-                        "Talab bo'yicha 2,5 soatlik video",
-                        AppVectors.slowMotion,
-                      ),
-                      customListTile(
-                        "Mobil, ish stoli va televizorda kirish",
-                        AppVectors.technology,
-                      ),
-                      customListTile(
-                        "Qo'llab-quvvatlanadigan fayllar",
-                        AppVectors.audioBook,
-                      ),
-                      customListTile(
-                        "To'liq umr bo'yi kirish",
-                        AppVectors.infinite,
-                      ),
-                      customListTile(
-                        "Tugatish sertifikati",
-                        AppVectors.interface,
-                      ),
+                      // Text(
+                      //   "Bu kurs quyidagilarni o'z ichiga oladi",
+                      //   style: AppTextStyles.source.semiBold(
+                      //     color: AppColors.black,
+                      //     fontSize: 20,
+                      //   ),
+                      // ),
+                      // customListTile("Mavzulashtirilgan video darslar"),
+                      // customListTile("Mavzulashtirilgan testlar"),
+                      // customListTile("Kurs bo’yicha yakuniy test "),
+                      // customListTile("Tamomlaganlik haqida ssertifikat"),
+                      SizedBox(height: appH(30)),
                       Visibility(
                         visible: !course.isStarted,
                         child: BasicButtonWg(
@@ -303,154 +325,81 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                   ? "Sotib olish - ${state.entity.priceInfo['price']}"
                                   : 'Boshlash',
                           onTap: () {
-                            context.read<StartCourseBloc>().add(
-                              StartCourseEvent(widget.courseId),
-                            );
-                            // context.read<CourseByIdBloc>().add(
-                            //   CourseByIdEvent(widget.courseId),
-                            // );
-                            // context.read<LessonsBloc>().add(
-                            //   LessonsEvent(widget.courseId),
-                            // );
-                            state.entity.priceInfo != null &&
-                                    state.entity.priceInfo is Map &&
-                                    state.entity.priceInfo.containsKey('price')
-                                ? showBottomSheet(
-                                  context: context,
-                                  builder:
-                                      (context) => Container(
-                                        padding: EdgeInsets.only(top: 10),
-                                        height: appH(280),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.white,
-                                        ),
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 180,
-                                                  ),
-                                              child: Divider(
-                                                height: 5,
-                                                thickness: 3,
-                                              ),
-                                            ),
-                                            SizedBox(height: appH(10)),
-                                            Text(
-                                              "To'lov",
-                                              style: AppTextStyles.source
-                                                  .medium(
-                                                    color: AppColors.black,
-                                                    fontSize: 20,
-                                                  ),
-                                            ),
-                                            SizedBox(height: appH(10)),
-                                            Divider(),
-                                            SizedBox(height: appH(10)),
-                                            Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: appH(20),
-                                              ),
-                                              child: Column(
-                                                children: [
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      // if (state.entity.isPaid ==
-                                                      //     true) {
-                                                      //   successFlushBar(
-                                                      //     context,
-                                                      //     'Successfully started!',
-                                                      //   );
-                                                      //   _tabController
-                                                      //       .animateTo(1);
-                                                      // } else {
-                                                      //   showErrorFlushbar(
-                                                      //     context,
-                                                      //     'Not Paid!',
-                                                      //   );
-                                                      // }
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                            vertical: 10,
-                                                          ),
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              10,
-                                                            ),
-                                                      ),
-                                                      shadowColor:
-                                                          Colors.transparent,
-                                                      minimumSize: Size(
-                                                        double.infinity,
-                                                        appH(50),
-                                                      ),
-                                                      backgroundColor: Color(
-                                                        0xffF7F7F8,
-                                                      ),
-                                                    ),
-                                                    child: Image.asset(
-                                                      AppImages.paymentClick,
-                                                      width: appW(64),
-                                                      height: appH(24),
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: appH(50)),
-                                                  ElevatedButton(
-                                                    onPressed: () {
-                                                      AppRoute.close();
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                      shadowColor:
-                                                          Colors.transparent,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              10,
-                                                            ),
-                                                        side: BorderSide(
-                                                          width: 1,
-                                                          color:
-                                                              AppColors.appBg,
-                                                        ),
-                                                      ),
-                                                      backgroundColor:
-                                                          AppColors.white,
-                                                      minimumSize: Size(
-                                                        double.infinity,
-                                                        appH(50),
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      'Bekor qilish',
-                                                      style: AppTextStyles
-                                                          .source
-                                                          .regular(
-                                                            color:
-                                                                AppColors.appBg,
-                                                            fontSize: 14,
-                                                          ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                            final hasPrice =
+                                state.entity.priceInfo != null &&
+                                state.entity.priceInfo is Map &&
+                                state.entity.priceInfo.containsKey('price');
+
+                            if (hasPrice) {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) {
+                                  return Container(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    height: appH(280),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.white,
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(16),
                                       ),
-                                )
-                                : _lessonsTab();
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 180,
+                                          ),
+                                          child: Divider(
+                                            height: 5,
+                                            thickness: 3,
+                                          ),
+                                        ),
+                                        SizedBox(height: appH(10)),
+                                        Text(
+                                          "To'lov",
+                                          style: AppTextStyles.source.medium(
+                                            color: AppColors.black,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                        SizedBox(height: appH(10)),
+                                        Divider(),
+                                        SizedBox(height: appH(10)),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: appH(20),
+                                          ),
+                                          child: column(),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            } else {
+                              context.read<StartCourseBloc>().add(
+                                StartCourseEvent(widget.courseId),
+                              );
+                              context.read<CourseByIdBloc>().add(
+                                CourseByIdEvent(widget.courseId),
+                              );
+                              context.read<LessonsBloc>().add(
+                                LessonsEvent(widget.courseId),
+                              );
+                              _tabController.animateTo(1);
+                            }
                           },
                         ),
                       ),
+
+                      SizedBox(height: appH(20)),
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         }
         return SizedBox.shrink();
@@ -458,11 +407,89 @@ class _SingleCoursePageState extends State<SingleCoursePage>
     );
   }
 
-  Widget customListTile(String tileTitle, String icons) {
+  Column column() {
+    return Column(
+      spacing: 50,
+      children: [
+        BlocConsumer<BuyCourseBloc, BuyCourseState>(
+          listener: (context, state) {
+            if (state is BuyCourseLoaded) {
+              final url = state.entity.url;
+              if (url.isNotEmpty) {
+                launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+              }
+            }
+          },
+          builder: (context, state) {
+            bool isLoading = state is BuyCourseLoading;
+
+            return ElevatedButton(
+              onPressed:
+                  isLoading
+                      ? null
+                      : () {
+                        context.read<BuyCourseBloc>().add(
+                          BuyCourseEvent(widget.courseId),
+                        );
+                      },
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                shadowColor: Colors.transparent,
+                minimumSize: Size(double.infinity, appH(50)),
+                backgroundColor: const Color(0xffF7F7F8),
+              ),
+              child:
+                  isLoading
+                      ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.black,
+                          strokeWidth: 2,
+                        ),
+                      )
+                      : Image.asset(
+                        AppImages.paymentClick,
+                        width: appW(64),
+                        height: appH(24),
+                      ),
+            );
+          },
+        ),
+        Spacer(),
+        ElevatedButton(
+          onPressed: () {
+            AppRoute.close();
+          },
+          style: ElevatedButton.styleFrom(
+            minimumSize: Size(double.infinity, appH(51)),
+            backgroundColor: AppColors.white,
+            shadowColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Color(0xff5B7BFE), width: 2),
+            ),
+          ),
+          child: Text(
+            'Bekor qilish',
+            style: AppTextStyles.source.medium(
+              color: Color(0xff5B7BFE),
+              fontSize: 16,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget customListTile(String tileTitle) {
     return Row(
       spacing: appW(12),
       children: [
-        SvgPicture.asset(icons),
+        Text('•'),
         Text(
           tileTitle,
           style: AppTextStyles.source.regular(
@@ -481,120 +508,406 @@ class _SingleCoursePageState extends State<SingleCoursePage>
           return Center(child: CircularProgressIndicator());
         } else if (state is LessonsLoaded) {
           final itemCount = state.response.data.length;
-          return ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: itemCount,
-            itemBuilder: (context, index) {
-              final lesson = state.response.data[index];
-              final isLast = index == itemCount - 1;
-              final bool isDone = lesson.isAccessible;
-              final Color mainColor =
-                  isDone ? AppColors.mainGreen : Color(0xffDAE1E9);
-              final Color textColor =
-                  isDone ? AppColors.black : Color(0xffDAE1E9);
-              return Column(
-                // spacing: 5,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ListTile(
-                    onTap:
-                        lesson.isAccessible
-                            ? () {
-                              AppRoute.go(
-                                SingleLessonVideo(
-                                  courseId: widget.courseId,
-                                  lessonId: lesson.id,
-                                  title: lesson.title,
+          final lessons = state.response.data;
+
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<FinalTestBloc>().add(
+                FinalTestCourseEvent(widget.courseId),
+              );
+              // context.read<FinishFinalTestBloc>().add(
+              //   FinishFinalTestEvent(widget.courseId),
+              // );
+            },
+            child: ListView.builder(
+              padding: EdgeInsets.symmetric(horizontal: appH(20)),
+              itemCount: itemCount + 1,
+              itemBuilder: (context, index) {
+                if (index < itemCount) {
+                  final lesson = lessons[index];
+                  final isLast = index == itemCount - 1;
+                  final bool isDone = lesson.isAccessible;
+                  final bool isDoneTest = lesson.isDone;
+                  final Color mainColor =
+                      isDone ? AppColors.mainGreen : Color(0xffDAE1E9);
+                  final Color textColor =
+                      isDone ? AppColors.black : Color(0xffDAE1E9);
+                  final testColors = int.parse(lesson.stars);
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        decoration:
+                            isDoneTest
+                                ? BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Colors.transparent,
+                                      testColors > 3
+                                          ? AppColors.inputGreyColor.withValues(
+                                            alpha: 0.1,
+                                          )
+                                          : AppColors.progressYellow.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                      AppColors.mainGreen.withValues(
+                                        alpha: 0.2,
+                                      ),
+                                      Colors.transparent,
+                                    ],
+                                    begin: Alignment.centerLeft,
+                                    end: Alignment.centerRight,
+                                    stops: [0.2, 1, 0.85, 2],
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                )
+                                : null,
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            hoverColor: Colors.transparent,
+                          ),
+                          child: ListTile(
+                            tileColor: Colors.transparent,
+                            onTap:
+                                lesson.isAccessible
+                                    ? () {
+                                      AppRoute.go(
+                                        SingleLessonVideo(
+                                          courseId: widget.courseId,
+                                          lessonId: lesson.id,
+                                          title: lesson.title,
+                                          imageUrl: lesson.imageUrl,
+                                          isTestEnabled: lesson.isDone,
+                                          isCameraVerifEnabled:
+                                              lesson
+                                                  .isCameraVerificationEnabled,
+                                        ),
+                                      );
+                                    }
+                                    : null,
+                            contentPadding: EdgeInsets.zero,
+                            leading: Stack(
+                              children: [
+                                Container(
+                                  padding: EdgeInsets.all(2),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color:
+                                          testColors > 3
+                                              ? mainColor
+                                              : AppColors.progressYellow,
+                                      width: 3,
+                                    ),
+                                  ),
+                                  child: ClipOval(
+                                    child: Image.network(
+                                      lesson.imageUrl,
+                                      height: 50,
+                                      width: 45,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (
+                                        context,
+                                        child,
+                                        loadingProgress,
+                                      ) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return SizedBox(
+                                          height: 50,
+                                          width: 45,
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 3,
+                                              value:
+                                                  loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          (loadingProgress
+                                                                  .expectedTotalBytes ??
+                                                              1)
+                                                      : null,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (
+                                        context,
+                                        error,
+                                        stackTrace,
+                                      ) {
+                                        return Container(
+                                          height: 50,
+                                          width: 45,
+                                          color: Colors.grey[300],
+                                          child: Icon(Icons.error, size: 20),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ),
-                              );
-                            }
-                            : null,
-                    contentPadding: EdgeInsets.zero,
-                    leading: Container(
-                      padding: EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: mainColor, width: 3),
-                      ),
-                      child: ClipOval(
-                        child: Image.network(
-                          lesson.imageUrl,
-                          height: 50,
-                          width: 45,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return SizedBox(
-                              height: 50,
-                              width: 45,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 3,
-                                  value:
-                                      loadingProgress.expectedTotalBytes != null
-                                          ? loadingProgress
-                                                  .cumulativeBytesLoaded /
-                                              (loadingProgress
-                                                      .expectedTotalBytes ??
-                                                  1)
-                                          : null,
-                                ),
+                                if (isDoneTest && testColors > 3)
+                                  Positioned(
+                                    right: 0,
+                                    bottom: 0,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            testColors > 3
+                                                ? AppColors.mainGreen
+                                                : AppColors.progressYellow,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      padding: EdgeInsets.all(3),
+                                      child: Icon(
+                                        Icons.check,
+                                        size: appH(12),
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            title: Text(
+                              lesson.title,
+                              style: AppTextStyles.source.medium(
+                                color: textColor,
+                                fontSize: 16,
                               ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 50,
-                              width: 45,
-                              color: Colors.grey[300],
-                              child: Icon(Icons.error, size: 20),
-                            );
-                          },
+                            ),
+                            subtitle:
+                                isDoneTest
+                                    ? RatingBar.builder(
+                                      initialRating:
+                                          double.tryParse(lesson.stars) ?? 0,
+                                      minRating: 0,
+                                      direction: Axis.horizontal,
+                                      allowHalfRating: true,
+                                      itemCount: 5,
+                                      itemPadding: EdgeInsets.symmetric(
+                                        horizontal: 4.0,
+                                      ),
+                                      itemSize: appH(12),
+                                      ignoreGestures: true,
+                                      itemBuilder:
+                                          (context, _) => Icon(
+                                            IconlyBold.star,
+                                            color: Colors.amber,
+                                          ),
+                                      onRatingUpdate: (rating) {},
+                                    )
+                                    : null,
+                          ),
                         ),
                       ),
-                    ),
-                    title: Text(
-                      lesson.title,
-                      style: AppTextStyles.source.medium(
-                        color: textColor,
-                        fontSize: 16,
-                      ),
-                    ),
-                    subtitle:
-                        isDone
-                            ? RatingBar.builder(
-                              initialRating: double.tryParse(lesson.stars) ?? 0,
-                              minRating: 0,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemPadding: EdgeInsets.symmetric(
-                                horizontal: 4.0,
+                      if (!isLast || isLast)
+                        Container(
+                          margin: EdgeInsets.only(left: appW(25)),
+                          width: appW(3),
+                          height: appH(10),
+                          decoration: BoxDecoration(
+                            color: mainColor,
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+                    ],
+                  );
+                } else {
+                  return BlocBuilder<FinalTestBloc, FinalTestState>(
+                    builder: (context, finalState) {
+                      if (finalState is FinalTestLoading) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (finalState is FinalTestError) {
+                        return ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: Container(
+                            padding: EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Color(0xffDAE1E9),
+                                width: 3,
                               ),
-                              itemSize: appH(12),
-                              ignoreGestures: true,
-                              itemBuilder:
-                                  (context, _) => Icon(
-                                    IconlyLight.star,
-                                    color: Colors.amber,
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                AppImages.finalTest,
+                                height: 50,
+                                width: 45,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          title: Text(
+                            'Yakuniy test',
+                            style: AppTextStyles.source.medium(
+                              color: Color(0xffDAE1E9),
+                              fontSize: 16,
+                            ),
+                          ),
+                        );
+                      } else if (finalState is FinalTestLoaded) {
+                        final questionId =
+                            finalState.response.data.map((e) => e.id).toList();
+                        final testType =
+                            finalState.response.data
+                                .map((e) => e.type)
+                                .toList();
+                        final allAccessible = lessons.every(
+                          (l) => l.isAccessible,
+                        );
+                        final Color mainColor =
+                            allAccessible
+                                ? AppColors.mainGreen
+                                : Color(0xffDAE1E9);
+                        final Color textColor =
+                            allAccessible ? AppColors.black : Color(0xffDAE1E9);
+
+                        final finishState =
+                            context.read<FinishFinalTestBloc>().state;
+                        final isOk =
+                            (finishState is FinishFinalTestLoaded &&
+                                finishState.response.ok);
+
+                        return Column(
+                          children: [
+                            SizedBox(height: appH(5)),
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: appH(5)),
+                              decoration:
+                                  isOk
+                                      ? BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.transparent,
+                                            AppColors.inputGreyColor.withValues(
+                                              alpha: 0.1,
+                                            ),
+                                            AppColors.mainGreen.withValues(
+                                              alpha: 0.2,
+                                            ),
+                                            Colors.transparent,
+                                          ],
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                          stops: [0.2, 1, 0.85, 2],
+                                        ),
+                                        borderRadius: BorderRadius.circular(8),
+                                      )
+                                      : null,
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  splashColor: Colors.transparent,
+                                  highlightColor: Colors.transparent,
+                                  hoverColor: Colors.transparent,
+                                ),
+                                child: ListTile(
+                                  onTap:
+                                      allAccessible
+                                          ? () {
+                                            if (finishState
+                                                    is FinishFinalTestLoaded &&
+                                                finishState.response.ok) {
+                                              // warningBarWg(
+                                              //   context,
+                                              //   'Yakuniy test allaqachon tugallangan!',
+                                              // );
+                                              AppRoute.go(
+                                                FinalTestPage(
+                                                  courseId: widget.courseId,
+                                                  questionId: questionId,
+                                                  testType: testType,
+                                                ),
+                                              );
+                                            } else {
+                                              AppRoute.go(
+                                                FinalTestPage(
+                                                  courseId: widget.courseId,
+                                                  questionId: questionId,
+                                                  testType: testType,
+                                                ),
+                                              );
+                                            }
+                                          }
+                                          : null,
+                                  contentPadding: EdgeInsets.zero,
+                                  leading: Stack(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: mainColor,
+                                            width: 3,
+                                          ),
+                                        ),
+                                        child: ClipOval(
+                                          child: Image.asset(
+                                            AppImages.finalTest,
+                                            height: 50,
+                                            width: 45,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      BlocBuilder<
+                                        FinishFinalTestBloc,
+                                        FinishFinalTestState
+                                      >(
+                                        builder: (context, state) {
+                                          if (state is FinishFinalTestLoaded) {
+                                            final isFinished =
+                                                state.response.ok;
+                                            return isFinished
+                                                ? Positioned(
+                                                  right: 0,
+                                                  bottom: 0,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          AppColors.mainGreen,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    padding: EdgeInsets.all(3),
+                                                    child: Icon(
+                                                      Icons.check,
+                                                      size: appH(12),
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                )
+                                                : SizedBox.shrink();
+                                          }
+                                          return SizedBox.shrink();
+                                        },
+                                      ),
+                                    ],
                                   ),
-                              onRatingUpdate: (rating) {},
-                            )
-                            : null,
-                  ),
-                  if (!isLast)
-                    Container(
-                      margin: EdgeInsets.only(left: appW(27), bottom: 5),
-                      width: appW(3),
-                      height: appH(18),
-                      decoration: BoxDecoration(
-                        color: mainColor,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                ],
-              );
-            },
+                                  title: Text(
+                                    'Yakuniy test',
+                                    style: AppTextStyles.source.medium(
+                                      color: textColor,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: appH(20)),
+                          ],
+                        );
+                      }
+                      return SizedBox.shrink();
+                    },
+                  );
+                }
+              },
+            ),
           );
         } else if (state is LessonsError) {
           return Center(child: Text(state.message));

@@ -5,6 +5,7 @@ import 'package:skills_xorijdaish/features/profile/domain/entity/certificate/cer
 import 'package:skills_xorijdaish/features/profile/domain/entity/self_profile_entity.dart';
 import 'package:skills_xorijdaish/features/profile/domain/entity/session/session_response.dart';
 import 'package:skills_xorijdaish/features/profile/domain/entity/support/support_response.dart';
+import 'package:skills_xorijdaish/features/profile/domain/entity/tickets_message/tickets_message_response.dart';
 import 'package:skills_xorijdaish/features/profile/domain/repo/profile_repository.dart';
 
 class ProfileRepoImpl implements ProfileRepository {
@@ -28,8 +29,8 @@ class ProfileRepoImpl implements ProfileRepository {
   }
 
   @override
-  Future<SupportResponse> fetchSupport() {
-    return remoteDataSource.getSupport();
+  Future<SupportResponse> fetchSupport({required int page}) {
+    return remoteDataSource.getSupport(page: page);
   }
 
   @override
@@ -37,7 +38,7 @@ class ProfileRepoImpl implements ProfileRepository {
     required String title,
     required String text,
     required String phoneNumber,
-    required File? file,
+    required List<File> file,
   }) {
     return remoteDataSource.postTicket(
       title: title,
@@ -50,5 +51,36 @@ class ProfileRepoImpl implements ProfileRepository {
   @override
   Future<CertificateResponse> fetchMyCertificates() {
     return remoteDataSource.getMyCertificate();
+  }
+
+  @override
+  Future<void> updateAvatar({required File avatar}) {
+    return remoteDataSource.updateAvatar(avatar: avatar);
+  }
+
+  @override
+  Future<TicketsMessageResponse> fetchTicketsMessage({required int ticketId}) {
+    return remoteDataSource.getTicketsMessage(ticketId: ticketId);
+  }
+
+  @override
+  Future<void> sendAMessage({
+    required ticketId,
+    required String text,
+    required List<File> files,
+  }) {
+    return remoteDataSource.getSendMessage(
+      ticketId: ticketId,
+      text: text,
+      files: files,
+    );
+  }
+
+  @override
+  Future<void> downloadImage({required int ticketId, required int fileId}) {
+    return remoteDataSource.getDownloadImage(
+      ticketId: ticketId,
+      fileId: fileId,
+    );
   }
 }

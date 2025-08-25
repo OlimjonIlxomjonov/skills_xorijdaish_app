@@ -19,6 +19,7 @@ class PreTripModel extends PreTripEntity {
     required super.imageUrl,
     required super.country,
     required super.priceInfo,
+    required super.isDone,
   });
 
   factory PreTripModel.fromJson(Map<String, dynamic> json) {
@@ -37,6 +38,7 @@ class PreTripModel extends PreTripEntity {
       imageUrl: json['image_url'],
       country: CountryModel.fromJson(json['country']),
       priceInfo: PriceInfoModel.fromJson(json['price_info']),
+      isDone: json['is_done'] ?? false,
     );
   }
 }

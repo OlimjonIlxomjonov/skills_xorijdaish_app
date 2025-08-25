@@ -8,14 +8,17 @@ class ReelsDataSourceImpl implements ReelsDataSource {
   final DioClient dioClient = DioClient();
 
   @override
-  Future<ReelsResponseModel> getReels() async {
+  Future<ReelsResponseModel> getReels({required int page}) async {
     try {
-      final response = await dioClient.get(ApiUrls.reels);
+      final response = await dioClient.get("${ApiUrls.reels}?page=$page");
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        logger.i('Successfully fetched all reels! ${response.statusCode}');
+        logger.i(
+          'Successfully fetched reels page $page! ${response.statusCode}',
+        );
         return ReelsResponseModel.fromJson(response.data);
       } else {
-        throw Exception('Could not get reels ${response.data}');
+        throw Exception('Could not get reels: ${response.data}');
       }
     } catch (e) {
       logger.e('Error occurred while getting reels! $e');

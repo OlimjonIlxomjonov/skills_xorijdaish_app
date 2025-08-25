@@ -4,6 +4,4 @@ class ForeignLanguageResponse {
   final List<ForeignLanguageEntity> data;
 
   ForeignLanguageResponse({required this.data});
-
-
 }

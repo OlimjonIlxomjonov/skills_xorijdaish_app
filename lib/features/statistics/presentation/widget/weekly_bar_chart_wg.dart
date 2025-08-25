@@ -2,18 +2,25 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
+import 'package:skills_xorijdaish/core/utils/logger/logger.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
 
 import '../screens/statistic_page.dart';
 
-class WeeklyBarChart extends StatelessWidget {
+class WeeklyBarChart extends StatefulWidget {
   final Map<String, double> data;
 
   const WeeklyBarChart({super.key, required this.data});
 
   @override
+  State<WeeklyBarChart> createState() => _WeeklyBarChartState();
+}
+
+class _WeeklyBarChartState extends State<WeeklyBarChart> {
+  @override
   Widget build(BuildContext context) {
-    final entries = data.entries.toList();
+    final double minVisibleValue = 0.5;
+    final entries = widget.data.entries.toList();
     final maxY =
         entries.map((e) => e.value).reduce((a, b) => a > b ? a : b) * 1.2;
 
@@ -25,7 +32,23 @@ class WeeklyBarChart extends StatelessWidget {
       child: BarChart(
         BarChartData(
           maxY: maxY,
-          barTouchData: BarTouchData(enabled: false),
+          barTouchData: BarTouchData(
+            enabled: true,
+            touchTooltipData: BarTouchTooltipData(
+              getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                final entry = entries[group.x.toInt()];
+                final minutes = formatDuration(entry.value.toInt());
+                return BarTooltipItem(
+                  '$minutes',
+                  AppTextStyles.source.regular(
+                    color: Colors.white,
+                    fontSize: 12,
+                  ),
+                );
+              },
+            ),
+          ),
+
           gridData: FlGridData(show: false),
           borderData: FlBorderData(show: false),
 
@@ -62,10 +85,13 @@ class WeeklyBarChart extends StatelessWidget {
               x: i,
               barRods: [
                 BarChartRodData(
-                  toY: e.value,
+                  toY: e.value == 0 ? minVisibleValue : e.value,
                   color: AppColors.secondBlue,
                   width: appW(43),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(6),
+                    topRight: Radius.circular(6),
+                  ),
                 ),
               ],
             );
@@ -73,5 +99,24 @@ class WeeklyBarChart extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String formatDuration(int seconds) {
+    logger.f(seconds);
+    final duration = Duration(seconds: seconds);
+
+    final weeks = duration.inDays ~/ 7;
+    if (weeks > 0) return "$weeks hafta";
+
+    final days = duration.inDays;
+    if (days > 0) return "$days kun";
+
+    final hours = duration.inHours;
+    if (hours > 0) return "$hours soat";
+
+    final minutes = duration.inMinutes;
+    if (minutes > 0) return "$minutes daqiqa";
+
+    return "${duration.inSeconds} soniya";
   }
 }

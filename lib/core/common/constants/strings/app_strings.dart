@@ -52,12 +52,12 @@ abstract class AppStrings {
   /// Profile
   static const String myProfile = 'Mening Profilim';
   static const String shxsiyMalumotlar = "Shaxsiy ma’lumotlar";
-  static const String bildirishNomalar = "Bildirishnomalar";
+  static const String bildirishNomalar = "Xabarnoma";
   static const String sertifikatLar = 'Sertifikatlar';
   static const String faolSeanslar = 'Faol seanslar';
   static const String qollabQuvatlash = "Qo’llab quvvatlash";
   static const String ilovaTili = "Ilova tili";
-  static const String faq = 'FAQ';
+  static const String faq = "Ko'p beriladigan savollar";
   static const String tungiRejim = 'Tungi rejim';
   static const String akkauntdanChiqish = 'Akkauntdan chiqish';
 
@@ -69,4 +69,3 @@ abstract class AppStrings {
       "Kechirasiz, siz kiritgan kalit soʻz topilmadi. Iltimos, yana tekshiring yoki boshqa kalit soʻz bilan qidiring.";
   static const String result = 'Natija';
 }
-

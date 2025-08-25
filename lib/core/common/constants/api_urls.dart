@@ -16,9 +16,22 @@ abstract class ApiUrls {
   static const skillTest = '/api/courses/';
   static const coursesById = '/api/courses/';
   static const myCourses = '/api/courses/my';
+  static const preTripByCountry = '/api/courses/pre-trip-courses?country_id=';
 
   /// Course Tests
   static const testAnswers = '/api/courses/';
+  static const selectPairs = '/api/courses/';
+  static const answerSelectPairs = '/api/courses/';
+  static const finishTest = '/api/courses/';
+  static const finalTestCourse = '/api/courses/';
+  static const finalTestById = '/api/courses/';
+  static const listenNComplete = '/api/courses/';
+  static const answerListenNComplete = '/api/courses/';
+  static const fillInTheBlank = '/api/courses/';
+  static const listenNCompleteWords = '/api/courses/';
+  static const multipleChoiceWithPictures = '/api/courses/';
+  static const answerFillInTheBlank = '/api/courses/';
+  static const listenNSelectPairs = '/api/courses/';
 
   /// Reels
   static const reels = '/api/reels';
@@ -32,6 +45,7 @@ abstract class ApiUrls {
   static const tickets = '/api/tickets';
   static const createTicket = '/api/tickets/store';
   static const myCertificates = '/api/certificates/my';
+  static const updateAvatar = '/api/my-img';
 
   /// Lessons
   static const lessons = '/api/courses/';
@@ -40,9 +54,52 @@ abstract class ApiUrls {
   static const lessonTests = '/api/courses/';
   static const testById = '/api/courses/';
   static const startACourse = '/api/courses/';
+  static const lessonById = '/api/courses/';
 
   /// Statistics
   static const averageTime = '/api/stats/average';
   static const weekly = '/api/stats/week';
   static const courseTime = '/api/stats/courses?date=';
+
+  /// Notifications
+  static const notifications = '/api/notifications';
+  static const notificationsCount = '/api/notifications/unread-count';
+  static const readAll = '/api/notifications/read-all';
+
+  /// Search
+  static const search = '/api/search?search=';
+
+  /// Set Video Time
+  static const setVideoTime = '/api/courses/';
+
+  /// banners
+  static const banners = '/api/banners';
+
+  /// Tickets
+  static const ticketsMessage = '/api/tickets/';
+
+  /// Finish Final test
+  static const finishFinalTest = '/api/courses/';
+  static const ansFinalSelectPairs = '/api/courses/';
+  static const ansFinalMultipleChoice = '/api/courses/';
+  static const ansFinalListenNComplete = '/api/courses/';
+  static const ansFinalFillInTheBlank = '/api/courses/';
+  static const ansFinalListenNCompleteWords = '/api/courses/';
+  static const ansFinalMultipleChoiceWithPictures = '/api/courses/';
+  static const ansFinalListenNSelectPairs = '/api/courses/';
+
+  /// ====
+
+  /// BUY a Course
+  static const buyACourse = '/api/payment/click';
+
+  /// Tickets Chat
+  static const sendMessage = '/api/tickets/';
+  static const downloadImage = '/api/tickets/';
+
+  /// tests (all)
+  static const finalTestResponse = '/api/courses/';
+
+  /// Rate A Course
+  static const rateACourse = '/api/courses/';
 }

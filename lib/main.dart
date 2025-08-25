@@ -1,5 +1,6 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter/services.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:skills_xorijdaish/my_bloc_provider.dart';
 
@@ -11,5 +12,9 @@ Future<void> main() async {
   await setup();
   await Hive.initFlutter();
   await Hive.openBox('authBox');
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(MyBlocProvider(child: const MyApp()));
 }

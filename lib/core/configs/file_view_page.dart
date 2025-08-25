@@ -1,37 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-class FileViewerPage extends StatefulWidget {
+class FileViewerPage extends StatelessWidget {
+  final String extension;
   final String url;
 
-  const FileViewerPage({super.key, required this.url});
-
-  @override
-  State<FileViewerPage> createState() => _FileViewerPageState();
-}
-
-class _FileViewerPageState extends State<FileViewerPage> {
-  late final WebViewController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller =
-        WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..loadRequest(Uri.parse(widget.url));
-  }
+  const FileViewerPage({super.key, required this.extension, required this.url});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Fayl ko‘rish"),
-        backgroundColor: AppColors.white,
-      ),
-      body: WebViewWidget(controller: _controller),
+      appBar: AppBar(),
+      body: Center(child: buildFileViewer(extension, url)),
     );
+  }
+
+  Widget buildFileViewer(String extension, String url) {
+    extension = extension.toLowerCase();
+
+    if (extension == 'pdf') {
+      return SfPdfViewer.network(url);
+    } else if (['jpg', 'jpeg', 'png'].contains(extension)) {
+      return Image.network(url, fit: BoxFit.contain);
+    } else {
+      return Center(child: Text('Unsupported file type'));
+    }
   }
 }

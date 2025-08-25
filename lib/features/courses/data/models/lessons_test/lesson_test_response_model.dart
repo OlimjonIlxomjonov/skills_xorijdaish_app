@@ -5,11 +5,12 @@ class LessonTestResponseModel extends LessonTestsResponse {
   LessonTestResponseModel({required super.data});
 
   factory LessonTestResponseModel.fromJson(Map<String, dynamic> json) {
+    final dataJson = json['data'];
     return LessonTestResponseModel(
       data:
-          (json['data'] as List)
-              .map((e) => LessonsTestModel.fromJson(e))
-              .toList(),
+          dataJson is List
+              ? dataJson.map((e) => LessonsTestModel.fromJson(e)).toList()
+              : [],
     );
   }
 }

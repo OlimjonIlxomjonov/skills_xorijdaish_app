@@ -13,6 +13,7 @@ class SoftSkillsModel extends SoftSkillsEntity {
     required super.createdAt,
     required super.updatedAt,
     required super.imageUrl,
+    required super.isDone,
   });
 
   factory SoftSkillsModel.fromJson(Map<String, dynamic> json) {
@@ -28,6 +29,7 @@ class SoftSkillsModel extends SoftSkillsEntity {
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       imageUrl: json['image_url'] ?? '',
+      isDone: json['is_done'] ?? false,
     );
   }
 }

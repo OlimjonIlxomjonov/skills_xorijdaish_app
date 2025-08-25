@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-
 import '../../../../core/common/constants/colors/app_colors.dart';
 import '../../../../core/common/textstyles/app_text_styles.dart';
-import '../../../../core/utils/responsiveness/app_responsive.dart';
 
-Widget card(Color color, double size, String text, String task) {
+Widget card(Color color, double size, String? text, String task) {
   return Container(
     width: size,
-    height: appH(210),
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
       color: color,
@@ -32,7 +29,7 @@ Widget card(Color color, double size, String text, String task) {
           ),
         ),
         Text(
-          text,
+          text ?? '',
           style: AppTextStyles.source.regular(
             color: AppColors.white,
             fontSize: 18,

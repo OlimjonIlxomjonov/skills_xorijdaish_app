@@ -14,12 +14,14 @@ class PreTripEntity {
   final int videosDurationInSeconds;
   final String videosDuration;
   final String createdAt;
+  final bool isDone;
   final String updatedAt;
   final String imageUrl;
   final CountryEnt country;
   final PriceInfoEntity priceInfo;
 
   PreTripEntity({
+    required this.isDone,
     required this.id,
     required this.title,
     required this.isStarted,
@@ -35,6 +37,4 @@ class PreTripEntity {
     required this.country,
     required this.priceInfo,
   });
-
-
 }

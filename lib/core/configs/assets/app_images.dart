@@ -5,10 +5,8 @@ class AppImages {
   static const String userAvatar = '${baseUrl}user_avatar$format';
   static const String saleAdvert = '${baseUrl}sale_ad$format';
 
-  static const String swidLogo = '${baseUrl}swid_logo$format';
   static const String complexLogo = '${baseUrl}complex_logo$format';
   static const String poweredBy = '${baseUrl}powered_by$format';
-  static const String iomLogo = "${baseUrl}logo_iom$format";
 
   static const String rusTiliKursi = '${baseUrl}rustili_kursi$format';
   static const String grandHat = '${baseUrl}grand_hat$format';
@@ -29,7 +27,13 @@ class AppImages {
   static const String sertifikatPagePaper = "${baseUrl}complate_paper$format";
   static const String certificate = '${baseUrl}real_certificate$format';
 
-  static const String migration = "${baseUrl}migration$format";
   static const String skillTest = "${baseUrl}skill_test$format";
   static const String paymentClick = "${baseUrl}click$format";
+
+  static const String finalTest = '${baseUrl}final_test$format';
+  static const String tests = '${baseUrl}tests$format';
+  static const String abc = '${baseUrl}abc$format';
+  static const String migLogo = '${baseUrl}mig_logo$format';
+  static const String poweredByRight = '${baseUrl}powered_by_r$format';
+  static const String iomLogo = '${baseUrl}iom_logo$format';
 }

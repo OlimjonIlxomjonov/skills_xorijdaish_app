@@ -36,18 +36,16 @@ class _CreateTicketState extends State<CreateTicket> {
   final TextEditingController muammoController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
-  File? pickedFile;
+  List<File> pickedFiles = [];
 
-  void pickFile() async {
-    final result = await FilePicker.platform.pickFiles();
+  void pickFiles() async {
+    final result = await FilePicker.platform.pickFiles(allowMultiple: true);
 
-    if (result != null && result.files.single.path != null) {
+    if (result != null) {
       setState(() {
-        pickedFile = File(result.files.single.path!);
-      });
-    } else {
-      setState(() {
-        pickedFile = null;
+        pickedFiles.addAll(
+          result.paths.whereType<String>().map((path) => File(path)).toList(),
+        );
       });
     }
   }
@@ -74,7 +72,7 @@ class _CreateTicketState extends State<CreateTicket> {
     }
 
     context.read<CreateTicketBloc>().add(
-      CreateTicketEvent(subject, issue, phone, pickedFile),
+      CreateTicketEvent(subject, issue, phone, pickedFiles),
     );
 
     return true;
@@ -96,69 +94,162 @@ class _CreateTicketState extends State<CreateTicket> {
             horizontal: appW(20),
             vertical: appH(20),
           ),
-          child: Column(
-            spacing: 5,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Mavzu'),
-              CustomTextfield(
-                hintText: 'Izoh qoldiring...',
-                controller: mavzuController,
-              ),
-              SizedBox(height: appH(15)),
-              Text('Muammo'),
-              CustomTextfield(
-                hintText: 'Izoh qoldiring...',
-                controller: muammoController,
-              ),
-              SizedBox(height: appH(15)),
-              GestureDetector(
-                onTap: pickFile,
-                child: DottedBorder(
-                  borderType: BorderType.RRect,
-                  radius: Radius.circular(10),
-                  dashPattern: [6, 4],
-                  color: AppColors.textGrey,
-                  strokeWidth: 1.5,
-                  child: Container(
-                    height: appH(56),
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: Color(0xffF7F7F8),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.shade50,
-                          spreadRadius: 1,
-                          blurRadius: 15,
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      spacing: 10,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SvgPicture.asset(AppVectors.upload),
-                        SizedBox(width: 10),
-                        Text(
-                          pickedFile != null
-                              ? pickedFile!.path.split('/').last
-                              : 'Upload file (pdf, doc, excel)',
-                          style: AppTextStyles.source.regular(
-                            color: Color(0xff150A33),
-                            fontSize: 12,
+          child: SingleChildScrollView(
+            child: Column(
+              spacing: 5,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Mavzu'),
+                CustomTextfield(
+                  hintText: 'Izoh qoldiring...',
+                  controller: mavzuController,
+                ),
+                SizedBox(height: appH(15)),
+                Text('Muammo'),
+                CustomTextfield(
+                  hintText: 'Izoh qoldiring...',
+                  controller: muammoController,
+                ),
+                SizedBox(height: appH(15)),
+                GestureDetector(
+                  onTap: pickFiles,
+                  child: DottedBorder(
+                    borderType: BorderType.RRect,
+                    radius: Radius.circular(10),
+                    dashPattern: [6, 4],
+                    color: AppColors.textGrey,
+                    strokeWidth: 1.5,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Color(0xffF7F7F8),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade50,
+                            spreadRadius: 1,
+                            blurRadius: 15,
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child:
+                          pickedFiles.isEmpty
+                              ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(AppVectors.upload),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    'Upload file (pdf, doc, excel)',
+                                    style: AppTextStyles.source.regular(
+                                      color: Color(0xff150A33),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              )
+                              : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  GestureDetector(
+                                    onTap: pickFiles,
+                                    child: DottedBorder(
+                                      borderType: BorderType.RRect,
+                                      radius: Radius.circular(10),
+                                      dashPattern: [6, 4],
+                                      color: AppColors.textGrey,
+                                      strokeWidth: 1.5,
+                                      child: Container(
+                                        height: appH(56),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xffF7F7F8),
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              SvgPicture.asset(
+                                                AppVectors.upload,
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Text(
+                                                'Upload files (pdf, doc, excel)',
+                                                style: AppTextStyles.source
+                                                    .regular(
+                                                      color: const Color(
+                                                        0xff150A33,
+                                                      ),
+                                                      fontSize: 12,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  ...pickedFiles.map((file) {
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 4),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              file.path.split('/').last,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: AppTextStyles.source
+                                                  .regular(
+                                                    color: const Color(
+                                                      0xff150A33,
+                                                    ),
+                                                    fontSize: 12,
+                                                  ),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: Icon(
+                                              Icons.close,
+                                              size: 16,
+                                              color: Colors.red,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                pickedFiles.remove(file);
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: appH(15)),
-              Text('Telefon raqam'),
-              CustomPhoneTextField(controller: phoneController),
-            ],
+
+                SizedBox(height: appH(15)),
+                Text('Telefon raqam'),
+                CustomPhoneTextField(controller: phoneController),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: Container(
@@ -184,7 +275,7 @@ class _CreateTicketState extends State<CreateTicket> {
               if (success) {
                 AppRoute.close();
                 successFlushBar(context, 'Muvaffaqiyatl yaratildi!');
-                context.read<SupportBloc>().add(SupportEvent());
+                context.read<SupportBloc>().add(SupportEvent(1));
               }
             },
           ),

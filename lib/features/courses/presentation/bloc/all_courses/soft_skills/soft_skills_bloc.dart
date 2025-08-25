@@ -10,12 +10,12 @@ class SoftSkillsBloc extends Bloc<CoursesEvent, SoftSkillsState> {
   SoftSkillsBloc(this.useCase) : super(SoftSkillsInitial()) {
     on<GetSoftSkillsEvent>((event, emit) async {
       emit(SoftSkillsLoading());
-      if (appSession.softSkillsInfo != null) {
-        emit(SoftSkillsLoaded(appSession.softSkillsInfo!));
-      }
+      // if (appSession.softSkillsInfo != null) {
+      //   emit(SoftSkillsLoaded(appSession.softSkillsInfo!));
+      // }
       try {
         final result = await useCase.call(query: event.query);
-        appSession.softSkillsInfo = result;
+        // appSession.softSkillsInfo = result;
         emit(SoftSkillsLoaded(result));
       } catch (e) {
         emit(SoftSkillsError(e.toString()));

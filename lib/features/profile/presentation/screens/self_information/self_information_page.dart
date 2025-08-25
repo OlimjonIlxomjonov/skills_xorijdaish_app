@@ -52,11 +52,6 @@ class SelfInformationPage extends StatelessWidget {
               return Text(state.message);
             } else if (state is SelfInfoLoaded) {
               final info = state.entity;
-              userInfo.fullName = info.name ?? '';
-              userInfo.phoneNumber = info.phoneNumber ?? '';
-              userInfo.isVerified = info.isVerified;
-              logger.w(userInfo.isVerified);
-
               return Column(
                 spacing: 15,
                 children: [

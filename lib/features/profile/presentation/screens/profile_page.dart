@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/constants/strings/app_strings.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
@@ -18,15 +19,21 @@ import 'package:skills_xorijdaish/features/profile/presentation/bloc/profile_eve
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/revoke_session/revoke_session_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/self_info/self_info_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/self_info/self_info_state.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/update_avatar/update_avatar_bloc.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/update_avatar/update_avatar_state.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/active_sessions/active_session_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/certificates/certificates_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/notifications/notifications_page.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/screens/questions/question_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/self_information_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/user_info_storage.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/support/support_page.dart';
 
 import '../../../../core/utils/logger/logger.dart';
 import '../../../../core/utils/responsiveness/app_responsive.dart';
+import '../../data/repo/profile_repo_impl.dart';
+import '../../data/source/profile_remote_data_source_impl.dart';
+import '../../domain/usecase/session_use_case.dart';
 import '../bloc/sessions/session_bloc.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -37,21 +44,45 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  File? image;
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSessionId();
+  }
+
+  Future<void> _loadSessionId() async {
+    try {
+      final remoteDataSource = ProfileRemoteDataSourceImpl();
+      final repository = ProfileRepoImpl(remoteDataSource);
+      final sessionUseCase = SessionUseCase(repository);
+
+      final sessionResponse = await sessionUseCase.call();
+
+      final currentSession = sessionResponse.data.firstWhere(
+        (element) => element.isMe == true,
+      );
+
+      userInfo.sessionId = currentSession.id;
+      logger.i('Session ID loaded: ${userInfo.sessionId}');
+    } catch (e) {
+      logger.e('Error loading session ID: $e');
+    }
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
       final pickedFile = await _picker.pickImage(source: source);
       if (pickedFile != null) {
         final file = File(pickedFile.path);
-        setState(() {
-          image = file;
-        });
-        userInfo.avatarImage = file;
+
+        context.read<UpdateAvatarBloc>().add(UpdateAvatarEvent(file));
+
+        context.read<SelfInfoBloc>().add(SelfInfoEvent());
       }
     } catch (e) {
-      logger.e('Error occurred while getting an image, $e');
+      logger.e('Error occurred while picking image: $e');
     }
   }
 
@@ -66,6 +97,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 title: Text('Take a Photo'),
                 onTap: () {
                   Navigator.pop(context);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: Icon(IconlyLight.image),
+                title: Text('Choose from Gallery'),
+                onTap: () {
+                  Navigator.pop(context);
                   _pickImage(ImageSource.gallery);
                 },
               ),
@@ -78,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      appBar: CustomAppBar(titleText: AppStrings.myProfile, onTap: () {}),
+      appBar: CustomAppBar(titleText: AppStrings.myProfile),
       body: Padding(
         padding: EdgeInsets.only(
           left: appW(20),
@@ -89,13 +128,31 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             Stack(
               children: [
-                CircleAvatar(
-                  radius: appH(70),
-                  backgroundColor: AppColors.greyScale.grey300,
-                  backgroundImage:
-                      image != null
-                          ? FileImage(image!)
-                          : AssetImage(AppImages.defaultProfilePic),
+                BlocListener<UpdateAvatarBloc, UpdateAvatarState>(
+                  listener: (context, state) {
+                    if (state is UpdateAvatarLoaded) {
+                      context.read<SelfInfoBloc>().add(SelfInfoEvent());
+                    }
+                  },
+                  child: BlocBuilder<SelfInfoBloc, SelfInfoState>(
+                    builder: (context, state) {
+                      if (state is SelfInfoLoading) {
+                        return CircularProgressIndicator();
+                      } else if (state is SelfInfoLoaded) {
+                        return CircleAvatar(
+                          radius: appH(70),
+                          backgroundColor: AppColors.greyScale.grey300,
+                          backgroundImage:
+                              state.entity.avatar.isNotEmpty
+                                  ? NetworkImage(
+                                    "${state.entity.avatar}?v=${DateTime.now().millisecondsSinceEpoch}",
+                                  )
+                                  : AssetImage(AppImages.defaultProfilePic),
+                        );
+                      }
+                      return SizedBox.shrink();
+                    },
+                  ),
                 ),
                 Positioned(
                   bottom: 0,
@@ -119,68 +176,77 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
             SizedBox(height: appH(12)),
-            Column(
-              children: [
-                userInfo.isVerified == true
-                    ? Row(
-                      spacing: 10,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          userInfo.fullName ?? 'Label',
-                          style: AppTextStyles.source.semiBold(
-                            color: AppColors.black,
-                            fontSize: 20,
+            BlocBuilder<SelfInfoBloc, SelfInfoState>(
+              builder: (context, state) {
+                if (state is SelfInfoLoading) {
+                  return CircularProgressIndicator();
+                } else if (state is SelfInfoLoaded) {
+                  final isVerified = state.entity.isVerified;
+                  return Column(
+                    children: [
+                      isVerified
+                          ? Row(
+                            spacing: 10,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                state.entity.name,
+                                style: AppTextStyles.source.semiBold(
+                                  color: AppColors.black,
+                                  fontSize: 20,
+                                ),
+                              ),
+                              Icon(
+                                Icons.verified_rounded,
+                                color: AppColors.secondBlue,
+                              ),
+                            ],
+                          )
+                          : Text(
+                            state.entity.name,
+                            style: AppTextStyles.source.semiBold(
+                              color: AppColors.black,
+                              fontSize: 20,
+                            ),
+                          ),
+                      SizedBox(height: appH(8)),
+                      if (!isVerified)
+                        Center(
+                          child: Container(
+                            width: appW(200),
+                            padding: EdgeInsets.symmetric(
+                              vertical: appH(3),
+                              horizontal: appW(5),
+                            ),
+                            decoration: BoxDecoration(
+                              color: Color(0xffFC7B06),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              spacing: 10,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Shaxsingizni tasdiqlang',
+                                  style: AppTextStyles.source.medium(
+                                    color: AppColors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                Icon(
+                                  IconlyLight.arrow_right_2,
+                                  color: AppColors.white,
+                                  size: appW(15),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Icon(
-                          Icons.verified_rounded,
-                          color: AppColors.secondBlue,
-                        ),
-                      ],
-                    )
-                    : Text(
-                      userInfo.fullName ?? 'Label',
-                      style: AppTextStyles.source.semiBold(
-                        color: AppColors.black,
-                        fontSize: 20,
-                      ),
-                    ),
-                SizedBox(height: appH(8)),
-                userInfo.isVerified == true
-                    ? Text(userInfo.phoneNumber ?? '')
-                    : Center(
-                      child: Container(
-                        width: appW(200),
-                        padding: EdgeInsets.symmetric(
-                          vertical: appH(3),
-                          horizontal: appW(5),
-                        ),
-                        decoration: BoxDecoration(
-                          color: Color(0xffFC7B06),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          spacing: 10,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Shaxsingizni tasdiqlang',
-                              style: AppTextStyles.source.medium(
-                                color: AppColors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Icon(
-                              IconlyLight.arrow_right_2,
-                              color: AppColors.white,
-                              size: appW(15),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-              ],
+                    ],
+                  );
+                }
+                return SizedBox.shrink();
+              },
             ),
             SizedBox(height: appH(10)),
             Divider(color: AppColors.greyScale.grey200),
@@ -230,7 +296,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 buildRow(
                   IconlyLight.info_square,
-                  () {},
+                  () {
+                    AppRoute.go(QuestionPage());
+                  },
                   AppStrings.faq,
                   optionalIcon: IconlyLight.arrow_right_2,
                 ),
@@ -256,94 +324,87 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: AppColors.white,
       context: context,
       builder: (context) {
-        return SizedBox(
-          width: double.infinity,
-          height: appH(290),
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: 8, bottom: 24),
-                width: 38,
-                height: appH(3),
-                decoration: BoxDecoration(
-                  color: Color(0xffE0E0E0),
-                  borderRadius: BorderRadius.circular(100),
-                ),
+        return Column(
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: appH(8), bottom: appH(24)),
+              width: 38,
+              height: appH(3),
+              decoration: BoxDecoration(
+                color: Color(0xffE0E0E0),
+                borderRadius: BorderRadius.circular(100),
               ),
-              Text(
-                'Akkauntdan chiqish',
-                style: AppTextStyles.source.medium(
-                  color: AppColors.red,
-                  fontSize: 24,
-                ),
+            ),
+            Text(
+              'Akkauntdan chiqish',
+              style: AppTextStyles.source.medium(
+                color: AppColors.red,
+                fontSize: 24,
               ),
-              SizedBox(height: 24),
-              Divider(color: AppColors.greyScale.grey300),
-              SizedBox(height: 24),
-              Text(
-                'Siz rostdan ham akkauntdan chiqmoqchimisiz?',
-                style: AppTextStyles.source.regular(
-                  color: AppColors.black,
-                  fontSize: 20,
-                ),
-                textAlign: TextAlign.center,
+            ),
+            SizedBox(height: appH(24)),
+            Divider(color: AppColors.greyScale.grey300),
+            SizedBox(height: appH(24)),
+            Text(
+              'Siz rostdan ham akkauntdan chiqmoqchimisiz?',
+              style: AppTextStyles.source.regular(
+                color: AppColors.black,
+                fontSize: 20,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 24,
-                ),
-                child: Row(
-                  spacing: 12,
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          AppRoute.close();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, appH(51)),
-                          backgroundColor: AppColors.white,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(
-                              color: Color(0xff5B7BFE),
-                              width: 2,
-                            ),
-                          ),
+              textAlign: TextAlign.center,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: appW(24),
+                vertical: appH(24),
+              ),
+              child: Row(
+                spacing: 12,
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        AppRoute.close();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: Size(double.infinity, appH(51)),
+                        backgroundColor: AppColors.white,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Color(0xff5B7BFE), width: 2),
                         ),
-                        child: Text(
-                          'Bekor qilish',
-                          style: AppTextStyles.source.medium(
-                            color: Color(0xff5B7BFE),
-                            fontSize: 16,
-                          ),
+                      ),
+                      child: Text(
+                        'Bekor qilish',
+                        style: AppTextStyles.source.medium(
+                          color: Color(0xff5B7BFE),
+                          fontSize: 16,
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: BasicButtonWg(
-                        text: 'Tasdiqlash',
-                        onTap: () {
-                          if (userInfo.sessionId != null) {
-                            context.read<RevokeSessionBloc>().add(
-                              RevokeSessionEvent(userInfo.sessionId ?? ''),
-                            );
-                            logger.f(userInfo.sessionId ?? '');
-                            AppRoute.open(AuthPage());
-                            successFlushBar(context, 'Muvaffaqiyat!');
-                          } else {
-                            showErrorFlushbar(context, 'Xato!');
-                          }
-                        },
-                      ),
+                  ),
+                  Expanded(
+                    child: BasicButtonWg(
+                      text: 'Tasdiqlash',
+                      onTap: () {
+                        if (userInfo.sessionId != null) {
+                          context.read<RevokeSessionBloc>().add(
+                            RevokeSessionEvent(userInfo.sessionId ?? ''),
+                          );
+                          logger.f(userInfo.sessionId ?? '');
+                          AppRoute.open(AuthPage());
+                          successFlushBar(context, 'Muvaffaqiyat!');
+                        } else {
+                          showErrorFlushbar(context, 'Xato!');
+                        }
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

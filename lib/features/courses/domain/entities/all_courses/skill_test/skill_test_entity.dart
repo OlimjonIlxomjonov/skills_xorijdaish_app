@@ -9,9 +9,11 @@ class SkillTestEntity {
   final String videosDuration;
   final String createdAt;
   final String? updatedAt;
+  final bool isDone;
   final String imageUrl;
 
   SkillTestEntity({
+    required this.isDone,
     required this.id,
     required this.title,
     required this.isStarted,

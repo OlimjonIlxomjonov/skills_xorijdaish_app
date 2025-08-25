@@ -10,7 +10,7 @@ class SupportBloc extends Bloc<ProfileEvent, SupportState> {
     on<SupportEvent>((event, emit) async {
       emit(SupportLoading());
       try {
-        final response = await useCase.call();
+        final response = await useCase.call(page: event.page);
         emit(SupportLoaded(response));
       } catch (e) {
         emit(SupportError(e.toString()));

@@ -44,7 +44,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
     return Container(
       height: appH(55),
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
         border: Border.all(
           color: isTextFieldFocused ? AppColors.blue : AppColors.inputGreyColor,

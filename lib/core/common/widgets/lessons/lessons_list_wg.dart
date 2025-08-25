@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skills_xorijdaish/core/configs/assets/app_vectors.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses_event.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/bloc/get_courses_by_id/course_by_id_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/single_course/single_course_page.dart';
 import '../../../page_route/route_generator.dart';
 import '../../../utils/responsiveness/app_responsive.dart';
@@ -22,6 +19,8 @@ class LessonsListWg extends StatelessWidget {
   final int fileCount;
   final String? language;
   final bool isStarted;
+  final bool isDone;
+  final int? priceInfo;
 
   const LessonsListWg({
     super.key,
@@ -33,6 +32,8 @@ class LessonsListWg extends StatelessWidget {
     required this.fileCount,
     this.language,
     required this.isStarted,
+    required this.isDone,
+    this.priceInfo,
   });
 
   @override
@@ -56,50 +57,81 @@ class LessonsListWg extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.only(
+            borderRadius: BorderRadius.only(
               topLeft: Radius.circular(16),
               topRight: Radius.circular(16),
             ),
-            child: Image.network(
-              image,
-              width: appW(372),
-              height: appH(164),
-              fit: BoxFit.cover,
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Container(
+            child: Stack(
+              children: [
+                Image.network(
+                  image,
                   width: appW(372),
                   height: appH(164),
-                  alignment: Alignment.center,
-                  child: Shimmer.fromColors(
-                    baseColor: Colors.grey.shade300,
-                    highlightColor: Colors.grey.shade100,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      width: appW(372),
+                      height: appH(164),
+                      alignment: Alignment.center,
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey.shade300,
+                        highlightColor: Colors.grey.shade100,
+                        child: Container(
+                          width: appW(372),
+                          height: appH(164),
+                          color: Colors.white,
+                        ),
+                      ),
+                    );
+                  },
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: appW(372),
+                      height: appH(164),
+                      color: Colors.grey.shade200,
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.broken_image,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    );
+                  },
+                ),
+                if (isDone)
+                  Container(
+                    width: double.infinity,
+                    height: appH(164),
+                    color: Colors.black.withAlpha(150),
+                    child: SvgPicture.asset(
+                      AppVectors.certificate,
+                      fit: BoxFit.none,
+                    ),
+                  ),
+                if (priceInfo != null)
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                        vertical: appH(10),
-                        horizontal: appW(16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white.withOpacity(0.85),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '$priceInfo UZS',
+                        style: AppTextStyles.source.medium(
+                          color: AppColors.black,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
                   ),
-                );
-              },
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: appW(372),
-                  height: appH(164),
-                  color: Colors.grey.shade200,
-                  alignment: Alignment.center,
-                  child: const Icon(
-                    Icons.broken_image,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
-                );
-              },
+              ],
             ),
           ),
           Text(

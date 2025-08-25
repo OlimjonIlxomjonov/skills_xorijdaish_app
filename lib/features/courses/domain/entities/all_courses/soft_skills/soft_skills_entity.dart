@@ -10,8 +10,10 @@ class SoftSkillsEntity {
   final String createdAt;
   final String updatedAt;
   final String imageUrl;
+  final bool isDone;
 
   SoftSkillsEntity({
+    required this.isDone,
     required this.id,
     required this.title,
     required this.isStarted,

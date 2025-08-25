@@ -9,8 +9,8 @@ class ReelsRepoImpl extends ReelsRepository {
   ReelsRepoImpl(this.dataSource);
 
   @override
-  Future<ReelsResponse> fetchAllReels() {
-    return dataSource.getReels();
+  Future<ReelsResponse> fetchAllReels({required int page}) {
+    return dataSource.getReels(page: page);
   }
 
   @override

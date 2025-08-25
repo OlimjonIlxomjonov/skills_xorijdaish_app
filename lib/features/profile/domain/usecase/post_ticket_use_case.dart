@@ -11,7 +11,7 @@ class PostTicketUseCase {
     required String title,
     required String text,
     required String phoneNumber,
-    required File? file,
+    required List<File> file,
   }) {
     return repository.postTicket(
       title: title,

@@ -11,10 +11,12 @@ class ForeignLanguageEntity {
   final String stars;
   final String createdAt;
   final String updatedAt;
+  final bool isDone;
   final String imageUrl;
   final CountryEnt country;
 
   ForeignLanguageEntity({
+    required this.isDone,
     required this.id,
     required this.title,
     required this.isStarted,

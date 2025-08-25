@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:iconly/iconly.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
@@ -33,10 +34,46 @@ class _AppBottomNavState extends State<AppBottomNav> {
   void initState() {
     super.initState();
     _currentIndex = widget.initialIndex;
+
+    _updateSystemUI(_currentIndex);
+  }
+
+  void _updateSystemUI(int index) {
+    if (index == 3) {
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          systemNavigationBarColor: Color(0xff1C1C25),
+          systemNavigationBarIconBrightness: Brightness.light,
+        ),
+      );
+    } else {
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          systemNavigationBarColor: Colors.white,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_currentIndex == 3) {
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          systemNavigationBarColor: Color(0xff1C1C25),
+          systemNavigationBarIconBrightness: Brightness.light,
+        ),
+      );
+    } else {
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          systemNavigationBarColor: Colors.white,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+      );
+    }
+
     return Stack(
       children: [
         Container(
@@ -46,10 +83,14 @@ class _AppBottomNavState extends State<AppBottomNav> {
           backgroundColor: Colors.transparent,
           body: pages[_currentIndex],
           bottomNavigationBar: Container(
-            padding: const EdgeInsets.only(bottom: 20, left: 20, right: 20),
+            padding: EdgeInsets.only(
+              bottom: appH(20),
+              left: appW(20),
+              right: appW(20),
+            ),
             decoration: BoxDecoration(
               color: _currentIndex == 3 ? Color(0xff1C1C25) : AppColors.white,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
               ),
@@ -57,10 +98,12 @@ class _AppBottomNavState extends State<AppBottomNav> {
             ),
             child: GNav(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              gap: 8,
               iconSize: appH(24),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              tabMargin: const EdgeInsets.symmetric(horizontal: 4),
+              padding: EdgeInsets.symmetric(
+                horizontal: appW(16),
+                vertical: appH(12),
+              ),
+              tabMargin: EdgeInsets.symmetric(horizontal: appW(4)),
               backgroundColor:
                   _currentIndex == 3 ? Color(0xff1C1C25) : AppColors.white,
               activeColor: AppColors.textBlue,
@@ -68,6 +111,22 @@ class _AppBottomNavState extends State<AppBottomNav> {
               selectedIndex: _currentIndex,
               onTabChange: (index) {
                 setState(() => _currentIndex = index);
+                if (index == 3) {
+                  SystemChrome.setSystemUIOverlayStyle(
+                    const SystemUiOverlayStyle(
+                      systemNavigationBarColor: Color(0xff1C1C25),
+
+                      systemNavigationBarIconBrightness: Brightness.light,
+                    ),
+                  );
+                } else {
+                  SystemChrome.setSystemUIOverlayStyle(
+                    const SystemUiOverlayStyle(
+                      systemNavigationBarColor: Colors.white,
+                      systemNavigationBarIconBrightness: Brightness.dark,
+                    ),
+                  );
+                }
               },
               tabs: [
                 GButton(

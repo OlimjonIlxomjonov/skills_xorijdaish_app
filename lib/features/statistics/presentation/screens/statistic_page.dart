@@ -5,6 +5,7 @@ import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/constants/strings/app_strings.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
+import 'package:skills_xorijdaish/core/configs/cache/app_session_cache.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
 import 'package:skills_xorijdaish/features/statistics/presentation/bloc/average/average_bloc.dart';
 import 'package:skills_xorijdaish/features/statistics/presentation/bloc/average/average_state.dart';
@@ -85,107 +86,201 @@ class _StatisticPageState extends State<StatisticPage> {
       appBar: CustomAppBar(titleText: 'Statistika', onTap: () {}),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: appW(20)),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              Text(
-                AppStrings.activeSessions,
-                style: AppTextStyles.source.medium(
-                  color: AppColors.black,
-                  fontSize: 18,
-                ),
-              ),
-              BlocBuilder<AverageBloc, AverageState>(
-                builder: (context, state) {
-                  if (state is AverageLoading) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 20),
-                      child: Shimmer.fromColors(
-                        baseColor: Colors.grey.shade300,
-                        highlightColor: Colors.grey.shade100,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: appH(10),
-                            horizontal: appW(16),
-                          ),
-                          height: appH(35),
-                          decoration: BoxDecoration(color: Colors.white),
-                        ),
-                      ),
-                    );
-                  } else if (state is AverageError) {
-                    return Text('Error');
-                  } else if (state is AverageLoaded) {
-                    return Text(
-                      state.response.data.activeTimesInHumanReadable,
-                      style: AppTextStyles.source.semiBold(
-                        color: AppColors.black,
-                        fontSize: 28,
-                      ),
-                    );
-                  }
-                  return SizedBox.shrink();
-                },
-              ),
-              const SizedBox(height: 8),
-              Text(
-                AppStrings.dailyMidActive,
-                style: AppTextStyles.source.regular(
-                  color: AppColors.black,
-                  fontSize: 16,
-                ),
-              ),
-              BlocBuilder<WeekBloc, WeekStats>(
-                builder: (context, state) {
-                  if (state is WeekStatsLoading) {
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: 20),
-                      child: Shimmer.fromColors(
-                        baseColor: Colors.grey.shade300,
-                        highlightColor: Colors.grey.shade100,
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            vertical: appH(10),
-                            horizontal: appW(16),
-                          ),
-                          height: appH(160),
-                          decoration: BoxDecoration(color: Colors.white),
-                        ),
-                      ),
-                    );
-                    ;
-                  } else if (state is WeekStatsError) {
-                    return Text("Xatolik: ${state.message}");
-                  } else if (state is WeekStatsLoaded) {
-                    final dataList = state.response.data;
-                    final Map<String, double> chartData = {
-                      for (var item in dataList)
-                        getWeekdayLabel(item.weekday):
-                            item.activeTimesInSeconds.toDouble() / 60,
-                    };
-                    return WeeklyBarChart(data: chartData);
-                    // return Text('Test');
-                  }
+        child: RefreshIndicator(
+          onRefresh: () async {
+            appSession.averageResponse = null;
+            appSession.weekResponse = null;
 
-                  return const SizedBox.shrink();
-                },
-              ),
-
-              const SizedBox(height: 24),
-              Text(
-                'Kurslar uchun ajratilgan vaqt',
-                style: AppTextStyles.source.medium(
-                  color: AppColors.black,
-                  fontSize: 18,
+            context.read<AverageBloc>().add(AverageEvent());
+            context.read<WeekBloc>().add(WeekEvent());
+            context.read<CourseTimeBloc>().add(CourseTimeEvent(selectedDate));
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                Text(
+                  AppStrings.activeSessions,
+                  style: AppTextStyles.source.medium(
+                    color: AppColors.black,
+                    fontSize: 18,
+                  ),
                 ),
-              ),
-              SizedBox(height: appH(20)),
-              datePicker(selectedMonth, selectedYear, weekDates),
-              SizedBox(height: appH(20)),
-              courseTime(),
-            ],
+                BlocBuilder<AverageBloc, AverageState>(
+                  builder: (context, state) {
+                    if (state is AverageLoading) {
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: 20),
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.grey.shade300,
+                          highlightColor: Colors.grey.shade100,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              vertical: appH(10),
+                              horizontal: appW(16),
+                            ),
+                            height: appH(35),
+                            decoration: BoxDecoration(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    } else if (state is AverageError) {
+                      return Text(
+                        'Lost internet connection!',
+                        style: AppTextStyles.source.regular(
+                          color: AppColors.red,
+                          fontSize: 16,
+                        ),
+                      );
+                    } else if (state is AverageLoaded) {
+                      return Text(
+                        state.response.data.activeTimesInHumanReadable,
+                        style: AppTextStyles.source.semiBold(
+                          color: AppColors.black,
+                          fontSize: 28,
+                        ),
+                      );
+                    }
+                    return SizedBox.shrink();
+                  },
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  AppStrings.dailyMidActive,
+                  style: AppTextStyles.source.regular(
+                    color: AppColors.black,
+                    fontSize: 16,
+                  ),
+                ),
+                BlocBuilder<WeekBloc, WeekStats>(
+                  builder: (context, state) {
+                    if (state is WeekStatsLoading) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 20),
+                        child: Shimmer.fromColors(
+                          baseColor: Colors.grey.shade300,
+                          highlightColor: Colors.grey.shade100,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            spacing: 10,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: appH(10),
+                                  horizontal: appW(25),
+                                ),
+                                height: appH(180),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(6),
+                                    topRight: Radius.circular(6),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: appH(10),
+                                  horizontal: appW(25),
+                                ),
+                                height: appH(60),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(6),
+                                    topRight: Radius.circular(6),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: appH(10),
+                                  horizontal: appW(25),
+                                ),
+                                height: appH(120),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(6),
+                                    topRight: Radius.circular(6),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: appH(10),
+                                  horizontal: appW(25),
+                                ),
+                                height: appH(100),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(6),
+                                    topRight: Radius.circular(6),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: appH(10),
+                                  horizontal: appW(25),
+                                ),
+                                height: appH(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(6),
+                                    topRight: Radius.circular(6),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: appH(10),
+                                  horizontal: appW(25),
+                                ),
+                                height: appH(130),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(6),
+                                    topRight: Radius.circular(6),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else if (state is WeekStatsLoaded) {
+                      final dataList = state.response.data;
+                      final Map<String, double> chartData = {
+                        for (var item in dataList)
+                          getWeekdayLabel(item.weekday):
+                              item.activeTimesInSeconds.toDouble(),
+                      };
+                      return WeeklyBarChart(data: chartData);
+                    }
+
+                    return const SizedBox.shrink();
+                  },
+                ),
+
+                const SizedBox(height: 24),
+                Text(
+                  'Kurslar uchun ajratilgan vaqt',
+                  style: AppTextStyles.source.medium(
+                    color: AppColors.black,
+                    fontSize: 18,
+                  ),
+                ),
+                SizedBox(height: appH(20)),
+                datePicker(selectedMonth, selectedYear, weekDates),
+                SizedBox(height: appH(20)),
+                courseTime(),
+              ],
+            ),
           ),
         ),
       ),
@@ -206,7 +301,10 @@ class _StatisticPageState extends State<StatisticPage> {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
-                      border: Border.all(color: AppColors.textGrey, width: 0.3),
+                      border: Border.all(
+                        color: AppColors.inputGreyColor,
+                        width: 0.3,
+                      ),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Shimmer.fromColors(
@@ -257,8 +355,6 @@ class _StatisticPageState extends State<StatisticPage> {
               },
             ),
           );
-        } else if (state is CourseTimeStateError) {
-          return Text('Error');
         } else if (state is CourseTimeStateLoaded) {
           return ListView.builder(
             physics: NeverScrollableScrollPhysics(),
@@ -367,7 +463,7 @@ class _StatisticPageState extends State<StatisticPage> {
                       color: AppColors.white,
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: Icon(Icons.chevron_left, color: Colors.grey),
+                    child: const Icon(Icons.chevron_left, color: Colors.grey),
                   ),
                 ),
                 Text(

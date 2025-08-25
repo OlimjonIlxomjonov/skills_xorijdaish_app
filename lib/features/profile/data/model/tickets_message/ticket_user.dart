@@ -1,0 +1,63 @@
+import 'package:skills_xorijdaish/features/profile/domain/entity/tickets_message/ticket_user.dart';
+
+class TicketUserModel extends TicketUser {
+  TicketUserModel({
+    required super.id,
+    required super.name,
+    required super.email,
+    super.emailVerifiedAt,
+    required super.createdAt,
+    required super.updatedAt,
+    required super.isAdmin,
+    super.phoneNumber,
+    required super.surName,
+    required super.pin,
+    required super.userId,
+    required super.pportNo,
+    required super.midName,
+    super.userType,
+    required super.firstName,
+    required super.fullName,
+    required super.gender,
+    required super.nationality,
+    required super.birthDate,
+    required super.citizenship,
+    required super.pportIssuedBy,
+    required super.pportIssuedDate,
+    required super.pportExpiryDate,
+    required super.image,
+    required super.fcmToken,
+    required super.avatar,
+  });
+
+  factory TicketUserModel.fromJson(Map<String, dynamic> json) {
+    return TicketUserModel(
+      id: json['id'] ?? 0,
+      name: json['name'] ?? '',
+      email: json['email'] ?? '',
+      emailVerifiedAt: json['email_verified_at'] ?? '',
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'] ?? '',
+      isAdmin: json['is_admin'] ?? false,
+      phoneNumber: json['phone_number'] ?? '',
+      surName: json['sur_name'] ?? '',
+      pin: json['pin'] ?? '',
+      userId: json['user_id'] ?? '',
+      pportNo: json['pport_no'] ?? '',
+      midName: json['mid_name'] ?? '',
+      userType: json['user_type'] ?? '',
+      firstName: json['first_name'] ?? '',
+      fullName: json['full_name'] ?? '',
+      gender: json['gender'] ?? 0,
+      nationality: json['nationality'] ?? '',
+      birthDate: json['birth_date'] ?? '',
+      citizenship: json['citizenship'] ?? '',
+      pportIssuedBy: json['pport_issued_by'] ?? '',
+      pportIssuedDate: json['pport_issued_date'] ?? '',
+      pportExpiryDate: json['pport_expiry_date'] ?? '',
+      image: json['image'] ?? '',
+      fcmToken: json['fcm_token'] ?? '',
+      avatar: json['avatar'] ?? '',
+    );
+  }
+}

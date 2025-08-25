@@ -4,5 +4,4 @@ class PreTripResponse {
   final List<PreTripEntity> data;
 
   PreTripResponse({required this.data});
-
 }

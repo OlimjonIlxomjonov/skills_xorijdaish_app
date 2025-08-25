@@ -6,7 +6,7 @@ class SupportUseCase {
 
   SupportUseCase(this.repository);
 
-  Future<SupportResponse> call() {
-    return repository.fetchSupport();
+  Future<SupportResponse> call({required int page}) {
+    return repository.fetchSupport(page: page);
   }
 }

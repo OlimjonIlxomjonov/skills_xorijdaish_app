@@ -8,4 +8,16 @@ class ReelsResponse {
   final ReelsMetaData meta;
 
   ReelsResponse({required this.data, required this.links, required this.meta});
+
+  ReelsResponse copyWith({
+    List<ReelsEntity>? data,
+    ReelsLinks? links,
+    ReelsMetaData? meta,
+  }) {
+    return ReelsResponse(
+      data: data ?? this.data,
+      links: links ?? this.links,
+      meta: meta ?? this.meta,
+    );
+  }
 }

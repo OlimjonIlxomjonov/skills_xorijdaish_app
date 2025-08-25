@@ -9,6 +9,7 @@ import 'package:skills_xorijdaish/features/profile/presentation/bloc/profile_eve
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/support/support_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/support/support_state.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/user_info_storage.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/screens/support/chat/tickets_chat_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/support/create_ticket.dart';
 
 class TicketsPage extends StatefulWidget {
@@ -22,7 +23,7 @@ class _TicketsPageState extends State<TicketsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<SupportBloc>().add(SupportEvent());
+    context.read<SupportBloc>().add(SupportEvent(1));
   }
 
   @override
@@ -35,18 +36,119 @@ class _TicketsPageState extends State<TicketsPage> {
           return Text('Error');
         } else if (state is SupportLoaded) {
           return Expanded(
-            child: ListView.builder(
-              itemCount: state.response.data.length,
-              itemBuilder: (context, index) {
-                userInfo.response = state.response.data.isEmpty;
-                final support = state.response.data[index];
-                return _buildTicket(
-                  title: support.title,
-                  date: support.createdAt,
-                  status: support.status,
-                  onTap: () {},
-                );
+            child: RefreshIndicator(
+              onRefresh: () async {
+                context.read<SupportBloc>().add(SupportEvent(1));
               },
+              child: ListView.builder(
+                itemCount: state.response.data.length + 1,
+                itemBuilder: (context, index) {
+                  if (index == state.response.data.length) {
+                    final currentPage = state.response.metaData.currentPage;
+                    final lastPage = state.response.metaData.lastPage;
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // PREVIOUS
+                          OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              side: BorderSide(
+                                color: AppColors.appBg,
+                                width: 1.5,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                            ),
+                            onPressed:
+                                currentPage > 1
+                                    ? () {
+                                      context.read<SupportBloc>().add(
+                                        SupportEvent(currentPage - 1),
+                                      );
+                                    }
+                                    : null,
+                            child: Icon(IconlyLight.arrow_left_2),
+                          ),
+
+                          const SizedBox(width: 24),
+
+                          // CURRENT PAGE
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.appBg,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.appBg.withOpacity(0.3),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              "$currentPage / $lastPage",
+                              style: AppTextStyles.source.bold(
+                                color: AppColors.white,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(width: 24),
+
+                          // NEXT
+                          OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              side: BorderSide(
+                                color: AppColors.appBg,
+                                width: 1.5,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                            ),
+                            onPressed:
+                                currentPage < lastPage
+                                    ? () {
+                                      context.read<SupportBloc>().add(
+                                        SupportEvent(currentPage + 1),
+                                      );
+                                    }
+                                    : null,
+                            child: Icon(IconlyLight.arrow_right_2),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  final support = state.response.data[index];
+                  return _buildTicket(
+                    title: support.title,
+                    date: support.createdAt,
+                    status: support.status,
+                    onTap: () {
+                      AppRoute.go(TicketsChatPage(ticketId: support.id));
+                    },
+                  );
+                },
+              ),
             ),
           );
         }
@@ -79,17 +181,11 @@ class _TicketsPageState extends State<TicketsPage> {
         icon = Icons.warning_amber_rounded;
         statusText = 'Kutilmoqda';
         break;
-      case 'rejected':
-        bgColor = const Color(0xffFFE5E5);
-        textColor = const Color(0xffF15E5E);
-        icon = Icons.error;
-        statusText = 'Bekor qilingan';
-        break;
       default:
         bgColor = Colors.grey.shade200;
         textColor = Colors.grey;
         icon = Icons.info;
-        statusText = 'Nomaʼlum';
+        statusText = 'Bekor qilingan';
     }
 
     return GestureDetector(

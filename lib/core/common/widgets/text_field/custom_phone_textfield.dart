@@ -35,7 +35,7 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 2),
+      padding: EdgeInsets.symmetric(vertical: 2, horizontal: 2),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.inputGreyColor, width: 2),
         borderRadius: BorderRadius.circular(10),
@@ -47,10 +47,6 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
           fillColor: Colors.white,
           hintText: '000-00-00',
           contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-          // border: OutlineInputBorder(
-          //   borderRadius: BorderRadius.circular(10),
-          //   borderSide: BorderSide(color: AppColors.textGrey),
-          // ),
           border: InputBorder.none,
         ),
         initialCountryCode: 'UZ',
@@ -62,7 +58,7 @@ class _CustomPhoneTextFieldState extends State<CustomPhoneTextField> {
           size: 10,
         ),
         keyboardType: TextInputType.number,
-        style: TextStyle(fontSize: 16),
+        style: TextStyle(fontSize: 14),
       ),
     );
   }

@@ -66,6 +66,14 @@ class DioClient {
     }
   }
 
+  Future<Response> put(String path, {dynamic data}) async {
+    try {
+      return await _dio.put(path, data: data);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   /// DELETE
   Future<Response> delete(
     String path, {

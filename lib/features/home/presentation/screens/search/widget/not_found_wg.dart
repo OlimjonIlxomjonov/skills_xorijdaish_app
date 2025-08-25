@@ -14,26 +14,6 @@ class NotFoundWg extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          children: [
-            Text(
-              "${AppStrings.result} '$result'",
-              style: AppTextStyles.source.semiBold(
-                color: AppColors.black,
-                fontSize: 16,
-              ),
-            ),
-            Spacer(),
-            Text(
-              '0 ta',
-              style: AppTextStyles.source.semiBold(
-                color: AppColors.black,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: appH(20)),
         Image.asset(AppImages.searchNotFound),
         SizedBox(height: appH(28)),
         Text(

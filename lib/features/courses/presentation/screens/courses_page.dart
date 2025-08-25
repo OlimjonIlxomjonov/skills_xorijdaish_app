@@ -15,11 +15,12 @@ import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses/cou
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses_event.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/my_courses/my_course_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/my_courses/my_course_state.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/screens/country/choose_country_lessons.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/courses/foreign_languages_page.dart';
-import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/courses/pretrip_courses.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/courses/skill_test.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/courses/soft_skills_page.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/single_course/single_course_page.dart';
+import 'package:skills_xorijdaish/features/home/presentation/screens/search/search_page.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class CoursesPage extends StatefulWidget {
@@ -66,15 +67,18 @@ class _CoursesPageState extends State<CoursesPage>
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CustomAppBar(titleText: 'Kurslarimiz'),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+      body: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              AppRoute.go(SearchPage());
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: appW(20)),
+              margin: EdgeInsets.symmetric(horizontal: appW(20)),
               height: appH(50),
               decoration: BoxDecoration(
-                color: const Color(0xffF7F7F8),
+                color: Color(0xffF7F7F8),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
@@ -91,38 +95,38 @@ class _CoursesPageState extends State<CoursesPage>
                 ],
               ),
             ),
-            SizedBox(height: appH(20)),
-            TabBar(
+          ),
+          SizedBox(height: appH(20)),
+          TabBar(
+            controller: _tabController,
+            indicator: UnderlineTabIndicator(
+              borderRadius: BorderRadius.circular(100),
+              borderSide: BorderSide(width: 4.0, color: AppColors.textBlue),
+              insets: EdgeInsets.symmetric(horizontal: 0),
+            ),
+            labelColor: AppColors.textBlue,
+            unselectedLabelColor: Colors.grey,
+            labelStyle: AppTextStyles.source.semiBold(
+              fontSize: 16,
+              color: AppColors.grey,
+            ),
+            unselectedLabelStyle: AppTextStyles.source.regular(
+              fontSize: 16,
+              color: AppColors.appBg,
+            ),
+            tabs: const [
+              Tab(text: 'Barcha kurslar'),
+              Tab(text: 'Mening kurslarim'),
+            ],
+          ),
+          SizedBox(height: appH(20)),
+          Expanded(
+            child: TabBarView(
               controller: _tabController,
-              indicator: UnderlineTabIndicator(
-                borderRadius: BorderRadius.circular(100),
-                borderSide: BorderSide(width: 4.0, color: AppColors.textBlue),
-                insets: EdgeInsets.symmetric(horizontal: 0),
-              ),
-              labelColor: AppColors.textBlue,
-              unselectedLabelColor: Colors.grey,
-              labelStyle: AppTextStyles.source.semiBold(
-                fontSize: 16,
-                color: AppColors.grey,
-              ),
-              unselectedLabelStyle: AppTextStyles.source.regular(
-                fontSize: 16,
-                color: AppColors.appBg,
-              ),
-              tabs: const [
-                Tab(text: 'Barcha kurslar'),
-                Tab(text: 'Mening kurslarim'),
-              ],
+              children: [_buildAllCourses(), _buildMyCourses()],
             ),
-            SizedBox(height: appH(20)),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [_buildAllCourses(), _buildMyCourses()],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -135,6 +139,7 @@ class _CoursesPageState extends State<CoursesPage>
             if (state is CourseLoading) {
               return Expanded(
                 child: GridView.builder(
+                  padding: EdgeInsets.symmetric(horizontal: appW(20)),
                   itemCount: 4,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
@@ -165,7 +170,11 @@ class _CoursesPageState extends State<CoursesPage>
               final courses = state.response.data.toList();
               return Expanded(
                 child: GridView.builder(
-                  padding: EdgeInsets.only(top: 10),
+                  padding: EdgeInsets.only(
+                    top: 10,
+                    left: appW(20),
+                    right: appW(20),
+                  ),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     childAspectRatio: .8,
@@ -186,7 +195,7 @@ class _CoursesPageState extends State<CoursesPage>
                             ),
                           );
                         } else if (index == 1) {
-                          AppRoute.go(LessonsPage(query: 'pre-trip-courses'));
+                          AppRoute.go(ChooseCountryLessons());
                         } else if (index == 2) {
                           AppRoute.go(SoftSkillsPage(query: 'soft-skills'));
                         } else if (index == 3) {
@@ -194,7 +203,7 @@ class _CoursesPageState extends State<CoursesPage>
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           color: AppColors.white,
@@ -209,7 +218,12 @@ class _CoursesPageState extends State<CoursesPage>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Image.asset(pic),
+                            Image.asset(
+                              pic,
+                              fit: BoxFit.fill,
+                              width: appW(112),
+                              height: appH(94),
+                            ),
                             Text(
                               textAlign: TextAlign.center,
                               title,
@@ -232,8 +246,6 @@ class _CoursesPageState extends State<CoursesPage>
                   },
                 ),
               );
-            } else if (state is CourseError) {
-              return Text('Error');
             }
             return SizedBox.shrink();
           },
@@ -249,6 +261,7 @@ class _CoursesPageState extends State<CoursesPage>
           return Center(child: CircularProgressIndicator());
         } else if (state is MyCourseLoaded) {
           return ListView.builder(
+            padding: EdgeInsets.only(left: appW(20), right: appW(20)),
             itemCount: state.response.data.length,
             itemBuilder: (context, index) {
               final my = state.response.data[index];
@@ -292,7 +305,7 @@ class _CoursesPageState extends State<CoursesPage>
                             ),
                           ),
                           Text(
-                            my.humanSeconds,
+                            formatDuration(my.seconds),
                             style: AppTextStyles.source.medium(
                               color: AppColors.textGrey,
                               fontSize: 14,
@@ -332,9 +345,27 @@ class _CoursesPageState extends State<CoursesPage>
       },
       listener: (context, state) {
         if (state is MyCourseError) {
-          showErrorFlushbar(context, 'Xato!');
+          showErrorFlushbar(context, 'Internet aloqani tekshiring!');
         }
       },
     );
   }
+}
+
+String formatDuration(int seconds) {
+  final duration = Duration(seconds: seconds);
+
+  final weeks = duration.inDays ~/ 7;
+  if (weeks > 0) return "$weeks hafta";
+
+  final days = duration.inDays;
+  if (days > 0) return "$days kun";
+
+  final hours = duration.inHours;
+  if (hours > 0) return "$hours soat";
+
+  final minutes = duration.inMinutes;
+  if (minutes > 0) return "$minutes daqiqa";
+
+  return "${duration.inSeconds} soniya";
 }

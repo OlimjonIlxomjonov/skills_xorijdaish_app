@@ -4,5 +4,4 @@ class SoftSkillsResponse {
   final List<SoftSkillsEntity> data;
 
   SoftSkillsResponse({required this.data});
-
 }

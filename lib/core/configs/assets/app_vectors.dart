@@ -4,7 +4,6 @@ abstract class AppVectors {
 
   static const String logo = '${basePath}app_logo$format';
 
-  static const String poweredBy = '${basePath}powered_by$format';
   static const String userAvatar = '${basePath}user_avatar$format';
 
   static const String oneId = '${basePath}one_id$format';
@@ -27,4 +26,16 @@ abstract class AppVectors {
   static const String fire = '${basePath}fire$format';
 
   static const String upload = '${basePath}upload$format';
+  static const String certificate = '${basePath}certificate$format';
+  static const String listen = '${basePath}listen$format';
+
+  static const String spWaves = '${basePath}waves$format';
+  static const String sendPlane = '${basePath}send$format';
+  static const String pdf = '${basePath}pdf$format';
+  static const String swidLogo = '${basePath}swid_logo$format';
+  static const String migratsiyaLogo = '${basePath}migratsiya_logo$format';
+  static const String iomLogo = '${basePath}iom_logo$format';
+
+  static const String warning = '${basePath}warning$format';
+
 }

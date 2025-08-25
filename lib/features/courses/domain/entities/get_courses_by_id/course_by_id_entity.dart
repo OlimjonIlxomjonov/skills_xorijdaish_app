@@ -9,6 +9,7 @@ class CourseByIdEntity {
   final String description;
   final int progress;
   final bool isStarted;
+  final String videosDuration;
   final int videosDurationInSeconds;
   final int videos;
   final int filesCount;
@@ -24,6 +25,7 @@ class CourseByIdEntity {
 
   CourseByIdEntity({
     required this.id,
+    required this.videosDuration,
     required this.title,
     required this.lastLessonId,
     required this.isPaid,

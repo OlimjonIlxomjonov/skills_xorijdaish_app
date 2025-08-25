@@ -7,7 +7,7 @@ class ReelsUseCase {
 
   ReelsUseCase(this.repository);
 
-  Future<ReelsResponse> call() {
-    return repository.fetchAllReels();
+  Future<ReelsResponse> call({int page = 1}) {
+    return repository.fetchAllReels(page: page);
   }
 }

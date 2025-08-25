@@ -38,55 +38,28 @@ class _ChooseCountryLessonsState extends State<ChooseCountryLessons> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        backgroundColor: AppColors.white,
-        toolbarHeight: appH(100),
-        title: Row(
-          children: [
-            CircleAvatar(
-              radius: appH(30),
-              backgroundImage: AssetImage(AppImages.userAvatar),
-            ),
-            SizedBox(width: appW(10)),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${AppStrings.hayrliKun} 👋',
-                  style: AppTextStyles.source.medium(
-                    color: AppColors.grey,
-                    fontSize: 14,
-                  ),
-                ),
-                SizedBox(height: appH(10)),
-                Text(
-                  userInfo.fullName ?? '',
-                  style: SansTextStyle().semiBold(
-                    color: AppColors.black,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
       backgroundColor: AppColors.white,
+      appBar: AppBar(
+        title: Text(
+          'Davlatni tanlang',
+          style: AppTextStyles.source.medium(
+            color: AppColors.black,
+            fontSize: 18,
+          ),
+        ),
+        leading: IconButton(
+          onPressed: () {
+            AppRoute.close();
+          },
+          icon: Icon(IconlyLight.arrow_left_2),
+        ),
+        backgroundColor: AppColors.white,
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: appH(10)),
-            Text(
-              AppStrings.davlatTanlang,
-              style: AppTextStyles.source.semiBold(
-                color: AppColors.black,
-                fontSize: 16,
-              ),
-            ),
             SizedBox(height: appH(10)),
             BlocBuilder<CountriesBloc, CountriesState>(
               builder: (context, state) {
@@ -154,7 +127,6 @@ class _ChooseCountryLessonsState extends State<ChooseCountryLessons> {
                                   selectedCount = country.id;
                                 });
                               },
-
                               contentPadding: EdgeInsets.zero,
                               leading: CircleAvatar(
                                 radius: 25,
@@ -216,7 +188,7 @@ class _ChooseCountryLessonsState extends State<ChooseCountryLessons> {
           isEnabled: selectedCount != null,
           onTap: () {
             if (selectedCount != null) {
-              AppRoute.go(LessonsPage(query: 'pre-trip-courses'));
+              AppRoute.go(LessonsPage(countryId: selectedCount!));
             }
           },
         ),
@@ -237,10 +209,10 @@ class _ChooseCountryLessonsState extends State<ChooseCountryLessons> {
         height: 50,
         fit: BoxFit.cover,
         placeholder:
-            (context, url) => const CircularProgressIndicator(strokeWidth: 2),
+            (context, url) => CircularProgressIndicator(strokeWidth: 2),
         errorWidget: (context, url, error) {
-          debugPrint('⚠️ Image failed to load: $url\nError: $error');
-          return const Icon(Icons.flag, size: 32, color: Colors.grey);
+          debugPrint('Image failed to load: $url\nError: $error');
+          return Icon(Icons.flag, size: 32, color: Colors.grey);
         },
       ),
     );

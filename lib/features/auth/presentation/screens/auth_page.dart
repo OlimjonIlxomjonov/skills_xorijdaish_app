@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/constants/strings/app_strings.dart';
@@ -22,7 +23,14 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: AppColors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: Column(
         children: [
           Expanded(
@@ -127,7 +135,25 @@ class _AuthPageState extends State<AuthPage> {
                     ),
                   ),
                   Spacer(),
-                  Image.asset(AppImages.migration),
+                  // SvgPicture.asset(AppVectors.poweredBy),
+                  Row(
+                    spacing: 12,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Powered by',
+                        style: AppTextStyles.source.medium(
+                          color: AppColors.black,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Image.asset(
+                        AppImages.poweredByRight,
+                        width: appW(96),
+                        height: appH(25),
+                      ),
+                    ],
+                  ),
                   SizedBox(height: appH(30)),
                 ],
               ),
