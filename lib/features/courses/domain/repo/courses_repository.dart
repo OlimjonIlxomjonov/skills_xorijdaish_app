@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:skills_xorijdaish/features/courses/domain/entities/all_courses/buy_course/buy_course_entity.dart';
 import 'package:skills_xorijdaish/features/courses/domain/entities/all_courses/foreign_language/foreign_language_response.dart';
 import 'package:skills_xorijdaish/features/courses/domain/entities/all_courses/pre_trip_courses/pre_trip_response.dart';
@@ -36,7 +38,10 @@ abstract class CoursesRepository {
 
   Future<PreTripResponse> fetchPreTripCourses({required String query});
 
-  Future<LessonsResponse> fetchLessons({required int courseId});
+  Future<LessonsResponse> fetchLessons({
+    required int courseId,
+    required int page,
+  });
 
   Future<VideoEntity> fetchVideo({
     required int courseId,
@@ -250,4 +255,9 @@ abstract class CoursesRepository {
     required double stars,
     required String comment,
   });
+
+  /// Face Recognition
+  Future<void> faceRecognitionMyId({required String code, required File image});
+
+  Future<void> faceRecognitionCompare({required File image});
 }

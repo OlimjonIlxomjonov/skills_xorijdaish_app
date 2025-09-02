@@ -107,7 +107,6 @@ class FinishTestPage extends StatelessWidget {
                         testResult(finish.all.toString(), 'Jami savollar'),
                         testResult(finish.corrects.toString(), "To'g'ri"),
                         testResult(finish.incorrects.toString(), "Noto'g'ri"),
-                        testResult(formatDuration(finish.time), "Vaqt"),
                       ],
                     ),
                   ),
@@ -122,7 +121,7 @@ class FinishTestPage extends StatelessWidget {
                         barrierColor: Colors.black.withOpacity(0.5),
                         builder: (context) => ResultDialog(finish: finish),
                       );
-                      context.read<LessonsBloc>().add(LessonsEvent(courseId));
+                      context.read<LessonsBloc>().add(LessonsEvent(courseId, 1));
                     },
                   ),
                 ],
@@ -133,24 +132,6 @@ class FinishTestPage extends StatelessWidget {
         },
       ),
     );
-  }
-
-  String formatDuration(int seconds) {
-    final duration = Duration(seconds: seconds);
-
-    final weeks = duration.inDays ~/ 7;
-    if (weeks > 0) return "$weeks hafta";
-
-    final days = duration.inDays;
-    if (days > 0) return "$days kun";
-
-    final hours = duration.inHours;
-    if (hours > 0) return "$hours soat";
-
-    final minutes = duration.inMinutes;
-    if (minutes > 0) return "$minutes daqiqa";
-
-    return "${duration.inSeconds} soniya";
   }
 
   Row testResult(finish, String text) {

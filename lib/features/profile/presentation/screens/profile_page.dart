@@ -323,6 +323,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return showModalBottomSheet(
       backgroundColor: AppColors.white,
       context: context,
+
       builder: (context) {
         return Column(
           children: [

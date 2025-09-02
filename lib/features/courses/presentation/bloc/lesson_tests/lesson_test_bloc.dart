@@ -9,17 +9,17 @@ class LessonTestBloc extends Bloc<CoursesEvent, LessonTestState> {
 
   LessonTestBloc(this.useCase) : super(LessonTestInitial()) {
     on<LessonTestEvent>((event, emit) async {
-      if (appSession.lessonTestsResponse != null) {
-        emit(LessonTestLoaded(appSession.lessonTestsResponse!));
-        return;
-      }
+      // if (appSession.lessonTestsResponse != null) {
+      //   emit(LessonTestLoaded(appSession.lessonTestsResponse!));
+      //   return;
+      // }
       emit(LessonTestLoading());
       try {
         final response = await useCase.call(
           courseId: event.courseId,
           lessonId: event.lessonId,
         );
-        appSession.lessonTestsResponse = response;
+        // appSession.lessonTestsResponse = response;
         emit(LessonTestLoaded(response));
       } catch (e) {
         emit(LessonTestError(e.toString()));

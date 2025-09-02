@@ -9,9 +9,12 @@ class LessonsBloc extends Bloc<CoursesEvent, LessonsState> {
 
   LessonsBloc(this.useCase) : super(LessonsInitial()) {
     on<LessonsEvent>((event, emit) async {
-      emit(LessonsLoading());
+      // emit(LessonsLoading());
       try {
-        final response = await useCase.call(courseId: event.courseId);
+        final response = await useCase.call(
+          courseId: event.courseId,
+          page: event.page,
+        );
         emit(LessonsLoaded(response));
       } catch (e) {
         emit(LessonsError(e.toString()));

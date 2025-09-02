@@ -57,7 +57,7 @@ class _SearchPageState extends State<SearchPage> {
               padding: EdgeInsets.only(left: 20, top: 4, right: 5),
               height: appH(50),
               decoration: BoxDecoration(
-                color: const Color(0xffF7F7F8),
+                color: Color(0xffF7F7F8),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: TextField(
@@ -208,7 +208,7 @@ class _SearchPageState extends State<SearchPage> {
                               height: appH(164),
                               color: Colors.grey.shade200,
                               alignment: Alignment.center,
-                              child: const Icon(
+                              child: Icon(
                                 Icons.broken_image,
                                 size: 40,
                                 color: Colors.grey,
@@ -227,46 +227,50 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ],
                     )
-                    : Image.network(
-                      search.imageUrl,
-                      width: appW(372),
-                      height: appH(164),
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
+                    : Stack(
+                      children: [
+                        Image.network(
+                          search.imageUrl,
                           width: appW(372),
                           height: appH(164),
-                          alignment: Alignment.center,
-                          child: Shimmer.fromColors(
-                            baseColor: Colors.grey.shade300,
-                            highlightColor: Colors.grey.shade100,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                vertical: appH(10),
-                                horizontal: appW(16),
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              width: appW(372),
+                              height: appH(164),
+                              alignment: Alignment.center,
+                              child: Shimmer.fromColors(
+                                baseColor: Colors.grey.shade300,
+                                highlightColor: Colors.grey.shade100,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: appH(10),
+                                    horizontal: appW(16),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
                               ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              width: appW(372),
+                              height: appH(164),
+                              color: Colors.grey.shade200,
+                              alignment: Alignment.center,
+                              child: const Icon(
+                                Icons.broken_image,
+                                size: 40,
+                                color: Colors.grey,
                               ),
-                            ),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: appW(372),
-                          height: appH(164),
-                          color: Colors.grey.shade200,
-                          alignment: Alignment.center,
-                          child: const Icon(
-                            Icons.broken_image,
-                            size: 40,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
+                            );
+                          },
+                        ),
+                      ],
                     ),
           ),
           Text(
@@ -290,7 +294,7 @@ class _SearchPageState extends State<SearchPage> {
               SizedBox(width: appW(3)),
               SvgPicture.asset(AppVectors.documentText),
               Text(
-                "${search.filesCount} ta video",
+                "${search.filesCount ?? 0} ta video",
                 style: AppTextStyles.source.medium(
                   color: AppColors.black,
                   fontSize: 13,
@@ -316,7 +320,10 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
           BasicButtonWg(
-            text: AppStrings.start,
+            text:
+                search.isStarted
+                    ? AppStrings.contunie
+                    : AppStrings.kursniBoshlash,
             onTap: () {
               AppRoute.go(SingleCoursePage(courseId: search.id));
             },

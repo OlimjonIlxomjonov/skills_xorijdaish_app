@@ -102,4 +102,8 @@ abstract class ApiUrls {
 
   /// Rate A Course
   static const rateACourse = '/api/courses/';
+
+  //face recognition
+  static const faceRecognitionMyId = '/api/face-recognition/my-id';
+  static const faceRecognitionCompare = '/api/face-recognition/compare';
 }

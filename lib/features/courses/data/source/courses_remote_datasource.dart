@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:skills_xorijdaish/core/common/constants/api_urls.dart';
 import 'package:skills_xorijdaish/core/netwrok/dio_client.dart';
 import 'package:skills_xorijdaish/core/utils/logger/logger.dart';
@@ -143,10 +145,13 @@ class CoursesRemoteDatasourceImpl implements CoursesRemoteDatasource {
   }
 
   @override
-  Future<LessonsResponseModel> getLessons({required int courseId}) async {
+  Future<LessonsResponseModel> getLessons({
+    required int courseId,
+    required int page,
+  }) async {
     try {
       final response = await dioClient.get(
-        "${ApiUrls.lessons}$courseId/lessons",
+        "${ApiUrls.lessons}$courseId/lessons?page=$page",
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         logger.i('Success! ${response.statusCode}');
@@ -1004,6 +1009,43 @@ class CoursesRemoteDatasourceImpl implements CoursesRemoteDatasource {
       }
     } catch (e) {
       logger.e('Error $e');
+    }
+  }
+
+  @override
+  Future<void> getFaceRecognitionMyId({
+    required String code,
+    required File image,
+  }) async {
+    try {
+      final response = await dioClient.post(
+        ApiUrls.faceRecognitionMyId,
+        data: {"code": code, "image": image},
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        logger.i('Success: ${response.data}');
+      } else {
+        throw Exception('Error: ${response.data}');
+      }
+    } catch (e) {
+      logger.e("Error: $e");
+    }
+  }
+
+  @override
+  Future<void> getFaceRecognitionCompare({required File image}) async {
+    try {
+      final response = await dioClient.post(
+        ApiUrls.faceRecognitionCompare,
+        data: {"image": image},
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        logger.i('Success: ${response.data}');
+      } else {
+        throw Exception('Error: ${response.data}');
+      }
+    } catch (e) {
+      logger.e("Error: $e");
     }
   }
 }

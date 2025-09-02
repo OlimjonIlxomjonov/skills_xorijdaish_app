@@ -49,7 +49,7 @@ class _SingleCoursePageState extends State<SingleCoursePage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    context.read<LessonsBloc>().add(LessonsEvent(widget.courseId));
+    context.read<LessonsBloc>().add(LessonsEvent(widget.courseId, 1));
     context.read<CourseByIdBloc>().add(CourseByIdEvent(widget.courseId));
     context.read<FinalTestBloc>().add(FinalTestCourseEvent(widget.courseId));
     context.read<FinishFinalTestBloc>().add(
@@ -268,134 +268,113 @@ class _SingleCoursePageState extends State<SingleCoursePage>
       },
       builder: (context, state) {
         if (state is CourseByIdLoading) {
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         } else if (state is CourseByIdLoaded) {
           final course = state.entity;
           logger.f(state.entity.videosDuration);
           return Padding(
             padding: EdgeInsets.only(left: appW(20), right: appW(20)),
-            child: Stack(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              spacing: appH(18),
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SingleChildScrollView(
-                  child: Column(
-                    spacing: appH(18),
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ReadMoreText(
-                        sanitizeHtml(course.description),
-                        trimLines: 2,
-                        colorClickableText: AppColors.textBlue,
-                        trimMode: TrimMode.Line,
-                        trimCollapsedText: ' See more',
-                        trimExpandedText: ' See less',
-                        style: AppTextStyles.source.regular(
-                          fontSize: 14,
-                          color: AppColors.black,
-                        ),
-                        moreStyle: AppTextStyles.source.regular(
-                          fontSize: 14,
-                          color: AppColors.secondBlue,
-                        ),
-                        lessStyle: AppTextStyles.source.regular(
-                          fontSize: 14,
-                          color: AppColors.secondBlue,
-                        ),
-                      ),
-                      // Text(
-                      //   "Bu kurs quyidagilarni o'z ichiga oladi",
-                      //   style: AppTextStyles.source.semiBold(
-                      //     color: AppColors.black,
-                      //     fontSize: 20,
-                      //   ),
-                      // ),
-                      // customListTile("Mavzulashtirilgan video darslar"),
-                      // customListTile("Mavzulashtirilgan testlar"),
-                      // customListTile("Kurs bo’yicha yakuniy test "),
-                      // customListTile("Tamomlaganlik haqida ssertifikat"),
-                      SizedBox(height: appH(30)),
-                      Visibility(
-                        visible: !course.isStarted,
-                        child: BasicButtonWg(
-                          text:
-                              (state.entity.priceInfo != null &&
-                                      state.entity.priceInfo is Map &&
-                                      state.entity.priceInfo.containsKey(
-                                        'price',
-                                      ))
-                                  ? "Sotib olish - ${state.entity.priceInfo['price']}"
-                                  : 'Boshlash',
-                          onTap: () {
-                            final hasPrice =
-                                state.entity.priceInfo != null &&
-                                state.entity.priceInfo is Map &&
-                                state.entity.priceInfo.containsKey('price');
+                ReadMoreText(
+                  sanitizeHtml(course.description),
+                  trimLines: 2,
+                  colorClickableText: AppColors.textBlue,
+                  trimMode: TrimMode.Line,
+                  trimCollapsedText: ' Batafsil',
+                  trimExpandedText: ' Yopish',
+                  style: AppTextStyles.source.regular(
+                    fontSize: 14,
+                    color: AppColors.black,
+                  ),
+                  moreStyle: AppTextStyles.source.regular(
+                    fontSize: 14,
+                    color: AppColors.secondBlue,
+                  ),
+                  lessStyle: AppTextStyles.source.regular(
+                    fontSize: 14,
+                    color: AppColors.secondBlue,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: appH(40)),
+                  child: Visibility(
+                    visible: !course.isStarted,
+                    child: BasicButtonWg(
+                      text:
+                          (state.entity.priceInfo != null &&
+                                  state.entity.priceInfo is Map &&
+                                  state.entity.priceInfo.containsKey('price'))
+                              ? "Sotib olish - ${state.entity.priceInfo['price']}"
+                              : 'Boshlash',
+                      onTap: () {
+                        final hasPrice =
+                            state.entity.priceInfo != null &&
+                            state.entity.priceInfo is Map &&
+                            state.entity.priceInfo.containsKey('price');
 
-                            if (hasPrice) {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) {
-                                  return Container(
-                                    padding: const EdgeInsets.only(top: 10),
-                                    height: appH(280),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.white,
-                                      borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(16),
+                        if (hasPrice) {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) {
+                              return Container(
+                                padding: EdgeInsets.only(top: appH(10)),
+                                height: appH(280),
+                                decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(16),
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: appW(180),
+                                      ),
+                                      child: Divider(height: 5, thickness: 3),
+                                    ),
+                                    SizedBox(height: appH(10)),
+                                    Text(
+                                      "To'lov",
+                                      style: AppTextStyles.source.medium(
+                                        color: AppColors.black,
+                                        fontSize: 20,
                                       ),
                                     ),
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 180,
-                                          ),
-                                          child: Divider(
-                                            height: 5,
-                                            thickness: 3,
-                                          ),
-                                        ),
-                                        SizedBox(height: appH(10)),
-                                        Text(
-                                          "To'lov",
-                                          style: AppTextStyles.source.medium(
-                                            color: AppColors.black,
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                        SizedBox(height: appH(10)),
-                                        Divider(),
-                                        SizedBox(height: appH(10)),
-                                        Padding(
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: appH(20),
-                                          ),
-                                          child: column(),
-                                        ),
-                                      ],
+                                    SizedBox(height: appH(10)),
+                                    Divider(),
+                                    SizedBox(height: appH(10)),
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: appH(20),
+                                      ),
+                                      child: column(),
                                     ),
-                                  );
-                                },
+                                  ],
+                                ),
                               );
-                            } else {
-                              context.read<StartCourseBloc>().add(
-                                StartCourseEvent(widget.courseId),
-                              );
-                              context.read<CourseByIdBloc>().add(
-                                CourseByIdEvent(widget.courseId),
-                              );
-                              context.read<LessonsBloc>().add(
-                                LessonsEvent(widget.courseId),
-                              );
-                              _tabController.animateTo(1);
-                            }
-                          },
-                        ),
-                      ),
-
-                      SizedBox(height: appH(20)),
-                    ],
+                            },
+                          );
+                        } else {
+                          context.read<StartCourseBloc>().add(
+                            StartCourseEvent(widget.courseId),
+                          );
+                          context.read<CourseByIdBloc>().add(
+                            CourseByIdEvent(widget.courseId),
+                          );
+                          context.read<LessonsBloc>().add(
+                            LessonsEvent(widget.courseId, 1),
+                          );
+                          _tabController.animateTo(1);
+                        }
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -459,7 +438,6 @@ class _SingleCoursePageState extends State<SingleCoursePage>
             );
           },
         ),
-        Spacer(),
         ElevatedButton(
           onPressed: () {
             AppRoute.close();
@@ -512,12 +490,7 @@ class _SingleCoursePageState extends State<SingleCoursePage>
 
           return RefreshIndicator(
             onRefresh: () async {
-              context.read<FinalTestBloc>().add(
-                FinalTestCourseEvent(widget.courseId),
-              );
-              // context.read<FinishFinalTestBloc>().add(
-              //   FinishFinalTestEvent(widget.courseId),
-              // );
+              context.read<LessonsBloc>().add(LessonsEvent(widget.courseId, 1));
             },
             child: ListView.builder(
               padding: EdgeInsets.symmetric(horizontal: appH(20)),
@@ -532,24 +505,21 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                       isDone ? AppColors.mainGreen : Color(0xffDAE1E9);
                   final Color textColor =
                       isDone ? AppColors.black : Color(0xffDAE1E9);
-                  final testColors = int.parse(lesson.stars);
+                  final currentPage = state.response.metaData.currentPage;
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
+                        padding: EdgeInsets.symmetric(vertical: appH(5)),
                         decoration:
                             isDoneTest
                                 ? BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
                                       Colors.transparent,
-                                      testColors > 3
-                                          ? AppColors.inputGreyColor.withValues(
-                                            alpha: 0.1,
-                                          )
-                                          : AppColors.progressYellow.withValues(
-                                            alpha: 0.1,
-                                          ),
+                                      AppColors.inputGreyColor.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       AppColors.mainGreen.withValues(
                                         alpha: 0.2,
                                       ),
@@ -561,7 +531,7 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                   ),
                                   borderRadius: BorderRadius.circular(8),
                                 )
-                                : null,
+                                : BoxDecoration(),
                         child: Theme(
                           data: Theme.of(context).copyWith(
                             splashColor: Colors.transparent,
@@ -595,10 +565,7 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color:
-                                          testColors > 3
-                                              ? mainColor
-                                              : AppColors.progressYellow,
+                                      color: mainColor,
                                       width: 3,
                                     ),
                                   ),
@@ -650,16 +617,13 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                     ),
                                   ),
                                 ),
-                                if (isDoneTest && testColors > 3)
+                                if (isDoneTest)
                                   Positioned(
                                     right: 0,
                                     bottom: 0,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color:
-                                            testColors > 3
-                                                ? AppColors.mainGreen
-                                                : AppColors.progressYellow,
+                                        color: AppColors.mainGreen,
                                         shape: BoxShape.circle,
                                       ),
                                       padding: EdgeInsets.all(3),
@@ -704,7 +668,7 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                           ),
                         ),
                       ),
-                      if (!isLast || isLast)
+                      if (!isLast)
                         Container(
                           margin: EdgeInsets.only(left: appW(25)),
                           width: appW(3),
@@ -712,6 +676,95 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                           decoration: BoxDecoration(
                             color: mainColor,
                             borderRadius: BorderRadius.circular(50),
+                          ),
+                        ),
+
+                      if (isLast)
+                        state.response.metaData.total >
+                                state.response.metaData.perPage
+                            ? Row(
+                              spacing: 30,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                IconButton(
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: AppColors.appBg,
+                                    foregroundColor: AppColors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                  ),
+                                  onPressed:
+                                      state.response.metaData.currentPage > 1
+                                          ? () {
+                                            context.read<LessonsBloc>().add(
+                                              LessonsEvent(
+                                                widget.courseId,
+                                                currentPage - 1,
+                                              ),
+                                            );
+                                          }
+                                          : null,
+                                  icon: Icon(Icons.keyboard_arrow_left),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: appW(10),
+                                    vertical: appH(3),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(
+                                      width: 0.7,
+                                      color: AppColors.appBg,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "${state.response.metaData.currentPage}",
+                                  ),
+                                ),
+
+                                IconButton(
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: AppColors.appBg,
+                                    foregroundColor: AppColors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                  ),
+                                  onPressed:
+                                      currentPage !=
+                                              state.response.metaData.lastPage
+                                          ? () {
+                                            context.read<LessonsBloc>().add(
+                                              LessonsEvent(
+                                                widget.courseId,
+                                                currentPage + 1,
+                                              ),
+                                            );
+                                          }
+                                          : null,
+                                  icon: Icon(Icons.keyboard_arrow_right),
+                                ),
+                              ],
+                            )
+                            : SizedBox.shrink(),
+                      if (isLast)
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          height: 1,
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Color.fromRGBO(12, 18, 33, 0.0),
+                                Color.fromRGBO(12, 18, 33, 0.2),
+                                Color.fromRGBO(12, 18, 33, 0.0),
+                              ],
+                              stops: [0.0, 0.5043, 1.0],
+                            ),
                           ),
                         ),
                     ],
@@ -812,17 +865,17 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                             if (finishState
                                                     is FinishFinalTestLoaded &&
                                                 finishState.response.ok) {
-                                              // warningBarWg(
-                                              //   context,
-                                              //   'Yakuniy test allaqachon tugallangan!',
-                                              // );
-                                              AppRoute.go(
-                                                FinalTestPage(
-                                                  courseId: widget.courseId,
-                                                  questionId: questionId,
-                                                  testType: testType,
-                                                ),
+                                              warningBarWg(
+                                                context,
+                                                'Yakuniy test allaqachon tugallangan!',
                                               );
+                                              // AppRoute.go(
+                                              //   FinalTestPage(
+                                              //     courseId: widget.courseId,
+                                              //     questionId: questionId,
+                                              //     testType: testType,
+                                              //   ),
+                                              // );
                                             } else {
                                               AppRoute.go(
                                                 FinalTestPage(

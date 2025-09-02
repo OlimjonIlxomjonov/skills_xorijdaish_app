@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:iconly/iconly.dart';
 import 'package:skills_xorijdaish/features/reels/presentation/bloc/get_reels/reels_bloc.dart';
-import 'package:skills_xorijdaish/features/reels/presentation/bloc/put_like/like_bloc.dart';
 import 'package:skills_xorijdaish/features/reels/presentation/bloc/reels_event.dart';
 import 'package:skills_xorijdaish/features/reels/presentation/screens/reels_item.dart';
-import 'package:skills_xorijdaish/features/reels/presentation/screens/reels_video_overlay.dart';
-import 'package:skills_xorijdaish/features/reels/presentation/screens/reels_video_page.dart';
 
 import '../../../../core/common/constants/colors/app_colors.dart';
-import '../../../../core/common/textstyles/app_text_styles.dart';
-import '../../../../core/utils/responsiveness/app_responsive.dart';
 import '../bloc/get_reels/reels_state.dart';
 
 class ReelsScreen extends StatefulWidget {
@@ -21,9 +15,6 @@ class ReelsScreen extends StatefulWidget {
 }
 
 class _ReelsScreenState extends State<ReelsScreen> {
-  late bool isLiked;
-  late int localLikes;
-
   @override
   void initState() {
     super.initState();
@@ -39,6 +30,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
           if (state is ReelsLoaded) {
             return PageView.builder(
               scrollDirection: Axis.vertical,
+              physics: const BouncingScrollPhysics(),
               itemCount: state.response.meta.total,
               itemBuilder: (context, index) {
                 if (index < state.response.data.length) {
@@ -56,7 +48,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                               : currentPage,
                     ),
                   );
-                  return const Center(child: CircularProgressIndicator());
+                  return Center(child: CircularProgressIndicator());
                 }
               },
             );

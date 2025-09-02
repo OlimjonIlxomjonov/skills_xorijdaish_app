@@ -39,8 +39,8 @@ class AppSessionCache {
   BannersResponse? bannersResponse;
 
   // video lessons
-  LessonTestsResponse? lessonTestsResponse;
-  FileEntity? fileResponse;
+  // LessonTestsResponse? lessonTestsResponse;
+  // FileEntity? fileResponse;
 
   // stats
   AverageResponse? averageResponse;

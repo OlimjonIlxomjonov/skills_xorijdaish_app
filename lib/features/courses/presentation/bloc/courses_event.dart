@@ -1,3 +1,5 @@
+import 'dart:io';
+
 abstract class CoursesEvent {
   CoursesEvent();
 }
@@ -25,9 +27,10 @@ class PreTripEvent extends CoursesEvent {
 }
 
 class LessonsEvent extends CoursesEvent {
+  final int page;
   final int courseId;
 
-  LessonsEvent(this.courseId);
+  LessonsEvent(this.courseId, this.page);
 }
 
 class VideoEvent extends CoursesEvent {
@@ -354,4 +357,17 @@ class RateCourseEvent extends CoursesEvent {
   final String comment;
 
   RateCourseEvent(this.courseId, this.stars, this.comment);
+}
+
+class FaceRecMyIdEvent extends CoursesEvent {
+  final String code;
+  final File image;
+
+  FaceRecMyIdEvent(this.code, this.image);
+}
+
+class FaceRecognitionCompareEvent extends CoursesEvent {
+  final File image;
+
+  FaceRecognitionCompareEvent(this.image);
 }

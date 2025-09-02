@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:skills_xorijdaish/features/courses/data/models/all_courses_model/buy_course/buy_course_model.dart';
 import 'package:skills_xorijdaish/features/courses/data/models/all_courses_model/foreign_language/foreign_language_response_model.dart';
 import 'package:skills_xorijdaish/features/courses/data/models/all_courses_model/pre_trip_courses/pre_trip_response.dart';
@@ -43,7 +45,10 @@ abstract class CoursesRemoteDatasource {
 
   Future<PreTripResponseModel> getPreTripCourses({required String query});
 
-  Future<LessonsResponseModel> getLessons({required int courseId});
+  Future<LessonsResponseModel> getLessons({
+    required int courseId,
+    required int page,
+  });
 
   Future<VideoModel> getVideo({required int courseId, required int lessonsId});
 
@@ -250,4 +255,11 @@ abstract class CoursesRemoteDatasource {
     required double stars,
     required String comment,
   });
+
+  Future<void> getFaceRecognitionMyId({
+    required String code,
+    required File image,
+  });
+
+  Future<void> getFaceRecognitionCompare({required File image});
 }

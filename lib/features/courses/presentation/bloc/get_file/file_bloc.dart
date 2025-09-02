@@ -9,17 +9,17 @@ class FileBloc extends Bloc<CoursesEvent, FileState> {
 
   FileBloc(this.useCase) : super(FileInitial()) {
     on<FileEvent>((event, emit) async {
-      if (appSession.fileResponse != null) {
-        emit(FileLoaded(appSession.fileResponse!));
-        return;
-      }
+      // if (appSession.fileResponse != null) {
+      //   emit(FileLoaded(appSession.fileResponse!));
+      //   return;
+      // }
       emit(FileLoading());
       try {
         final response = await useCase.call(
           courseId: event.courseId,
           lessonId: event.lessonsId,
         );
-        appSession.fileResponse = response;
+        // appSession.fileResponse = response;
         emit(FileLoaded(response));
       } catch (e) {
         emit(FileError(e.toString()));

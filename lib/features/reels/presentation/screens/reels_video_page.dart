@@ -9,21 +9,25 @@ import 'package:visibility_detector/visibility_detector.dart';
 class ReelVideo extends StatefulWidget {
   final String url;
 
-  const ReelVideo({super.key, required this.url});
+  const ReelVideo({
+    super.key,
+    required this.url,
+  });
 
   @override
-  State<ReelVideo> createState() => _ReelVideoState();
+  State<ReelVideo> createState() => ReelVideoState();
 }
 
-class _ReelVideoState extends State<ReelVideo> {
+class ReelVideoState extends State<ReelVideo> {
   late FlickManager flickManager;
-  bool _showIcon = false;
+  bool _showPlayPauseIcon = false;
   IconData _currentIcon = Icons.play_arrow;
   Timer? _hideTimer;
 
   @override
   void initState() {
     super.initState();
+    print("🎬 Simple ReelVideo initState called");
     flickManager = FlickManager(
       videoPlayerController: VideoPlayerController.network(widget.url),
     );
@@ -36,27 +40,33 @@ class _ReelVideoState extends State<ReelVideo> {
     super.dispose();
   }
 
-  void _togglePlayPause(VideoPlayerController controller) {
-    if (controller.value.isPlaying) {
-      controller.pause();
-      _currentIcon = Icons.pause;
+  void togglePlayPause() {
+    print("🎮 togglePlayPause called!");
+    final controller = flickManager.flickVideoManager?.videoPlayerController;
+    if (controller != null) {
+      if (controller.value.isPlaying) {
+        controller.pause();
+        _currentIcon = Icons.pause;
+        print("⏸️ Video paused");
+      } else {
+        controller.play();
+        _currentIcon = Icons.play_arrow;
+        print("▶️ Video playing");
+      }
+
+      setState(() => _showPlayPauseIcon = true);
+
+      _hideTimer?.cancel();
+      _hideTimer = Timer(Duration(milliseconds: 800), () {
+        if (mounted) setState(() => _showPlayPauseIcon = false);
+      });
     } else {
-      controller.play();
-      _currentIcon = Icons.play_arrow;
+      print("❌ Controller is null!");
     }
-
-    setState(() => _showIcon = true);
-
-    _hideTimer?.cancel();
-    _hideTimer = Timer(Duration(milliseconds: 800), () {
-      setState(() => _showIcon = false);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = flickManager.flickVideoManager!.videoPlayerController;
-
     return VisibilityDetector(
       key: Key(widget.url),
       onVisibilityChanged: (info) {
@@ -66,36 +76,33 @@ class _ReelVideoState extends State<ReelVideo> {
           flickManager.flickControlManager?.pause();
         }
       },
-      child: GestureDetector(
-        onTap: () => _togglePlayPause(controller!),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            FlickVideoPlayer(
-              flickManager: flickManager,
-              flickVideoWithControls: const FlickVideoWithControls(
-                controls: SizedBox.shrink(),
-              ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          FlickVideoPlayer(
+            flickManager: flickManager,
+            flickVideoWithControls: const FlickVideoWithControls(
+              controls: SizedBox.shrink(),
             ),
+          ),
 
-            AnimatedOpacity(
-              opacity: _showIcon ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 500),
-              child: Container(
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.black.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: Icon(
-                  _currentIcon,
-                  size: 30,
-                  color: Colors.white.withValues(alpha: 0.8),
-                ),
+          AnimatedOpacity(
+            opacity: _showPlayPauseIcon ? 1.0 : 0.0,
+            duration: const Duration(milliseconds: 500),
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.black.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(50),
+              ),
+              child: Icon(
+                _currentIcon,
+                size: 30,
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

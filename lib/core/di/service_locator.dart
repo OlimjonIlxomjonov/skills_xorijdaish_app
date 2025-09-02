@@ -9,6 +9,8 @@ import 'package:skills_xorijdaish/features/courses/domain/usecase/buy_course/buy
 import 'package:skills_xorijdaish/features/courses/domain/usecase/country_use_case.dart';
 import 'package:skills_xorijdaish/features/courses/domain/usecase/course_by_id_use_case.dart';
 import 'package:skills_xorijdaish/features/courses/domain/usecase/courses_card_use_case.dart';
+import 'package:skills_xorijdaish/features/courses/domain/usecase/face_recognation/face_recognation_compare_use_case.dart';
+import 'package:skills_xorijdaish/features/courses/domain/usecase/face_recognation/face_recognition_my_id_use_case.dart';
 import 'package:skills_xorijdaish/features/courses/domain/usecase/file_use_case.dart';
 import 'package:skills_xorijdaish/features/courses/domain/usecase/final_test/ans_final_fill_in_the_blank_use_case.dart';
 import 'package:skills_xorijdaish/features/courses/domain/usecase/final_test/ans_final_listen_n_complete_use_case.dart';
@@ -52,6 +54,8 @@ import 'package:skills_xorijdaish/features/courses/presentation/bloc/all_courses
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/all_courses/soft_skills/soft_skills_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/countries/countries_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/courses/course_bloc.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/face_recognation/face_recognition_compare/face_recognition_compare_bloc.dart';
+import 'package:skills_xorijdaish/features/courses/presentation/bloc/face_recognation/face_recognition_my_id/face_rec_my_id_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/fetch_final_test/filil_in_the_blank/fetch_final_fill_in_the_blank_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/fetch_final_test/listen_n_complete_words/fetch_final_listen_n_complete_words_bloc.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/bloc/fetch_final_test/listen_n_select_pairs/fetch_final_listen_n_seletc_pairs_bloc.dart';
@@ -270,6 +274,10 @@ Future<void> setup() async {
   // final tests (all)
   sl.registerLazySingleton(() => FinalTestsRespUseCase(sl()));
 
+  // face recognition
+  sl.registerLazySingleton(() => FaceRecognitionMyIdUseCase(sl()));
+  sl.registerLazySingleton(() => FaceRecognitionCompareUseCase(sl()));
+
   /// BLOC
   // courses
   sl.registerLazySingleton(() => CountriesBloc(sl()));
@@ -369,4 +377,8 @@ Future<void> setup() async {
   );
   sl.registerLazySingleton(() => FetchFinalSelectPairsBloc(sl()));
   sl.registerLazySingleton(() => FetchFinalListenNSelectPairsBloc(sl()));
+
+  // face recognition
+  sl.registerLazySingleton(() => FaceRecMyIdBloc(sl()));
+  sl.registerLazySingleton(() => FaceRecognitionCompareBloc(sl()));
 }

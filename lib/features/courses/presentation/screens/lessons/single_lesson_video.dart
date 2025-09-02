@@ -274,13 +274,14 @@ class _SingleLessonVideoState extends State<SingleLessonVideo> {
                       ),
                     ),
                   );
-                } else if (state is LessonTestError) {
-                  return Text('Error');
                 } else if (state is LessonTestLoaded) {
                   final testId = state.response.data.map((e) => e.id).toList();
                   final testType =
                       state.response.data.map((e) => e.type).toList();
                   logger.f(testId);
+                  if (state.response.data.isEmpty) {
+                    return SizedBox.shrink();
+                  }
                   return GestureDetector(
                     onTap: () async {
                       if (!_isWatched) {

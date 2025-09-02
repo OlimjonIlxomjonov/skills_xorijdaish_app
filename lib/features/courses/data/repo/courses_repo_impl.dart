@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:skills_xorijdaish/features/courses/data/models/all_courses_model/skill_test/skill_test_model.dart';
 import 'package:skills_xorijdaish/features/courses/data/source/courses_remote_datasource_impl.dart';
 import 'package:skills_xorijdaish/features/courses/domain/entities/all_courses/buy_course/buy_course_entity.dart';
@@ -59,8 +61,11 @@ class CoursesRepoImpl implements CoursesRepository {
   }
 
   @override
-  Future<LessonsResponse> fetchLessons({required int courseId}) {
-    return datasource.getLessons(courseId: courseId);
+  Future<LessonsResponse> fetchLessons({
+    required int courseId,
+    required int page,
+  }) {
+    return datasource.getLessons(courseId: courseId, page: page);
   }
 
   @override
@@ -500,5 +505,18 @@ class CoursesRepoImpl implements CoursesRepository {
       stars: stars,
       comment: comment,
     );
+  }
+
+  @override
+  Future<void> faceRecognitionMyId({
+    required String code,
+    required File image,
+  }) {
+    return datasource.getFaceRecognitionMyId(code: code, image: image);
+  }
+
+  @override
+  Future<void> faceRecognitionCompare({required File image}) {
+    return datasource.getFaceRecognitionCompare(image: image);
   }
 }

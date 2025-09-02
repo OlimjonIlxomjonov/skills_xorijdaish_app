@@ -1,4 +1,4 @@
-enum CourseType { foreignLanguage, preTripCourse, softSkill }
+enum CourseType { foreignLanguage, preTripCourse, softSkill, skillTest }
 
 class UnifiedCourseEntity {
   final CourseType type;

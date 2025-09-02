@@ -2,6 +2,7 @@ import 'package:skills_xorijdaish/features/home/domain/entities/search/search_en
 
 import '../../../../courses/data/models/all_courses_model/foreign_language/foreign_language_model.dart';
 import '../../../../courses/data/models/all_courses_model/pre_trip_courses/pre_trip_model.dart';
+import '../../../../courses/data/models/all_courses_model/skill_test/skill_test_model.dart';
 import '../../../../courses/data/models/all_courses_model/soft_skills/soft_skills_model.dart';
 
 class SearchModel extends SearchEntity {
@@ -9,6 +10,7 @@ class SearchModel extends SearchEntity {
     required super.foreignLanguages,
     required super.preTripCourses,
     required super.softSkills,
+    required super.skillTests,
   });
 
   factory SearchModel.fromJson(Map<String, dynamic> json) {
@@ -24,6 +26,10 @@ class SearchModel extends SearchEntity {
       softSkills:
           (json['soft_skills'] as List)
               .map((e) => SoftSkillsModel.fromJson(e))
+              .toList(),
+      skillTests:
+          (json['skill_test'] as List)
+              .map((e) => SkillTestModel.fromJson(e))
               .toList(),
     );
   }

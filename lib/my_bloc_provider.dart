@@ -62,6 +62,8 @@ import 'package:skills_xorijdaish/features/statistics/presentation/bloc/course/c
 import 'core/di/service_locator.dart';
 import 'features/courses/presentation/bloc/all_courses/foreign_language/foreign_bloc.dart';
 import 'features/courses/presentation/bloc/all_courses/pre_trip_courses/pre_trip_bloc.dart';
+import 'features/courses/presentation/bloc/face_recognation/face_recognition_compare/face_recognition_compare_bloc.dart';
+import 'features/courses/presentation/bloc/face_recognation/face_recognition_my_id/face_rec_my_id_bloc.dart';
 import 'features/courses/presentation/bloc/lesson_tests/answer_fill_in_the_blank/answer_fill_in_the_blank_bloc.dart';
 import 'features/courses/presentation/bloc/lesson_tests/multiple_choice_with_pictures/multiple_ch_with_pictures.dart';
 import 'features/profile/presentation/bloc/sessions/session_bloc.dart';
@@ -216,6 +218,12 @@ class MyBlocProvider extends StatelessWidget {
         ),
         BlocProvider<FetchFinalListenNSelectPairsBloc>(
           create: (context) => sl<FetchFinalListenNSelectPairsBloc>(),
+        ),
+        BlocProvider<FaceRecMyIdBloc>(
+          create: (context) => sl<FaceRecMyIdBloc>(),
+        ),
+        BlocProvider<FaceRecognitionCompareBloc>(
+          create: (context) => sl<FaceRecognitionCompareBloc>(),
         ),
       ],
       child: child,

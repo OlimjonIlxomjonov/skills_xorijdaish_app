@@ -6,7 +6,7 @@ class LessonsUseCase {
 
   LessonsUseCase(this.repository);
 
-  Future<LessonsResponse> call({required int courseId}) {
-    return repository.fetchLessons(courseId: courseId);
+  Future<LessonsResponse> call({required int courseId, required int page}) {
+    return repository.fetchLessons(courseId: courseId, page: page);
   }
 }
