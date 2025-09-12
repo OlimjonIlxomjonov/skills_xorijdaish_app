@@ -4,6 +4,7 @@ import 'package:skills_xorijdaish/core/common/constants/api_urls.dart';
 import 'package:skills_xorijdaish/core/netwrok/dio_client.dart';
 import 'package:skills_xorijdaish/core/utils/logger/logger.dart';
 import 'package:skills_xorijdaish/features/profile/data/model/certificate/certificate_response_model.dart';
+import 'package:skills_xorijdaish/features/profile/data/model/faq/faq_response_model.dart';
 import 'package:skills_xorijdaish/features/profile/data/model/self_profile_model.dart';
 import 'package:skills_xorijdaish/features/profile/data/model/session/session_response_model.dart';
 import 'package:skills_xorijdaish/features/profile/data/model/support/support_response_model.dart';
@@ -239,6 +240,22 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       }
     } catch (e) {
       logger.e('Error catch $e');
+      rethrow;
+    }
+  }
+
+  @override
+  Future<FaqResponseModel> getFaqs() async {
+    try {
+      final response = await dioClient.get(ApiUrls.faqs);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        logger.i('Success: ${response.data}');
+        return FaqResponseModel.fromJson(response.data);
+      } else {
+        throw Exception('Error: ${response.data}');
+      }
+    } catch (e) {
+      logger.e('Error catch: $e');
       rethrow;
     }
   }

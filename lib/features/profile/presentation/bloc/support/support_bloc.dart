@@ -8,7 +8,6 @@ class SupportBloc extends Bloc<ProfileEvent, SupportState> {
 
   SupportBloc(this.useCase) : super(SupportInitial()) {
     on<SupportEvent>((event, emit) async {
-      // emit(SupportLoading());
       try {
         final response = await useCase.call(page: event.page);
         emit(SupportLoaded(response));

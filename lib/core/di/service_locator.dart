@@ -111,6 +111,7 @@ import 'package:skills_xorijdaish/features/profile/data/source/profile_remote_da
 import 'package:skills_xorijdaish/features/profile/domain/repo/profile_repository.dart';
 import 'package:skills_xorijdaish/features/profile/domain/usecase/certificate_use_case.dart';
 import 'package:skills_xorijdaish/features/profile/domain/usecase/download_image.dart';
+import 'package:skills_xorijdaish/features/profile/domain/usecase/faqs_use_case.dart';
 import 'package:skills_xorijdaish/features/profile/domain/usecase/post_ticket_use_case.dart';
 import 'package:skills_xorijdaish/features/profile/domain/usecase/revoke_session_use_case.dart';
 import 'package:skills_xorijdaish/features/profile/domain/usecase/self_profile_use_case.dart';
@@ -122,6 +123,7 @@ import 'package:skills_xorijdaish/features/profile/domain/usecase/update_avatar_
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/certificate/certificate_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/create_ticket/create_ticket_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/download_image/download_image_bloc.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/faqs/faqs_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/revoke_session/revoke_session_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/self_info/self_info_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/send_message/send_message_bloc.dart';
@@ -278,6 +280,9 @@ Future<void> setup() async {
   sl.registerLazySingleton(() => FaceRecognitionMyIdUseCase(sl()));
   sl.registerLazySingleton(() => FaceRecognitionCompareUseCase(sl()));
 
+  // FAQS
+  sl.registerLazySingleton(() => FaqsUseCase(sl()));
+
   /// BLOC
   // courses
   sl.registerLazySingleton(() => CountriesBloc(sl()));
@@ -381,4 +386,7 @@ Future<void> setup() async {
   // face recognition
   sl.registerLazySingleton(() => FaceRecMyIdBloc(sl()));
   sl.registerLazySingleton(() => FaceRecognitionCompareBloc(sl()));
+
+  // FAQS
+  sl.registerLazySingleton(() => FaqsBloc(sl()));
 }

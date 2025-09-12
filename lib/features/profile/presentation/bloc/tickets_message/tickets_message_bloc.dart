@@ -8,7 +8,6 @@ class TicketsMessageBloc extends Bloc<ProfileEvent, TicketsMessageState> {
 
   TicketsMessageBloc(this.useCase) : super(TicketsMessageInitial()) {
     on<TicketsMessageEvent>((event, emit) async {
-      emit(TicketsMessageLoading());
       try {
         final response = await useCase.call(ticketId: event.ticketId);
         emit(TicketsMessageLoaded(response));

@@ -57,3 +57,5 @@ class DownloadImageEvent extends ProfileEvent {
 
   DownloadImageEvent(this.ticketId, this.fileId);
 }
+
+class FaqsEvent extends ProfileEvent {}

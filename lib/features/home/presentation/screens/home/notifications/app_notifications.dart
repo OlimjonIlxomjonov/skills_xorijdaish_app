@@ -42,7 +42,7 @@ class _AppNotificationsState extends State<AppNotifications> {
         scrolledUnderElevation: 0,
         backgroundColor: AppColors.white,
         title: Text(
-          'Bildirishnomalar',
+          'Xabarnoma',
           style: AppTextStyles.source.medium(
             color: AppColors.black,
             fontSize: 20,

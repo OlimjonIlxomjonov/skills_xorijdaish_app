@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:iconly/iconly.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/constants/strings/app_strings.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
@@ -15,6 +14,7 @@ import 'package:skills_xorijdaish/core/common/widgets/flush_bar/sucess_flesh_bar
 import 'package:skills_xorijdaish/core/configs/assets/app_images.dart';
 import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
 import 'package:skills_xorijdaish/features/auth/presentation/screens/auth_page.dart';
+import 'package:skills_xorijdaish/features/home/presentation/screens/home/notifications/app_notifications.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/profile_event.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/revoke_session/revoke_session_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/self_info/self_info_bloc.dart';
@@ -23,7 +23,6 @@ import 'package:skills_xorijdaish/features/profile/presentation/bloc/update_avat
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/update_avatar/update_avatar_state.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/active_sessions/active_session_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/certificates/certificates_page.dart';
-import 'package:skills_xorijdaish/features/profile/presentation/screens/notifications/notifications_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/questions/question_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/self_information_page.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/user_info_storage.dart';
@@ -73,7 +72,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final pickedFile = await _picker.pickImage(source: source);
+      final pickedFile = await _picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 80,
+      );
       if (pickedFile != null) {
         final file = File(pickedFile.path);
 
@@ -89,27 +93,95 @@ class _ProfilePageState extends State<ProfilePage> {
   void showImagePickerOptions() {
     showModalBottomSheet(
       context: context,
-      builder:
-          (context) => Wrap(
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: appH(20),
+            horizontal: appW(24),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                leading: Icon(IconlyLight.camera),
-                title: Text('Take a Photo'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.camera);
-                },
+              // Drag handle
+              Container(
+                margin: EdgeInsets.only(bottom: appH(16)),
+                width: 38,
+                height: appH(4),
+                decoration: BoxDecoration(
+                  color: AppColors.greyScale.grey300,
+                  borderRadius: BorderRadius.circular(100),
+                ),
               ),
-              ListTile(
-                leading: Icon(IconlyLight.image),
-                title: Text('Choose from Gallery'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage(ImageSource.gallery);
-                },
+
+              Text(
+                'Rasm tanlash',
+                style: AppTextStyles.source.semiBold(
+                  color: AppColors.black,
+                  fontSize: 18,
+                ),
               ),
+              SizedBox(height: appH(20)),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildPickerOption(
+                    icon: IconlyLight.camera,
+                    label: 'Kamera',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickImage(ImageSource.camera);
+                    },
+                  ),
+                  _buildPickerOption(
+                    icon: IconlyLight.image,
+                    label: 'Galereya',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickImage(ImageSource.gallery);
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: appH(16)),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPickerOption({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(appH(14)),
+            decoration: BoxDecoration(
+              color: AppColors.secondBlue.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, size: appH(28), color: AppColors.secondBlue),
+          ),
+          SizedBox(height: appH(8)),
+          Text(
+            label,
+            style: AppTextStyles.source.medium(
+              color: AppColors.textGrey,
+              fontSize: 14,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -265,7 +337,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 buildRow(
                   IconlyLight.notification,
                   () {
-                    AppRoute.go(NotificationsPage());
+                    AppRoute.go(AppNotifications());
                   },
                   AppStrings.bildirishNomalar,
                   optionalIcon: IconlyLight.arrow_right_2,
@@ -323,89 +395,105 @@ class _ProfilePageState extends State<ProfilePage> {
     return showModalBottomSheet(
       backgroundColor: AppColors.white,
       context: context,
-
+      isScrollControlled: true,
+      // ✅ important
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (context) {
-        return Column(
-          children: [
-            Container(
-              margin: EdgeInsets.only(top: appH(8), bottom: appH(24)),
-              width: 38,
-              height: appH(3),
-              decoration: BoxDecoration(
-                color: Color(0xffE0E0E0),
-                borderRadius: BorderRadius.circular(100),
-              ),
-            ),
-            Text(
-              'Akkauntdan chiqish',
-              style: AppTextStyles.source.medium(
-                color: AppColors.red,
-                fontSize: 24,
-              ),
-            ),
-            SizedBox(height: appH(24)),
-            Divider(color: AppColors.greyScale.grey300),
-            SizedBox(height: appH(24)),
-            Text(
-              'Siz rostdan ham akkauntdan chiqmoqchimisiz?',
-              style: AppTextStyles.source.regular(
-                color: AppColors.black,
-                fontSize: 20,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: appW(24),
-                vertical: appH(24),
-              ),
-              child: Row(
-                spacing: 12,
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ), // ✅ prevents keyboard overlap
+          child: Wrap(
+            // ✅ makes height wrap content
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min, // ✅ only take as much as needed
                 children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        AppRoute.close();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: Size(double.infinity, appH(51)),
-                        backgroundColor: AppColors.white,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Color(0xff5B7BFE), width: 2),
-                        ),
-                      ),
-                      child: Text(
-                        'Bekor qilish',
-                        style: AppTextStyles.source.medium(
-                          color: Color(0xff5B7BFE),
-                          fontSize: 16,
-                        ),
-                      ),
+                  Container(
+                    margin: EdgeInsets.only(top: appH(8), bottom: appH(24)),
+                    width: 38,
+                    height: appH(3),
+                    decoration: BoxDecoration(
+                      color: Color(0xffE0E0E0),
+                      borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  Expanded(
-                    child: BasicButtonWg(
-                      text: 'Tasdiqlash',
-                      onTap: () {
-                        if (userInfo.sessionId != null) {
-                          context.read<RevokeSessionBloc>().add(
-                            RevokeSessionEvent(userInfo.sessionId ?? ''),
-                          );
-                          logger.f(userInfo.sessionId ?? '');
-                          AppRoute.open(AuthPage());
-                          successFlushBar(context, 'Muvaffaqiyat!');
-                        } else {
-                          showErrorFlushbar(context, 'Xato!');
-                        }
-                      },
+                  Text(
+                    'Akkauntdan chiqish',
+                    style: AppTextStyles.source.medium(
+                      color: AppColors.red,
+                      fontSize: 24,
+                    ),
+                  ),
+                  SizedBox(height: appH(24)),
+                  Divider(color: AppColors.greyScale.grey300),
+                  SizedBox(height: appH(24)),
+                  Text(
+                    'Siz rostdan ham akkauntdan chiqmoqchimisiz?',
+                    style: AppTextStyles.source.regular(
+                      color: AppColors.black,
+                      fontSize: 20,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: appW(24),
+                      vertical: appH(24),
+                    ),
+                    child: Row(
+                      spacing: 12,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () => AppRoute.close(),
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(double.infinity, appH(51)),
+                              backgroundColor: AppColors.white,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                side: BorderSide(
+                                  color: Color(0xff5B7BFE),
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            child: Text(
+                              'Bekor qilish',
+                              style: AppTextStyles.source.medium(
+                                color: Color(0xff5B7BFE),
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: BasicButtonWg(
+                            text: 'Tasdiqlash',
+                            onTap: () {
+                              if (userInfo.sessionId != null) {
+                                context.read<RevokeSessionBloc>().add(
+                                  RevokeSessionEvent(userInfo.sessionId ?? ''),
+                                );
+                                logger.f(userInfo.sessionId ?? '');
+                                AppRoute.open(AuthPage());
+                                successFlushBar(context, 'Muvaffaqiyat!');
+                              } else {
+                                showErrorFlushbar(context, 'Xato!');
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
+            ],
+          ),
         );
       },
     );

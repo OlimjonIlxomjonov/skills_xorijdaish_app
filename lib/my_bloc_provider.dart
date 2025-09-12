@@ -49,6 +49,7 @@ import 'package:skills_xorijdaish/features/home/presentation/block/search/search
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/certificate/certificate_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/create_ticket/create_ticket_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/download_image/download_image_bloc.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/faqs/faqs_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/revoke_session/revoke_session_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/self_info/self_info_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/send_message/send_message_bloc.dart';
@@ -225,6 +226,7 @@ class MyBlocProvider extends StatelessWidget {
         BlocProvider<FaceRecognitionCompareBloc>(
           create: (context) => sl<FaceRecognitionCompareBloc>(),
         ),
+        BlocProvider<FaqsBloc>(create: (context) => sl<FaqsBloc>()),
       ],
       child: child,
     );

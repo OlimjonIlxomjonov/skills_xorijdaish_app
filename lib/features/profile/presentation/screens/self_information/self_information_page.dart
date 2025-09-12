@@ -48,8 +48,6 @@ class SelfInformationPage extends StatelessWidget {
                   );
                 },
               );
-            } else if (state is SelfInfoError) {
-              return Text(state.message);
             } else if (state is SelfInfoLoaded) {
               final info = state.entity;
               return Column(

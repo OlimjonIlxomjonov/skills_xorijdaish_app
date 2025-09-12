@@ -34,7 +34,6 @@ abstract class AppVectors {
   static const String pdf = '${basePath}pdf$format';
   static const String swidLogo = '${basePath}swid_logo$format';
   static const String migratsiyaLogo = '${basePath}migratsiya_logo$format';
-  static const String iomLogo = '${basePath}iom_logo$format';
 
   static const String warning = '${basePath}warning$format';
 

@@ -36,7 +36,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                 if (index < state.response.data.length) {
                   final reels = state.response.data[index];
 
-                  return ReelItem(reel: reels);
+                  return ReelItem(key: ValueKey(reels.id), reel: reels);
                 } else {
                   final currentPage = state.response.meta.currentPage;
                   final lastPage = state.response.meta.lastPage;
@@ -48,7 +48,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                               : currentPage,
                     ),
                   );
-                  return Center(child: CircularProgressIndicator());
+                  return SizedBox.shrink();
                 }
               },
             );

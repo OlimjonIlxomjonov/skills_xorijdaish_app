@@ -36,7 +36,7 @@ class _SkillTestPageState extends State<SkillTestPage> {
         child: BlocBuilder<SkillTestBloc, SkillTestState>(
           builder: (context, state) {
             if (state is SkillTestLoading) {
-              return CircularProgressIndicator();
+              return Center(child: CircularProgressIndicator());
             } else if (state is SkillTestLoaded) {
               final skillTest = state.response;
 

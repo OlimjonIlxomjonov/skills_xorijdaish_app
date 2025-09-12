@@ -42,8 +42,6 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
         builder: (context, state) {
           if (state is SessionLoading) {
             return Center(child: CircularProgressIndicator());
-          } else if (state is SessionError) {
-            return Text('Error Occurred!');
           } else if (state is SessionLoaded) {
             return Padding(
               padding: EdgeInsets.symmetric(horizontal: appW(20)),
@@ -75,10 +73,11 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
                           }
                         },
                         child: Slidable(
+                          key: ValueKey(session.id),
                           endActionPane:
                               !session.isMe
                                   ? ActionPane(
-                                    motion: BehindMotion(),
+                                    motion: const BehindMotion(),
                                     children: [
                                       SlidableAction(
                                         onPressed: (_) {
@@ -86,11 +85,13 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
                                             RevokeSessionEvent(session.id),
                                           );
                                         },
-                                        backgroundColor: Color(0xFFFE4A49),
+                                        backgroundColor: const Color(
+                                          0xFFFE4A49,
+                                        ),
                                         foregroundColor: Colors.white,
                                         icon: Icons.delete,
                                         label: 'Delete',
-                                        borderRadius: BorderRadius.only(
+                                        borderRadius: const BorderRadius.only(
                                           topRight: Radius.circular(12),
                                           bottomRight: Radius.circular(12),
                                         ),
@@ -98,57 +99,78 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
                                     ],
                                   )
                                   : null,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: appH(5)),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Color(0xff0A0D1408)),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: ListTile(
-                              // onTap: () {
-                              //   !session.isMe
-                              //       ? buildShowBottomSheet(context, session)
-                              //       : SizedBox.shrink();
-                              // },
-                              contentPadding: EdgeInsets.only(
-                                left: appW(10),
-                                right: appW(10),
-                              ),
-                              leading: CircleAvatar(
-                                backgroundColor: Color(0xffF2F5F8),
-                                radius: appH(25),
-                                child: Icon(Icons.smartphone),
-                              ),
-                              title: RichText(
-                                text: TextSpan(
-                                  text: session.name,
-                                  children: [
-                                    TextSpan(
-                                      text: " (${session.updatedAtHuman})",
-                                      style: AppTextStyles.source.medium(
-                                        color: Color(0xff525866),
-                                        fontSize: 14,
-                                      ),
+                          child: Builder(
+                            builder:
+                                (slidableContext) => InkWell(
+                                  borderRadius: BorderRadius.circular(12),
+                                  onTap: () {
+                                    if (!session.isMe) {
+                                      Slidable.of(
+                                        slidableContext,
+                                      )?.openEndActionPane();
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: appH(5),
                                     ),
-                                  ],
-                                  style: AppTextStyles.source.medium(
-                                    color: Color(0xff0E121B),
-                                    fontSize: 14,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: const Color(0xff0A0D1408),
+                                      ),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.only(
+                                        left: appW(10),
+                                        right: appW(10),
+                                      ),
+                                      leading: CircleAvatar(
+                                        backgroundColor: const Color(
+                                          0xffF2F5F8,
+                                        ),
+                                        radius: appH(25),
+                                        child: const Icon(Icons.smartphone),
+                                      ),
+                                      title: RichText(
+                                        text: TextSpan(
+                                          text: session.name,
+                                          children: [
+                                            TextSpan(
+                                              text:
+                                                  " (${session.updatedAtHuman})",
+                                              style: AppTextStyles.source
+                                                  .medium(
+                                                    color: const Color(
+                                                      0xff525866,
+                                                    ),
+                                                    fontSize: 14,
+                                                  ),
+                                            ),
+                                          ],
+                                          style: AppTextStyles.source.medium(
+                                            color: const Color(0xff0E121B),
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        session.location ?? '-:-',
+                                        style: AppTextStyles.source.medium(
+                                          color: const Color(0xff525866),
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      trailing:
+                                          !session.isMe
+                                              ? Icon(
+                                                Icons.close,
+                                                size: appH(15),
+                                              )
+                                              : const SizedBox.shrink(),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              subtitle: Text(
-                                session.location ?? '-:-',
-                                style: AppTextStyles.source.medium(
-                                  color: Color(0xff525866),
-                                  fontSize: 14,
-                                ),
-                              ),
-                              trailing:
-                                  !session.isMe
-                                      ? Icon(Icons.close, size: appH(15))
-                                      : SizedBox.shrink(),
-                            ),
                           ),
                         ),
                       ),
@@ -164,114 +186,114 @@ class _ActiveSessionPageState extends State<ActiveSessionPage> {
     );
   }
 
-  PersistentBottomSheetController buildShowBottomSheet(
-    BuildContext context,
-    SessionEntity session,
-  ) {
-    return showBottomSheet(
-      context: context,
-      builder:
-          (context) => Container(
-            padding: EdgeInsets.only(top: 10),
-            height: appH(280),
-            decoration: BoxDecoration(color: AppColors.white),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 180),
-                  child: Divider(height: 5, thickness: 3),
-                ),
-                SizedBox(height: appH(10)),
-                Text(
-                  "Seansni chiqarish",
-                  style: AppTextStyles.source.medium(
-                    color: Colors.red,
-                    fontSize: 22,
-                  ),
-                ),
-                SizedBox(height: appH(10)),
-                Divider(),
-                SizedBox(height: appH(10)),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: appH(20)),
-                  child: Column(
-                    children: [
-                      Text(
-                        textAlign: TextAlign.center,
-                        'Siz rostdan ham seansni chiqarmiqchisizmi? \n ${session.name}',
-                        style: AppTextStyles.source.regular(
-                          color: AppColors.black,
-                          fontSize: 16,
-                        ),
-                      ),
-                      SizedBox(height: appH(50)),
-                      Row(
-                        spacing: 15,
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                AppRoute.close();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  side: BorderSide(
-                                    width: 1,
-                                    color: AppColors.appBg,
-                                  ),
-                                ),
-                                backgroundColor: AppColors.white,
-                                minimumSize: Size(double.infinity, appH(50)),
-                              ),
-                              child: Text(
-                                'Bekor qilish',
-                                style: AppTextStyles.source.medium(
-                                  color: AppColors.appBg,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                context.read<RevokeSessionBloc>().add(
-                                  RevokeSessionEvent(session.id),
-                                );
-                                context.read<SessionBloc>().add(SessionEvent());
-                                AppRoute.close();
-                                successFlushBar(
-                                  context,
-                                  "Muvaffaqiyatli o'chirildi!",
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                backgroundColor: AppColors.appBg,
-                                minimumSize: Size(double.infinity, appH(50)),
-                              ),
-                              child: Text(
-                                'Tasdiqlash',
-                                style: AppTextStyles.source.medium(
-                                  color: AppColors.white,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-    );
-  }
+  // PersistentBottomSheetController buildShowBottomSheet(
+  //   BuildContext context,
+  //   SessionEntity session,
+  // ) {
+  //   return showBottomSheet(
+  //     context: context,
+  //     builder:
+  //         (context) => Container(
+  //           padding: EdgeInsets.only(top: 10),
+  //           height: appH(280),
+  //           decoration: BoxDecoration(color: AppColors.white),
+  //           child: Column(
+  //             children: [
+  //               Padding(
+  //                 padding: const EdgeInsets.symmetric(horizontal: 180),
+  //                 child: Divider(height: 5, thickness: 3),
+  //               ),
+  //               SizedBox(height: appH(10)),
+  //               Text(
+  //                 "Seansni chiqarish",
+  //                 style: AppTextStyles.source.medium(
+  //                   color: Colors.red,
+  //                   fontSize: 22,
+  //                 ),
+  //               ),
+  //               SizedBox(height: appH(10)),
+  //               Divider(),
+  //               SizedBox(height: appH(10)),
+  //               Padding(
+  //                 padding: EdgeInsets.symmetric(horizontal: appH(20)),
+  //                 child: Column(
+  //                   children: [
+  //                     Text(
+  //                       textAlign: TextAlign.center,
+  //                       'Siz rostdan ham seansni chiqarmiqchisizmi? \n ${session.name}',
+  //                       style: AppTextStyles.source.regular(
+  //                         color: AppColors.black,
+  //                         fontSize: 16,
+  //                       ),
+  //                     ),
+  //                     SizedBox(height: appH(50)),
+  //                     Row(
+  //                       spacing: 15,
+  //                       children: [
+  //                         Expanded(
+  //                           child: ElevatedButton(
+  //                             onPressed: () {
+  //                               AppRoute.close();
+  //                             },
+  //                             style: ElevatedButton.styleFrom(
+  //                               shadowColor: Colors.transparent,
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(10),
+  //                                 side: BorderSide(
+  //                                   width: 1,
+  //                                   color: AppColors.appBg,
+  //                                 ),
+  //                               ),
+  //                               backgroundColor: AppColors.white,
+  //                               minimumSize: Size(double.infinity, appH(50)),
+  //                             ),
+  //                             child: Text(
+  //                               'Bekor qilish',
+  //                               style: AppTextStyles.source.medium(
+  //                                 color: AppColors.appBg,
+  //                                 fontSize: 14,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                         Expanded(
+  //                           child: ElevatedButton(
+  //                             onPressed: () {
+  //                               context.read<RevokeSessionBloc>().add(
+  //                                 RevokeSessionEvent(session.id),
+  //                               );
+  //                               context.read<SessionBloc>().add(SessionEvent());
+  //                               AppRoute.close();
+  //                               successFlushBar(
+  //                                 context,
+  //                                 "Muvaffaqiyatli o'chirildi!",
+  //                               );
+  //                             },
+  //                             style: ElevatedButton.styleFrom(
+  //                               shadowColor: Colors.transparent,
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(10),
+  //                               ),
+  //                               backgroundColor: AppColors.appBg,
+  //                               minimumSize: Size(double.infinity, appH(50)),
+  //                             ),
+  //                             child: Text(
+  //                               'Tasdiqlash',
+  //                               style: AppTextStyles.source.medium(
+  //                                 color: AppColors.white,
+  //                                 fontSize: 14,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //   );
+  // }
 }

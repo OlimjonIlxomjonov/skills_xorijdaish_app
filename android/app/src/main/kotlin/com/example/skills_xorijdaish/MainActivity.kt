@@ -1,4 +1,4 @@
-package com.example.skills_xorijdaish
+package uz.study.go
 
 import io.flutter.embedding.android.FlutterActivity
 

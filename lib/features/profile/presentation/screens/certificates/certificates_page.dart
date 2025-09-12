@@ -24,8 +24,6 @@ class CertificatesPage extends StatelessWidget {
         builder: (context, state) {
           if (state is CertificateLoading) {
             return Center(child: CircularProgressIndicator());
-          } else if (state is CertificateError) {
-            return Text('check logs!');
           } else if (state is CertificateLoaded) {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),

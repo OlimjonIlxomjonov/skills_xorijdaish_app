@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
@@ -18,6 +21,8 @@ import 'package:skills_xorijdaish/features/profile/presentation/bloc/send_messag
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/tickets_message/tickets_message_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/tickets_message/tickets_message_state.dart';
 
+import '../../../../../../core/services/token_storage/token_storage_service_impl.dart';
+import '../../../../data/model/tickets_message/tickets_message_model.dart';
 import '../../../widget/file_opener_wg.dart';
 
 class TicketsChatPage extends StatefulWidget {
@@ -33,13 +38,84 @@ class _TicketsChatPageState extends State<TicketsChatPage> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController messageController = TextEditingController();
   final List<File> files = [];
+  final PusherChannelsFlutter pusher = PusherChannelsFlutter.getInstance();
+  final tokenStorage = TokenStorageServiceImpl();
 
   @override
   void initState() {
     super.initState();
+
     context.read<TicketsMessageBloc>().add(
       TicketsMessageEvent(widget.ticketId),
     );
+
+    _connectPusher();
+  }
+
+  Future<void> _connectPusher() async {
+    final token = await tokenStorage.getAccessToken();
+
+    try {
+      await pusher.init(
+        apiKey: "mbzfd4y116py2cjxflm4",
+        cluster: "mt1",
+        useTLS: true,
+        onConnectionStateChange: (String currentState, String previousState) {
+          debugPrint(
+            "Pusher state changed from $previousState to $currentState",
+          );
+        },
+        onError: (message, code, e) {
+          debugPrint("Pusher error: $message | Code: $code | Exception: $e");
+        },
+        onAuthorizer: (channelName, socketId, options) async {
+          final response = await http.post(
+            Uri.parse("https://skills.avacoder.uz/broadcasting/auth"),
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer $token",
+            },
+            body: jsonEncode({
+              "channel_name": channelName,
+              "socket_id": socketId,
+            }),
+          );
+
+          if (response.statusCode != 200) {
+            debugPrint("Auth failed: ${response.body}");
+          }
+          return response.body;
+        },
+      );
+
+      await pusher.connect();
+
+      await pusher.subscribe(
+        channelName: "private-chat.${widget.ticketId}",
+        onEvent: (event) {
+          debugPrint("Event: ${event.eventName} => ${event.data}");
+
+          if (event.eventName == "new-message") {
+            try {
+              // final msg = TicketsMessageModel.fromJson(jsonDecode(event.data));
+              context.read<TicketsMessageBloc>().add(
+                TicketsMessageEvent(widget.ticketId),
+              );
+            } catch (e) {
+              debugPrint("Failed to parse new message: $e");
+            }
+          }
+        },
+      );
+    } catch (e) {
+      debugPrint("Pusher connect error: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    pusher.disconnect();
+    super.dispose();
   }
 
   @override
@@ -334,6 +410,7 @@ class _TicketsChatPageState extends State<TicketsChatPage> {
                       }).toList(),
                 ),
               ],
+              SizedBox(height: 4),
               if (message.text.isNotEmpty)
                 Text(
                   message.text,

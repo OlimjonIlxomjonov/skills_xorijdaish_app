@@ -30,7 +30,10 @@ import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../core/common/widgets/flush_bar/warning_bar_wg.dart';
+import '../../../../profile/presentation/bloc/self_info/self_info_bloc.dart';
+import '../../../../profile/presentation/bloc/self_info/self_info_state.dart';
 import '../../bloc/all_courses/buy_course/buy_course_state.dart';
+import '../../widgets/face_id_verif_wg.dart';
 
 class SingleCoursePage extends StatefulWidget {
   final int courseId;
@@ -193,10 +196,13 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                   ),
                                   state.entity.priceInfo['discount'] != 0
                                       ? Text(
-                                        "${state.entity.priceInfo['discount']} UZS",
-                                        style: AppTextStyles.source.semiBold(
+                                        "${state.entity.priceInfo['old_price']} UZS",
+                                        style: TextStyle(
                                           color: AppColors.textGrey,
                                           fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          decoration:
+                                              TextDecoration.lineThrough,
                                         ),
                                       )
                                       : SizedBox.shrink(),
@@ -861,7 +867,7 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                 child: ListTile(
                                   onTap:
                                       allAccessible
-                                          ? () {
+                                          ? () async {
                                             if (finishState
                                                     is FinishFinalTestLoaded &&
                                                 finishState.response.ok) {
@@ -869,14 +875,23 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                                 context,
                                                 'Yakuniy test allaqachon tugallangan!',
                                               );
-                                              // AppRoute.go(
-                                              //   FinalTestPage(
-                                              //     courseId: widget.courseId,
-                                              //     questionId: questionId,
-                                              //     testType: testType,
-                                              //   ),
-                                              // );
-                                            } else {
+                                              return;
+                                            }
+
+                                            final selfInfoState =
+                                                context
+                                                    .read<SelfInfoBloc>()
+                                                    .state;
+                                            bool isVerified = false;
+                                            if (selfInfoState
+                                                is SelfInfoLoaded) {
+                                              isVerified =
+                                                  selfInfoState
+                                                      .entity
+                                                      .isVerified;
+                                            }
+
+                                            if (isVerified) {
                                               AppRoute.go(
                                                 FinalTestPage(
                                                   courseId: widget.courseId,
@@ -884,9 +899,53 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                                   testType: testType,
                                                 ),
                                               );
+                                              return;
                                             }
+
+                                            final lessonsState =
+                                                context
+                                                    .read<LessonsBloc>()
+                                                    .state;
+                                            bool isCameraVerifEnabled = false;
+                                            if (lessonsState is LessonsLoaded) {
+                                              isCameraVerifEnabled =
+                                                  lessonsState
+                                                      .response
+                                                      .data[index]
+                                                      .isCameraVerificationEnabled;
+                                            }
+
+                                            if (isCameraVerifEnabled) {
+                                              final success =
+                                                  await startFaceVerification(
+                                                    context,
+                                                  );
+                                              logger.f(
+                                                'Raw MyID result: $success',
+                                              );
+
+                                              if (success) {
+                                                AppRoute.go(
+                                                  FinalTestPage(
+                                                    courseId: widget.courseId,
+                                                    questionId: questionId,
+                                                    testType: testType,
+                                                  ),
+                                                );
+                                              }
+                                              return;
+                                            }
+
+                                            AppRoute.go(
+                                              FinalTestPage(
+                                                courseId: widget.courseId,
+                                                questionId: questionId,
+                                                testType: testType,
+                                              ),
+                                            );
                                           }
                                           : null,
+
                                   contentPadding: EdgeInsets.zero,
                                   leading: Stack(
                                     children: [

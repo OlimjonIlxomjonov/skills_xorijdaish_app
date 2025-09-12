@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:skills_xorijdaish/features/profile/data/model/certificate/certificate_response_model.dart';
+import 'package:skills_xorijdaish/features/profile/data/model/faq/faq_response_model.dart';
 import 'package:skills_xorijdaish/features/profile/data/model/self_profile_model.dart';
 import 'package:skills_xorijdaish/features/profile/data/model/session/session_response_model.dart';
 import 'package:skills_xorijdaish/features/profile/data/model/support/support_response_model.dart';
@@ -37,4 +38,6 @@ abstract class ProfileRemoteDataSource {
   });
 
   Future<void> getDownloadImage({required int ticketId, required int fileId});
+
+  Future<FaqResponseModel> getFaqs();
 }

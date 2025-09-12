@@ -117,7 +117,7 @@ class CourseCard extends StatelessWidget {
                       color: AppColors.black,
                       fontSize: 15,
                     ),
-                    maxLines: 2,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   Row(

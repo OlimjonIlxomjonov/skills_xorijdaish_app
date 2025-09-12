@@ -29,10 +29,13 @@ import 'package:skills_xorijdaish/features/courses/presentation/bloc/set_video_t
 import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/content_page.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/screens/lessons/tests/tests_page.dart';
 import 'package:skills_xorijdaish/features/courses/presentation/widgets/player_video_widget.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/profile_event.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/bloc/self_info/self_info_bloc.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import '../../../../../core/configs/file_view_page.dart';
 import '../../../../../main.dart';
+import '../../../../profile/presentation/bloc/self_info/self_info_state.dart';
 import '../../widgets/face_id_verif_wg.dart';
 
 class SingleLessonVideo extends StatefulWidget {
@@ -74,11 +77,11 @@ class _SingleLessonVideoState extends State<SingleLessonVideo> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    context.read<VideoBloc>().close();
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   context.read<VideoBloc>().close();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -291,6 +294,34 @@ class _SingleLessonVideoState extends State<SingleLessonVideo> {
                         );
                         return;
                       }
+
+                      // check if test already passed
+                      if (widget.isTestEnabled) {
+                        warningBarWg(context, "Test o'tib bo'lingan!");
+                        return;
+                      }
+
+                      final selfInfoState = context.read<SelfInfoBloc>().state;
+
+                      bool isVerified = false;
+                      if (selfInfoState is SelfInfoLoaded) {
+                        isVerified = selfInfoState.entity.isVerified;
+                      }
+
+                      // If user is already verified => skip camera verification
+                      if (isVerified) {
+                        AppRoute.go(
+                          TestsPage(
+                            courseId: widget.courseId,
+                            lessonId: widget.lessonId,
+                            questionId: testId,
+                            testType: testType,
+                          ),
+                        );
+                        return;
+                      }
+
+                      // If camera verification is required
                       if (widget.isCameraVerifEnabled) {
                         final success = await startFaceVerification(context);
                         logger.f('Raw MyID result: $success');
@@ -308,17 +339,17 @@ class _SingleLessonVideoState extends State<SingleLessonVideo> {
                         return;
                       }
 
-                      widget.isTestEnabled
-                          ? warningBarWg(context, "Test o'tib bo'lingan!")
-                          : AppRoute.go(
-                            TestsPage(
-                              courseId: widget.courseId,
-                              lessonId: widget.lessonId,
-                              questionId: testId,
-                              testType: testType,
-                            ),
-                          );
+                      // Normal case
+                      AppRoute.go(
+                        TestsPage(
+                          courseId: widget.courseId,
+                          lessonId: widget.lessonId,
+                          questionId: testId,
+                          testType: testType,
+                        ),
+                      );
                     },
+
                     child: buildContainer(
                       "Test topshiriqlari",
                       BlocBuilder<VideoBloc, VideoState>(

@@ -106,4 +106,7 @@ abstract class ApiUrls {
   //face recognition
   static const faceRecognitionMyId = '/api/face-recognition/my-id';
   static const faceRecognitionCompare = '/api/face-recognition/compare';
+
+  // FAQS
+  static const faqs = '/api/faqs';
 }

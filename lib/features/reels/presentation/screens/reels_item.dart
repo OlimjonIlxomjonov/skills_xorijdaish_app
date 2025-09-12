@@ -4,7 +4,6 @@ import 'package:iconly/iconly.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skills_xorijdaish/features/reels/domain/entity/reels_entity.dart';
 import 'package:skills_xorijdaish/features/reels/presentation/screens/reels_video_page.dart';
-
 import '../../../../core/common/constants/colors/app_colors.dart';
 import '../../../../core/common/textstyles/app_text_styles.dart';
 import '../../../../core/utils/responsiveness/app_responsive.dart';
@@ -26,8 +25,7 @@ class _ReelItemState extends State<ReelItem>
   late int localLikes;
   bool _showHeart = false;
   late AnimationController _heartController;
-  final GlobalKey<ReelVideoState> _videoKey =
-      GlobalKey<ReelVideoState>();
+  final GlobalKey<ReelVideoState> _videoKey = GlobalKey<ReelVideoState>();
 
   @override
   void initState() {
@@ -47,23 +45,19 @@ class _ReelItemState extends State<ReelItem>
   }
 
   void toggleLike() {
-    print("❤️ Like toggled!");
     setState(() {
       isLiked = !isLiked;
       localLikes += isLiked ? 1 : -1;
       _showHeart = true;
     });
-
     _heartController.forward(from: 0);
     Future.delayed(const Duration(milliseconds: 800), () {
       if (mounted) setState(() => _showHeart = false);
     });
-
     context.read<LikeBloc>().add(LikeEvent(widget.reel.id));
   }
 
   void handleVideoTap() {
-    print("🎯 Video tap detected!");
     _videoKey.currentState?.togglePlayPause();
   }
 
@@ -77,14 +71,16 @@ class _ReelItemState extends State<ReelItem>
       fit: StackFit.expand,
       children: [
         ReelVideo(key: _videoKey, url: widget.reel.url!),
-
         Positioned.fill(
           child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.bottomLeft,
                 end: Alignment.topRight,
-                colors: [Colors.black.withOpacity(0.3), Colors.transparent],
+                colors: [
+                  Colors.black.withValues(alpha: 0.3),
+                  Colors.transparent,
+                ],
                 stops: [0.0, 0.2],
               ),
             ),
@@ -96,32 +92,24 @@ class _ReelItemState extends State<ReelItem>
               gradient: LinearGradient(
                 begin: Alignment.bottomRight,
                 end: Alignment.topLeft,
-                colors: [Colors.black.withOpacity(0.3), Colors.transparent],
+                colors: [Colors.black.withValues(alpha: 0.3), Colors.transparent],
                 stops: [0.0, 0.3],
               ),
             ),
           ),
         ),
-
         Positioned.fill(
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () {
-              print("🎯 Tap anywhere - play/pause!");
               handleVideoTap();
             },
             onDoubleTap: () {
-              print("❤️ Double tap anywhere - like!");
               toggleLike();
             },
-            child: Container(
-              color:
-                  Colors
-                      .transparent,
-            ),
+            child: Container(color: Colors.transparent),
           ),
         ),
-
         if (_showHeart)
           Positioned.fill(
             child: IgnorePointer(
@@ -136,7 +124,6 @@ class _ReelItemState extends State<ReelItem>
               ),
             ),
           ),
-
         Positioned(
           bottom: 24,
           left: 20,
@@ -170,7 +157,6 @@ class _ReelItemState extends State<ReelItem>
             ),
           ),
         ),
-
         Positioned(
           right: 20,
           bottom: 24,
@@ -179,7 +165,6 @@ class _ReelItemState extends State<ReelItem>
             children: [
               IconButton(
                 onPressed: () {
-                  print("❤️ Like button pressed!");
                   toggleLike();
                 },
                 icon: Icon(
@@ -198,7 +183,6 @@ class _ReelItemState extends State<ReelItem>
               SizedBox(height: 24),
               IconButton(
                 onPressed: () {
-                  print("📤 Share button pressed!");
                   shareReel(widget.reel.link!);
                 },
                 icon: Icon(IconlyBold.send, color: Colors.white, size: 30),

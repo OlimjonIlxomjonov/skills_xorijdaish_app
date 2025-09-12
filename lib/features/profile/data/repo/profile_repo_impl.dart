@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:skills_xorijdaish/features/profile/data/source/profile_remote_data_source.dart';
 import 'package:skills_xorijdaish/features/profile/domain/entity/certificate/certificate_response.dart';
+import 'package:skills_xorijdaish/features/profile/domain/entity/faq/faq_response.dart';
 import 'package:skills_xorijdaish/features/profile/domain/entity/self_profile_entity.dart';
 import 'package:skills_xorijdaish/features/profile/domain/entity/session/session_response.dart';
 import 'package:skills_xorijdaish/features/profile/domain/entity/support/support_response.dart';
@@ -82,5 +83,10 @@ class ProfileRepoImpl implements ProfileRepository {
       ticketId: ticketId,
       fileId: fileId,
     );
+  }
+
+  @override
+  Future<FaqResponse> getFaqs() {
+    return remoteDataSource.getFaqs();
   }
 }

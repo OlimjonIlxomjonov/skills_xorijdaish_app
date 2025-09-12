@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:skills_xorijdaish/core/common/widgets/flush_bar/flush_bar_wg.dart';
 import 'package:skills_xorijdaish/core/services/token_storage/token_storage_service_impl.dart';
 import 'package:skills_xorijdaish/core/utils/logger/logger.dart';
 import 'package:skills_xorijdaish/features/app_bottom_nav.dart';
@@ -30,41 +32,55 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _precacheAssets(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => isReady = true);
+
+      _precacheAssets(context);
+
       _initializeApp();
     });
   }
 
   Future<void> _initializeApp() async {
     final token = tokenStorage.getAccessToken();
-
     if (token != null && token.isNotEmpty) {
       final isValid = await _checkIfTokenIsValid(token);
-      if (isValid) {
-        AppRoute.open(AppBottomNav());
+
+      if (isValid == true) {
+        Timer(const Duration(seconds: 3), () => AppRoute.open(AppBottomNav()));
+      } else if (isValid == null) {
+        Timer(const Duration(seconds: 3), () => AppRoute.open(AppBottomNav()));
       } else {
         await tokenStorage.deleteAccessToken();
         AppRoute.open(AuthPage());
       }
     } else {
-      Timer(Duration(seconds: 3), () => AppRoute.open(AuthPage()));
+      Timer(const Duration(seconds: 3), () => AppRoute.open(AuthPage()));
     }
   }
 
-  Future<bool> _checkIfTokenIsValid(String token) async {
+  Future<bool?> _checkIfTokenIsValid(String token) async {
     try {
       final remoteDataSource = ProfileRemoteDataSourceImpl();
       final repository = ProfileRepoImpl(remoteDataSource);
       final sessionUseCase = SessionUseCase(repository);
-
       final sessionResponse = await sessionUseCase.call();
-
       return sessionResponse.data.any((e) => e.isMe == true);
+    } on DioException catch (e) {
+      logger.e('Network issue while validating token: $e');
+
+      if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout ||
+          e.type == DioExceptionType.sendTimeout ||
+          e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.badCertificate ||
+          e.type == DioExceptionType.unknown) {
+        return null;
+      }
+
+      return false;
     } catch (e) {
-      logger.e('Token is invalid or expired: $e');
+      logger.e('Unexpected error: $e');
       return false;
     }
   }
@@ -102,7 +118,6 @@ class _SplashPageState extends State<SplashPage> {
                   fit: BoxFit.contain,
                 ),
               ).animate().slideX(begin: -2, end: 0, delay: 1.seconds),
-
               SizedBox(
                 height: appH(176),
                 child: SvgPicture.asset(
@@ -111,7 +126,6 @@ class _SplashPageState extends State<SplashPage> {
                   fit: BoxFit.none,
                 ),
               ).animate().slideX(begin: 1, end: 0, delay: 1.seconds),
-
               SizedBox(
                 height: appW(176),
                 child: Image.asset(
@@ -120,7 +134,6 @@ class _SplashPageState extends State<SplashPage> {
                   height: appH(70),
                 ),
               ).animate().slideX(begin: -2, end: 0, delay: 1.seconds),
-
               SizedBox(
                 height: appH(176),
                 child: SvgPicture.asset(AppVectors.logo).animate(),

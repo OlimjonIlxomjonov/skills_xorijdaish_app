@@ -295,7 +295,7 @@ class _HomePageState extends State<HomePage> {
                     builder: (context, state) {
                       if (state is CourseLoading) {
                         return SizedBox(
-                          height: appH(40),
+                          height: appH(50),
                           child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: 3,
@@ -314,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                                     highlightColor: Colors.grey.shade100,
                                     child: Container(
                                       padding: EdgeInsets.symmetric(
-                                        vertical: appH(20),
+                                        vertical: appH(40),
                                         horizontal: appW(16),
                                       ),
                                       decoration: BoxDecoration(

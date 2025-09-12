@@ -8,7 +8,6 @@ class SendMessageBloc extends Bloc<ProfileEvent, SendMessageState> {
 
   SendMessageBloc(this.useCase) : super(SendMessageInitial()) {
     on<SendMessageEvent>((event, emit) async {
-      emit(SendMessageLoading());
       try {
         await useCase.call(
           ticketId: event.ticketId,

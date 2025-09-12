@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:skills_xorijdaish/core/common/constants/api_urls.dart';
 import 'package:skills_xorijdaish/core/netwrok/dio_client.dart';
 import 'package:skills_xorijdaish/core/utils/logger/logger.dart';
@@ -1018,17 +1019,26 @@ class CoursesRemoteDatasourceImpl implements CoursesRemoteDatasource {
     required File image,
   }) async {
     try {
+      final formData = FormData.fromMap({
+        "code": code,
+        "image": await MultipartFile.fromFile(
+          image.path,
+          filename: "myid_image.jpg",
+        ),
+      });
+
       final response = await dioClient.post(
         ApiUrls.faceRecognitionMyId,
-        data: {"code": code, "image": image},
+        data: formData,
       );
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        logger.i('Success: ${response.data}');
+        logger.i('✅ Success: ${response.data}');
       } else {
         throw Exception('Error: ${response.data}');
       }
     } catch (e) {
-      logger.e("Error: $e");
+      logger.e("❌ Error: $e");
     }
   }
 

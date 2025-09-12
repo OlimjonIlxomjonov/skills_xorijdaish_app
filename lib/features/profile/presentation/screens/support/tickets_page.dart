@@ -8,9 +8,7 @@ import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart'
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/profile_event.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/support/support_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/support/support_state.dart';
-import 'package:skills_xorijdaish/features/profile/presentation/screens/self_information/user_info_storage.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/support/chat/tickets_chat_page.dart';
-import 'package:skills_xorijdaish/features/profile/presentation/screens/support/create_ticket.dart';
 
 class TicketsPage extends StatefulWidget {
   const TicketsPage({super.key});
@@ -32,8 +30,6 @@ class _TicketsPageState extends State<TicketsPage> {
       builder: (context, state) {
         if (state is SupportLoading) {
           return Center(child: CircularProgressIndicator());
-        } else if (state is SupportError) {
-          return Text('Error');
         } else if (state is SupportLoaded) {
           return Expanded(
             child: RefreshIndicator(
@@ -169,7 +165,7 @@ class _TicketsPageState extends State<TicketsPage> {
     String statusText;
 
     switch (status) {
-      case 'finished':
+      case 'accepted':
         bgColor = const Color(0xffE0FAEC);
         textColor = const Color(0xff1FC16B);
         icon = Icons.check_circle;
@@ -185,7 +181,7 @@ class _TicketsPageState extends State<TicketsPage> {
         bgColor = Colors.grey.shade200;
         textColor = Colors.grey;
         icon = Icons.info;
-        statusText = 'Bekor qilingan';
+        statusText = 'Yakunlangan';
     }
 
     return GestureDetector(

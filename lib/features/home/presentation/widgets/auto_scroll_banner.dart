@@ -2,11 +2,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/banners/banners_bloc.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/banners/banners_state.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/home_event.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../../../core/common/constants/colors/app_colors.dart';
 
 class AutoScrollBanner extends StatefulWidget {
   const AutoScrollBanner({super.key});
@@ -71,7 +74,13 @@ class _AutoScrollBannerState extends State<AutoScrollBanner> {
             ),
           );
         } else if (state is BannersError) {
-          return Text('data');
+          return Text(
+            'Check the internet connection!',
+            style: AppTextStyles.source.bold(
+              color: AppColors.red,
+              fontSize: 22,
+            ),
+          );
         }
         return SizedBox.shrink();
       },

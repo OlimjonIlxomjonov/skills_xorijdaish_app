@@ -297,11 +297,14 @@ class _CoursesPageState extends State<CoursesPage>
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            my.title,
-                            style: AppTextStyles.source.semiBold(
-                              color: AppColors.black,
-                              fontSize: 18,
+                          SizedBox(
+                            width: appW(200),
+                            child: Text(
+                              my.title,
+                              style: AppTextStyles.source.semiBold(
+                                color: AppColors.black,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
                           Text(

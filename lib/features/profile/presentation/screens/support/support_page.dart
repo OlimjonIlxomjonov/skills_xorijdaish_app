@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
@@ -9,8 +8,6 @@ import 'package:skills_xorijdaish/features/profile/presentation/screens/self_inf
 import 'package:skills_xorijdaish/features/profile/presentation/screens/support/create_ticket.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/support/tickets_page.dart';
 import '../../../../../core/common/widgets/button/basic_button_wg.dart';
-import '../../bloc/profile_event.dart';
-import '../../bloc/support/support_bloc.dart';
 import 'no_tickets_page.dart';
 
 class SupportPage extends StatefulWidget {

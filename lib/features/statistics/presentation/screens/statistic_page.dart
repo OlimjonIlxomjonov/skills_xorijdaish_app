@@ -385,11 +385,14 @@ class _StatisticPageState extends State<StatisticPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          time.title,
-                          style: AppTextStyles.source.semiBold(
-                            color: AppColors.black,
-                            fontSize: 18,
+                        SizedBox(
+                          width: appW(200),
+                          child: Text(
+                            time.title,
+                            style: AppTextStyles.source.semiBold(
+                              color: AppColors.black,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                         Text(
