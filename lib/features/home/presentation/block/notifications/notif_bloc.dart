@@ -10,7 +10,7 @@ class NotifBloc extends Bloc<HomeEvent, NotifState> {
     on<NotificationsEvent>((event, emit) async {
       try {
         final response = await useCase.call(page: event.page);
-        if (state is NotifLoaded) {
+        if (event.page > 1 && state is NotifLoaded) {
           final oldState = state as NotifLoaded;
 
           final updatedData = [...oldState.response.data, ...response.data];

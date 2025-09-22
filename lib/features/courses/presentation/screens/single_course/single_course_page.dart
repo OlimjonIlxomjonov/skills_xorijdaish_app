@@ -832,13 +832,11 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                 : Color(0xffDAE1E9);
                         final Color textColor =
                             allAccessible ? AppColors.black : Color(0xffDAE1E9);
-
                         final finishState =
                             context.read<FinishFinalTestBloc>().state;
                         final isOk =
                             (finishState is FinishFinalTestLoaded &&
                                 finishState.response.ok);
-
                         return Column(
                           children: [
                             SizedBox(height: appH(5)),

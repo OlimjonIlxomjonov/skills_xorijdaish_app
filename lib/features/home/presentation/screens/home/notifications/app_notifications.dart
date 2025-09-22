@@ -256,12 +256,12 @@ class _AppNotificationsState extends State<AppNotifications> {
                                   color:
                                       notif.isRead
                                           ? AppColors.greyScale.grey50
-                                          : Colors.green.shade200,
+                                          : Colors.blue.shade400,
                                   offset:
                                       notif.isRead
                                           ? Offset(0, 5)
                                           : Offset(0, 0),
-                                  blurRadius: notif.isRead ? 20 : 5,
+                                  blurRadius: notif.isRead ? 20 : 1,
                                 ),
                               ],
                             ),

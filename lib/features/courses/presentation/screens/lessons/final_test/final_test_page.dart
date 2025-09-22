@@ -4,7 +4,6 @@ import 'package:iconly/iconly.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/widgets/button/basic_button_wg.dart';
-import 'package:skills_xorijdaish/core/common/widgets/flush_bar/flush_bar_wg.dart';
 import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
 import 'package:skills_xorijdaish/core/utils/logger/logger.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
@@ -94,6 +93,10 @@ class _FinalTestPageState extends State<FinalTestPage> {
   }
 
   void _loadQuestion() {
+    if (widget.questionId.isEmpty) {
+      logger.e("No questions available for this test");
+      return;
+    }
     final currentQuestionId = widget.questionId[currentIndex];
     context.read<FinalTestByIdBloc>().add(
       FinalTestByIdEvent(widget.courseId, currentQuestionId),
@@ -216,6 +219,9 @@ class _FinalTestPageState extends State<FinalTestPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.questionId.isEmpty || widget.testType.isEmpty) {
+      return Scaffold(body: Center(child: Text("No questions available")));
+    }
     double progress = (currentIndex + 1) / widget.questionId.length;
     return PopScope(
       canPop: false,

@@ -12,4 +12,16 @@ class SupportResponse {
     required this.links,
     required this.metaData,
   });
+
+  SupportResponse copyWith({
+    List<SupportEntity>? data,
+    ReelsMetaData? metaData,
+    ReelsLinks? links,
+  }) {
+    return SupportResponse(
+      data: data ?? this.data,
+      metaData: metaData ?? this.metaData,
+      links: links ?? this.links,
+    );
+  }
 }

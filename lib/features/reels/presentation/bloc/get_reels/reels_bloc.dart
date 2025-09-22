@@ -11,7 +11,7 @@ class ReelsBloc extends Bloc<ReelsEvent, ReelsState> {
       try {
         final response = await useCase.call(page: event.page);
 
-        if (state is ReelsLoaded) {
+        if (event.page > 1 && state is ReelsLoaded) {
           final oldState = state as ReelsLoaded;
 
           final updatedData = [...oldState.response.data, ...response.data];

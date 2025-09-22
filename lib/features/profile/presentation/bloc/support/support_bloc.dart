@@ -10,7 +10,21 @@ class SupportBloc extends Bloc<ProfileEvent, SupportState> {
     on<SupportEvent>((event, emit) async {
       try {
         final response = await useCase.call(page: event.page);
-        emit(SupportLoaded(response));
+
+        if (event.page > 1 && state is SupportLoaded) {
+          final oldState = state as SupportLoaded;
+          final updatedData = [...oldState.response.data, ...response.data];
+
+          final updatedResponse = response.copyWith(
+            data: updatedData,
+            metaData: response.metaData,
+            links: response.links,
+          );
+
+          emit(SupportLoaded(updatedResponse));
+        } else {
+          emit(SupportLoaded(response));
+        }
       } catch (e) {
         emit(SupportError(e.toString()));
       }

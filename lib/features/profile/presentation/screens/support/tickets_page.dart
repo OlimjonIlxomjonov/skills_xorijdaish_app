@@ -44,38 +44,45 @@ class _TicketsPageState extends State<TicketsPage> {
                     final currentPage = state.response.metaData.currentPage;
                     final lastPage = state.response.metaData.lastPage;
                     final meta = state.response.metaData;
+                    final bool isLastPage = currentPage == lastPage;
                     if (meta.total > meta.perPage) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (currentPage < lastPage)
-                              Center(
-                                child: ElevatedButton(
-                                  // style: ElevatedButton.styleFrom(
-                                  //   backgroundColor: AppColors.appBg,
-                                  //   shape: RoundedRectangleBorder(
-                                  //     borderRadius: BorderRadius.circular(8),
-                                  //   ),
-                                  //   padding: EdgeInsets.symmetric(
-                                  //     horizontal: 24,
-                                  //     vertical: 12,
-                                  //   ),
-                                  // ),
-                                  onPressed: () {
-                                    context.read<SupportBloc>().add(
-                                      SupportEvent(currentPage + 1),
-                                    );
-                                  },
-                                  child: Text("Load More"),
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (currentPage < lastPage)
+                            Center(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.appBg,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  context.read<SupportBloc>().add(
+                                    SupportEvent(currentPage + 1),
+                                  );
+                                },
+                                child: Text(
+                                  "Load More",
+                                  style: AppTextStyles.source.medium(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
-                          ],
-                        ),
+                            )
+                          else
+                            SizedBox.shrink(),
+                          if (!isLastPage) SizedBox(height: appH(20)),
+                        ],
                       );
                     } else {
-                      return Text('');
+                      return SizedBox.shrink();
                     }
                   }
 
