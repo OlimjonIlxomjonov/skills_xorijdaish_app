@@ -396,7 +396,6 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: AppColors.white,
       context: context,
       isScrollControlled: true,
-      // ✅ important
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -404,12 +403,11 @@ class _ProfilePageState extends State<ProfilePage> {
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
-          ), // ✅ prevents keyboard overlap
+          ),
           child: Wrap(
-            // ✅ makes height wrap content
             children: [
               Column(
-                mainAxisSize: MainAxisSize.min, // ✅ only take as much as needed
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
                     margin: EdgeInsets.only(top: appH(8), bottom: appH(24)),

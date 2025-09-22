@@ -50,85 +50,27 @@ class _TicketsPageState extends State<TicketsPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // PREVIOUS
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                side: BorderSide(
-                                  color: AppColors.appBg,
-                                  width: 1.5,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 12,
-                                ),
-                              ),
-                              onPressed:
-                                  currentPage > 1
-                                      ? () {
-                                        context.read<SupportBloc>().add(
-                                          SupportEvent(currentPage - 1),
-                                        );
-                                      }
-                                      : null,
-                              child: Icon(IconlyLight.arrow_left_2),
-                            ),
-
-                            const SizedBox(width: 24),
-
-                            // CURRENT PAGE
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.appBg,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.appBg.withOpacity(0.3),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Text(
-                                "$currentPage / $lastPage",
-                                style: AppTextStyles.source.bold(
-                                  color: AppColors.white,
-                                  fontSize: 15,
+                            if (currentPage < lastPage)
+                              Center(
+                                child: ElevatedButton(
+                                  // style: ElevatedButton.styleFrom(
+                                  //   backgroundColor: AppColors.appBg,
+                                  //   shape: RoundedRectangleBorder(
+                                  //     borderRadius: BorderRadius.circular(8),
+                                  //   ),
+                                  //   padding: EdgeInsets.symmetric(
+                                  //     horizontal: 24,
+                                  //     vertical: 12,
+                                  //   ),
+                                  // ),
+                                  onPressed: () {
+                                    context.read<SupportBloc>().add(
+                                      SupportEvent(currentPage + 1),
+                                    );
+                                  },
+                                  child: Text("Load More"),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 24),
-                            // NEXT
-                            OutlinedButton(
-                              style: OutlinedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                side: BorderSide(
-                                  color: AppColors.appBg,
-                                  width: 1.5,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 12,
-                                ),
-                              ),
-                              onPressed:
-                                  currentPage < lastPage
-                                      ? () {
-                                        context.read<SupportBloc>().add(
-                                          SupportEvent(currentPage + 1),
-                                        );
-                                      }
-                                      : null,
-                              child: Icon(IconlyLight.arrow_right_2),
-                            ),
                           ],
                         ),
                       );

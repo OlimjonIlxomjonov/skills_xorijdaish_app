@@ -218,6 +218,7 @@ class _HomePageState extends State<HomePage> {
           context.read<SoftSkillsBloc>().add(GetSoftSkillsEvent('soft-skills'));
           context.read<SkillTestBloc>().add(SkillTestEvent('skill-test'));
           context.read<NotifCountBloc>().add(NotifCountEvent());
+          context.read<SelfInfoBloc>().add(SelfInfoEvent());
         },
         child: SingleChildScrollView(
           child: Column(

@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
 import 'package:skills_xorijdaish/core/common/widgets/appbar/custom_app_bar.dart';
@@ -20,8 +19,11 @@ import 'package:skills_xorijdaish/features/profile/presentation/bloc/send_messag
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/send_message/send_message_state.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/tickets_message/tickets_message_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/tickets_message/tickets_message_state.dart';
+import 'package:web_socket_channel/status.dart' as status;
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../../../../../core/services/token_storage/token_storage_service_impl.dart';
+import '../../../../../../core/utils/logger/logger.dart';
 import '../../../widget/file_opener_wg.dart';
 
 class TicketsChatPage extends StatefulWidget {
@@ -37,7 +39,6 @@ class _TicketsChatPageState extends State<TicketsChatPage> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController messageController = TextEditingController();
   final List<File> files = [];
-  final PusherChannelsFlutter pusher = PusherChannelsFlutter.getInstance();
   final tokenStorage = TokenStorageServiceImpl();
 
   @override
@@ -48,72 +49,59 @@ class _TicketsChatPageState extends State<TicketsChatPage> {
       TicketsMessageEvent(widget.ticketId),
     );
 
-    _connectPusher();
+    _setupWebSocket();
   }
 
-  Future<void> _connectPusher() async {
+  late WebSocketChannel channel;
+
+  Future<void> _setupWebSocket() async {
     final token = await tokenStorage.getAccessToken();
+    await connectWebSocket(widget.ticketId.toString(), token!);
+  }
 
-    try {
-      await pusher.init(
-        apiKey: "mbzfd4y116py2cjxflm4",
-        cluster: "mt1",
-        useTLS: true,
-        onConnectionStateChange: (String currentState, String previousState) {
-          debugPrint(
-            "Pusher state changed from $previousState to $currentState",
-          );
-        },
-        onError: (message, code, e) {
-          debugPrint("Pusher error: $message | Code: $code | Exception: $e");
-        },
-        onAuthorizer: (channelName, socketId, options) async {
-          final response = await http.post(
-            Uri.parse("https://skills.avacoder.uz/broadcasting/auth"),
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer $token",
-            },
-            body: jsonEncode({
-              "channel_name": channelName,
-              "socket_id": socketId,
-            }),
-          );
+  Future<void> connectWebSocket(String ticketId, String token) async {
+    channel = WebSocketChannel.connect(
+      Uri.parse('wss://admin-skills.xorijdaish.uz/app/mbzfd4y116py2cjxflm4'),
+    );
 
-          if (response.statusCode != 200) {
-            debugPrint("Auth failed: ${response.body}");
-          }
-          return response.body;
-        },
-      );
+    channel.stream.listen((message) async {
+      final data = jsonDecode(message);
+      logger.f("WS Message: $data");
 
-      await pusher.connect();
+      if (data["event"] == "pusher:connection_established") {
+        final socketId = jsonDecode(data["data"])["socket_id"];
 
-      await pusher.subscribe(
-        channelName: "private-chat.${widget.ticketId}",
-        onEvent: (event) {
-          debugPrint("Event: ${event.eventName} => ${event.data}");
+        final dio = Dio();
+        final resp = await dio.post(
+          "https://admin-skills.xorijdaish.uz/broadcasting/auth",
+          options: Options(headers: {"Authorization": "Bearer $token"}),
+          data: {
+            "channel_name": "private-chat.$ticketId",
+            "socket_id": socketId,
+          },
+        );
 
-          if (event.eventName == "new-message") {
-            try {
-              // final msg = TicketsMessageModel.fromJson(jsonDecode(event.data));
-              context.read<TicketsMessageBloc>().add(
-                TicketsMessageEvent(widget.ticketId),
-              );
-            } catch (e) {
-              debugPrint("Failed to parse new message: $e");
-            }
-          }
-        },
-      );
-    } catch (e) {
-      debugPrint("Pusher connect error: $e");
-    }
+        final authKey = resp.data["auth"];
+
+        channel.sink.add(
+          jsonEncode({
+            "event": "pusher:subscribe",
+            "data": {"channel": "private-chat.$ticketId", "auth": authKey},
+          }),
+        );
+      }
+
+      if (data["event"] == "new-message") {
+        context.read<TicketsMessageBloc>().add(
+          TicketsMessageEvent(widget.ticketId),
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
-    pusher.disconnect();
+    channel.sink.close(status.goingAway);
     super.dispose();
   }
 
@@ -299,9 +287,9 @@ class _TicketsChatPageState extends State<TicketsChatPage> {
                                     messageController.clear();
                                     files.clear();
                                   });
-                                  context.read<TicketsMessageBloc>().add(
-                                    TicketsMessageEvent(widget.ticketId),
-                                  );
+                                  // context.read<TicketsMessageBloc>().add(
+                                  //   TicketsMessageEvent(widget.ticketId),
+                                  // );
                                 }
                                 if (state is SendMessageError) {
                                   showErrorFlushbar(

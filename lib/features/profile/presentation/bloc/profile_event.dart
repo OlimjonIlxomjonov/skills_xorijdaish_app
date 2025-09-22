@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import '../../data/model/tickets_message/tickets_message_model.dart';
+
 class ProfileEvent {
   ProfileEvent();
 }

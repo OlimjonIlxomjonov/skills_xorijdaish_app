@@ -73,7 +73,7 @@ class _AppNotificationsState extends State<AppNotifications> {
                         color: Colors.grey,
                       )
                       : Icon(
-                        Icons.mark_email_read,
+                        Icons.check,
                         key: ValueKey('read'),
                         color: Colors.grey,
                       ),
