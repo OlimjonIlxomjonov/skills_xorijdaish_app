@@ -9,6 +9,7 @@ import 'package:skills_xorijdaish/features/profile/presentation/bloc/profile_eve
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/support/support_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/support/support_state.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/screens/support/chat/tickets_chat_page.dart';
+import 'package:skills_xorijdaish/features/profile/presentation/screens/support/no_tickets_page.dart';
 
 class TicketsPage extends StatefulWidget {
   const TicketsPage({super.key});
@@ -42,99 +43,104 @@ class _TicketsPageState extends State<TicketsPage> {
                   if (index == state.response.data.length) {
                     final currentPage = state.response.metaData.currentPage;
                     final lastPage = state.response.metaData.lastPage;
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // PREVIOUS
-                          OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              side: BorderSide(
-                                color: AppColors.appBg,
-                                width: 1.5,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
-                              ),
-                            ),
-                            onPressed:
-                                currentPage > 1
-                                    ? () {
-                                      context.read<SupportBloc>().add(
-                                        SupportEvent(currentPage - 1),
-                                      );
-                                    }
-                                    : null,
-                            child: Icon(IconlyLight.arrow_left_2),
-                          ),
-
-                          const SizedBox(width: 24),
-
-                          // CURRENT PAGE
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.appBg,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.appBg.withOpacity(0.3),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 3),
+                    final meta = state.response.metaData;
+                    if (meta.total > meta.perPage) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // PREVIOUS
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                              ],
+                                side: BorderSide(
+                                  color: AppColors.appBg,
+                                  width: 1.5,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                              ),
+                              onPressed:
+                                  currentPage > 1
+                                      ? () {
+                                        context.read<SupportBloc>().add(
+                                          SupportEvent(currentPage - 1),
+                                        );
+                                      }
+                                      : null,
+                              child: Icon(IconlyLight.arrow_left_2),
                             ),
-                            child: Text(
-                              "$currentPage / $lastPage",
-                              style: AppTextStyles.source.bold(
-                                color: AppColors.white,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
 
-                          const SizedBox(width: 24),
+                            const SizedBox(width: 24),
 
-                          // NEXT
-                          OutlinedButton(
-                            style: OutlinedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              side: BorderSide(
-                                color: AppColors.appBg,
-                                width: 1.5,
-                              ),
+                            // CURRENT PAGE
+                            Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 12,
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.appBg,
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.appBg.withOpacity(0.3),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                "$currentPage / $lastPage",
+                                style: AppTextStyles.source.bold(
+                                  color: AppColors.white,
+                                  fontSize: 15,
+                                ),
                               ),
                             ),
-                            onPressed:
-                                currentPage < lastPage
-                                    ? () {
-                                      context.read<SupportBloc>().add(
-                                        SupportEvent(currentPage + 1),
-                                      );
-                                    }
-                                    : null,
-                            child: Icon(IconlyLight.arrow_right_2),
-                          ),
-                        ],
-                      ),
-                    );
+                            const SizedBox(width: 24),
+                            // NEXT
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                side: BorderSide(
+                                  color: AppColors.appBg,
+                                  width: 1.5,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                              ),
+                              onPressed:
+                                  currentPage < lastPage
+                                      ? () {
+                                        context.read<SupportBloc>().add(
+                                          SupportEvent(currentPage + 1),
+                                        );
+                                      }
+                                      : null,
+                              child: Icon(IconlyLight.arrow_right_2),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Text('');
+                    }
                   }
 
                   final support = state.response.data[index];
+                  if (state.response.data.isEmpty) {
+                    return NoTicketsPage();
+                  }
                   return _buildTicket(
                     title: support.title,
                     date: support.createdAt,

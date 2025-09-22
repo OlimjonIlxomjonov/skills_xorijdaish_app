@@ -27,7 +27,9 @@ class StatisticPage extends StatefulWidget {
 class _StatisticPageState extends State<StatisticPage> {
   DateTime selectedDate = DateTime.now();
   DateTime currentWeekStart = DateTime.now().subtract(
-    Duration(days: DateTime.now().weekday - 1),
+    Duration(days: DateTime
+        .now()
+        .weekday - 1),
   );
   int visibleStartIndex = 0;
 
@@ -123,14 +125,6 @@ class _StatisticPageState extends State<StatisticPage> {
                             height: appH(35),
                             decoration: BoxDecoration(color: Colors.white),
                           ),
-                        ),
-                      );
-                    } else if (state is AverageError) {
-                      return Text(
-                        'Lost internet connection!',
-                        style: AppTextStyles.source.regular(
-                          color: AppColors.red,
-                          fontSize: 16,
                         ),
                       );
                     } else if (state is AverageLoaded) {
@@ -258,7 +252,7 @@ class _StatisticPageState extends State<StatisticPage> {
                       final Map<String, double> chartData = {
                         for (var item in dataList)
                           getWeekdayLabel(item.weekday):
-                              item.activeTimesInSeconds.toDouble(),
+                          item.activeTimesInSeconds.toDouble(),
                       };
                       return WeeklyBarChart(data: chartData);
                     }
@@ -436,11 +430,9 @@ class _StatisticPageState extends State<StatisticPage> {
     );
   }
 
-  Container datePicker(
-    String selectedMonth,
-    int selectedYear,
-    List<DateTime> weekDates,
-  ) {
+  Container datePicker(String selectedMonth,
+      int selectedYear,
+      List<DateTime> weekDates,) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       decoration: BoxDecoration(
@@ -518,61 +510,61 @@ class _StatisticPageState extends State<StatisticPage> {
 
               ...weekDates
                   .sublist(
-                    visibleStartIndex,
-                    (visibleStartIndex + 5).clamp(0, 7),
-                  )
+                visibleStartIndex,
+                (visibleStartIndex + 5).clamp(0, 7),
+              )
                   .map((date) {
-                    final isSelected =
-                        date.day == selectedDate.day &&
+                final isSelected =
+                    date.day == selectedDate.day &&
                         date.month == selectedDate.month &&
                         date.year == selectedDate.year;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedDate = date;
-                        });
-                        context.read<CourseTimeBloc>().add(
-                          CourseTimeEvent(selectedDate),
-                        );
-                      },
-                      child: Container(
-                        // width: appW(45),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: appW(12),
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color:
-                              isSelected
-                                  ? Color(0xff003F97)
-                                  : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              getWeekdayLabel(date.weekday),
-                              style: AppTextStyles.source.medium(
-                                color:
-                                    isSelected
-                                        ? Colors.white
-                                        : AppColors.textGrey,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              '${date.day}'.padLeft(2, '0'),
-                              style: AppTextStyles.source.semiBold(
-                                color:
-                                    isSelected ? Colors.white : AppColors.black,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      selectedDate = date;
+                    });
+                    context.read<CourseTimeBloc>().add(
+                      CourseTimeEvent(selectedDate),
                     );
-                  }),
+                  },
+                  child: Container(
+                    // width: appW(45),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: appW(12),
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                      isSelected
+                          ? Color(0xff003F97)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          getWeekdayLabel(date.weekday),
+                          style: AppTextStyles.source.medium(
+                            color:
+                            isSelected
+                                ? Colors.white
+                                : AppColors.textGrey,
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          '${date.day}'.padLeft(2, '0'),
+                          style: AppTextStyles.source.semiBold(
+                            color:
+                            isSelected ? Colors.white : AppColors.black,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
 
               if (visibleStartIndex + 5 < 7)
                 GestureDetector(

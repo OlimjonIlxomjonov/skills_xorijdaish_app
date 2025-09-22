@@ -22,7 +22,6 @@ import 'package:skills_xorijdaish/features/profile/presentation/bloc/tickets_mes
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/tickets_message/tickets_message_state.dart';
 
 import '../../../../../../core/services/token_storage/token_storage_service_impl.dart';
-import '../../../../data/model/tickets_message/tickets_message_model.dart';
 import '../../../widget/file_opener_wg.dart';
 
 class TicketsChatPage extends StatefulWidget {

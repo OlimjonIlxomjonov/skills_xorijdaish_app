@@ -128,6 +128,11 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                   child: Align(
                     alignment: Alignment.topLeft,
                     child: IconButton(
+                      style: IconButton.styleFrom(
+                        backgroundColor: AppColors.greyScale.grey500.withValues(
+                          alpha: 0.3,
+                        ),
+                      ),
                       padding: EdgeInsets.zero,
                       onPressed: () {
                         AppRoute.close();
@@ -280,110 +285,112 @@ class _SingleCoursePageState extends State<SingleCoursePage>
           logger.f(state.entity.videosDuration);
           return Padding(
             padding: EdgeInsets.only(left: appW(20), right: appW(20)),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              spacing: appH(18),
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ReadMoreText(
-                  sanitizeHtml(course.description),
-                  trimLines: 2,
-                  colorClickableText: AppColors.textBlue,
-                  trimMode: TrimMode.Line,
-                  trimCollapsedText: ' Batafsil',
-                  trimExpandedText: ' Yopish',
-                  style: AppTextStyles.source.regular(
-                    fontSize: 14,
-                    color: AppColors.black,
-                  ),
-                  moreStyle: AppTextStyles.source.regular(
-                    fontSize: 14,
-                    color: AppColors.secondBlue,
-                  ),
-                  lessStyle: AppTextStyles.source.regular(
-                    fontSize: 14,
-                    color: AppColors.secondBlue,
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(bottom: appH(40)),
-                  child: Visibility(
-                    visible: !course.isStarted,
-                    child: BasicButtonWg(
-                      text:
-                          (state.entity.priceInfo != null &&
-                                  state.entity.priceInfo is Map &&
-                                  state.entity.priceInfo.containsKey('price'))
-                              ? "Sotib olish - ${state.entity.priceInfo['price']}"
-                              : 'Boshlash',
-                      onTap: () {
-                        final hasPrice =
-                            state.entity.priceInfo != null &&
-                            state.entity.priceInfo is Map &&
-                            state.entity.priceInfo.containsKey('price');
-
-                        if (hasPrice) {
-                          showModalBottomSheet(
-                            context: context,
-                            isScrollControlled: true,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) {
-                              return Container(
-                                padding: EdgeInsets.only(top: appH(10)),
-                                height: appH(280),
-                                decoration: BoxDecoration(
-                                  color: AppColors.white,
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(16),
-                                  ),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: appW(180),
-                                      ),
-                                      child: Divider(height: 5, thickness: 3),
-                                    ),
-                                    SizedBox(height: appH(10)),
-                                    Text(
-                                      "To'lov",
-                                      style: AppTextStyles.source.medium(
-                                        color: AppColors.black,
-                                        fontSize: 20,
-                                      ),
-                                    ),
-                                    SizedBox(height: appH(10)),
-                                    Divider(),
-                                    SizedBox(height: appH(10)),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: appH(20),
-                                      ),
-                                      child: column(),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          );
-                        } else {
-                          context.read<StartCourseBloc>().add(
-                            StartCourseEvent(widget.courseId),
-                          );
-                          context.read<CourseByIdBloc>().add(
-                            CourseByIdEvent(widget.courseId),
-                          );
-                          context.read<LessonsBloc>().add(
-                            LessonsEvent(widget.courseId, 1),
-                          );
-                          _tabController.animateTo(1);
-                        }
-                      },
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                spacing: appH(18),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ReadMoreText(
+                    sanitizeHtml(course.description),
+                    trimLines: 2,
+                    colorClickableText: AppColors.textBlue,
+                    trimMode: TrimMode.Line,
+                    trimCollapsedText: ' Batafsil',
+                    trimExpandedText: ' Yopish',
+                    style: AppTextStyles.source.regular(
+                      fontSize: 14,
+                      color: AppColors.black,
+                    ),
+                    moreStyle: AppTextStyles.source.regular(
+                      fontSize: 14,
+                      color: AppColors.secondBlue,
+                    ),
+                    lessStyle: AppTextStyles.source.regular(
+                      fontSize: 14,
+                      color: AppColors.secondBlue,
                     ),
                   ),
-                ),
-              ],
+                  Padding(
+                    padding: EdgeInsets.only(bottom: appH(40)),
+                    child: Visibility(
+                      visible: !course.isStarted,
+                      child: BasicButtonWg(
+                        text:
+                            (state.entity.priceInfo != null &&
+                                    state.entity.priceInfo is Map &&
+                                    state.entity.priceInfo.containsKey('price'))
+                                ? "Sotib olish - ${state.entity.priceInfo['price']}"
+                                : 'Boshlash',
+                        onTap: () {
+                          final hasPrice =
+                              state.entity.priceInfo != null &&
+                              state.entity.priceInfo is Map &&
+                              state.entity.priceInfo.containsKey('price');
+
+                          if (hasPrice) {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) {
+                                return Container(
+                                  padding: EdgeInsets.only(top: appH(10)),
+                                  height: appH(280),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.white,
+                                    borderRadius: BorderRadius.vertical(
+                                      top: Radius.circular(16),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: appW(180),
+                                        ),
+                                        child: Divider(height: 5, thickness: 3),
+                                      ),
+                                      SizedBox(height: appH(10)),
+                                      Text(
+                                        "To'lov",
+                                        style: AppTextStyles.source.medium(
+                                          color: AppColors.black,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      SizedBox(height: appH(10)),
+                                      Divider(),
+                                      SizedBox(height: appH(10)),
+                                      Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: appH(20),
+                                        ),
+                                        child: column(),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          } else {
+                            context.read<StartCourseBloc>().add(
+                              StartCourseEvent(widget.courseId),
+                            );
+                            context.read<CourseByIdBloc>().add(
+                              CourseByIdEvent(widget.courseId),
+                            );
+                            context.read<LessonsBloc>().add(
+                              LessonsEvent(widget.courseId, 1),
+                            );
+                            _tabController.animateTo(1);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         }

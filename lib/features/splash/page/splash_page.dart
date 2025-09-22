@@ -45,7 +45,7 @@ class _SplashPageState extends State<SplashPage> {
     final token = tokenStorage.getAccessToken();
     if (token != null && token.isNotEmpty) {
       final isValid = await _checkIfTokenIsValid(token);
-
+      logger.f(token);
       if (isValid == true) {
         Timer(const Duration(seconds: 3), () => AppRoute.open(AppBottomNav()));
       } else if (isValid == null) {
