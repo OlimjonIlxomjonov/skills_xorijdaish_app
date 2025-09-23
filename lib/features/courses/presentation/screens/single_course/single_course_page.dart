@@ -764,7 +764,7 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                             : SizedBox.shrink(),
                       if (isLast)
                         Container(
-                          margin: EdgeInsets.symmetric(vertical: 10),
+                          margin: EdgeInsets.only(top: 10),
                           height: 1,
                           width: double.infinity,
                           decoration: const BoxDecoration(
@@ -783,153 +783,124 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                     ],
                   );
                 } else {
-                  return BlocBuilder<FinalTestBloc, FinalTestState>(
-                    builder: (context, finalState) {
-                      if (finalState is FinalTestLoading) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (finalState is FinalTestError) {
-                        return ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: Container(
-                            padding: EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Color(0xffDAE1E9),
-                                width: 3,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: Image.asset(
-                                AppImages.finalTest,
-                                height: 50,
-                                width: 45,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          title: Text(
-                            'Yakuniy test',
-                            style: AppTextStyles.source.medium(
-                              color: Color(0xffDAE1E9),
-                              fontSize: 16,
-                            ),
-                          ),
-                        );
-                      } else if (finalState is FinalTestLoaded) {
-                        final questionId =
-                            finalState.response.data.map((e) => e.id).toList();
-                        final testType =
-                            finalState.response.data
-                                .map((e) => e.type)
-                                .toList();
-                        final allAccessible = lessons.every(
-                          (l) => l.isAccessible,
-                        );
-                        final Color mainColor =
-                            allAccessible
-                                ? AppColors.mainGreen
-                                : Color(0xffDAE1E9);
-                        final Color textColor =
-                            allAccessible ? AppColors.black : Color(0xffDAE1E9);
-                        final finishState =
-                            context.read<FinishFinalTestBloc>().state;
-                        final isOk =
-                            (finishState is FinishFinalTestLoaded &&
-                                finishState.response.ok);
-                        return Column(
-                          children: [
-                            SizedBox(height: appH(5)),
-                            Container(
-                              padding: EdgeInsets.symmetric(vertical: appH(5)),
-                              decoration:
-                                  isOk
-                                      ? BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.transparent,
-                                            AppColors.inputGreyColor.withValues(
-                                              alpha: 0.1,
-                                            ),
-                                            AppColors.mainGreen.withValues(
-                                              alpha: 0.2,
-                                            ),
-                                            Colors.transparent,
-                                          ],
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                          stops: [0.2, 1, 0.85, 2],
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      )
-                                      : null,
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  splashColor: Colors.transparent,
-                                  highlightColor: Colors.transparent,
-                                  hoverColor: Colors.transparent,
+                  return SafeArea(
+                    child: BlocBuilder<FinalTestBloc, FinalTestState>(
+                      builder: (context, finalState) {
+                        if (finalState is FinalTestLoading) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (finalState is FinalTestError) {
+                          return ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: Container(
+                              padding: EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Color(0xffDAE1E9),
+                                  width: 3,
                                 ),
-                                child: ListTile(
-                                  onTap:
-                                      allAccessible
-                                          ? () async {
-                                            if (finishState
-                                                    is FinishFinalTestLoaded &&
-                                                finishState.response.ok) {
-                                              warningBarWg(
-                                                context,
-                                                'Yakuniy test allaqachon tugallangan!',
-                                              );
-                                              return;
-                                            }
+                              ),
+                              child: ClipOval(
+                                child: Image.asset(
+                                  AppImages.finalTest,
+                                  height: 50,
+                                  width: 45,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              'Yakuniy test',
+                              style: AppTextStyles.source.medium(
+                                color: Color(0xffDAE1E9),
+                                fontSize: 16,
+                              ),
+                            ),
+                          );
+                        } else if (finalState is FinalTestLoaded) {
+                          final questionId =
+                              finalState.response.data
+                                  .map((e) => e.id)
+                                  .toList();
+                          final testType =
+                              finalState.response.data
+                                  .map((e) => e.type)
+                                  .toList();
+                          final allAccessible = lessons.every(
+                            (l) => l.isAccessible,
+                          );
+                          final Color mainColor =
+                              allAccessible
+                                  ? AppColors.mainGreen
+                                  : Color(0xffDAE1E9);
+                          final Color textColor =
+                              allAccessible
+                                  ? AppColors.black
+                                  : Color(0xffDAE1E9);
+                          final finishState =
+                              context.read<FinishFinalTestBloc>().state;
+                          final isOk =
+                              (finishState is FinishFinalTestLoaded &&
+                                  finishState.response.ok);
+                          return Column(
+                            children: [
+                              Container(
+                                decoration:
+                                    isOk
+                                        ? BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Colors.transparent,
+                                              AppColors.inputGreyColor
+                                                  .withValues(alpha: 0.1),
+                                              AppColors.mainGreen.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                              Colors.transparent,
+                                            ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                            stops: [0.2, 1, 0.85, 2],
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        )
+                                        : null,
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                    splashColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                  ),
+                                  child: ListTile(
+                                    onTap:
+                                        allAccessible
+                                            ? () async {
+                                              if (finishState
+                                                      is FinishFinalTestLoaded &&
+                                                  finishState.response.ok) {
+                                                warningBarWg(
+                                                  context,
+                                                  'Yakuniy test allaqachon tugallangan!',
+                                                );
+                                                return;
+                                              }
 
-                                            final selfInfoState =
-                                                context
-                                                    .read<SelfInfoBloc>()
-                                                    .state;
-                                            bool isVerified = false;
-                                            if (selfInfoState
-                                                is SelfInfoLoaded) {
-                                              isVerified =
-                                                  selfInfoState
-                                                      .entity
-                                                      .isVerified;
-                                            }
+                                              final selfInfoState =
+                                                  context
+                                                      .read<SelfInfoBloc>()
+                                                      .state;
+                                              bool isVerified = false;
+                                              if (selfInfoState
+                                                  is SelfInfoLoaded) {
+                                                isVerified =
+                                                    selfInfoState
+                                                        .entity
+                                                        .isVerified;
+                                              }
 
-                                            if (isVerified) {
-                                              AppRoute.go(
-                                                FinalTestPage(
-                                                  courseId: widget.courseId,
-                                                  questionId: questionId,
-                                                  testType: testType,
-                                                ),
-                                              );
-                                              return;
-                                            }
-
-                                            final lessonsState =
-                                                context
-                                                    .read<LessonsBloc>()
-                                                    .state;
-                                            bool isCameraVerifEnabled = false;
-                                            if (lessonsState is LessonsLoaded) {
-                                              isCameraVerifEnabled =
-                                                  lessonsState
-                                                      .response
-                                                      .data[index]
-                                                      .isCameraVerificationEnabled;
-                                            }
-
-                                            if (isCameraVerifEnabled) {
-                                              final success =
-                                                  await startFaceVerification(
-                                                    context,
-                                                  );
-                                              logger.f(
-                                                'Raw MyID result: $success',
-                                              );
-
-                                              if (success) {
+                                              if (isVerified) {
                                                 AppRoute.go(
                                                   FinalTestPage(
                                                     courseId: widget.courseId,
@@ -937,90 +908,128 @@ class _SingleCoursePageState extends State<SingleCoursePage>
                                                     testType: testType,
                                                   ),
                                                 );
+                                                return;
                                               }
-                                              return;
+
+                                              final lessonsState =
+                                                  context
+                                                      .read<LessonsBloc>()
+                                                      .state;
+                                              bool isCameraVerifEnabled = false;
+                                              if (lessonsState
+                                                  is LessonsLoaded) {
+                                                isCameraVerifEnabled =
+                                                    lessonsState
+                                                        .response
+                                                        .data[index]
+                                                        .isCameraVerificationEnabled;
+                                              }
+
+                                              if (isCameraVerifEnabled) {
+                                                final success =
+                                                    await startFaceVerification(
+                                                      context,
+                                                    );
+                                                logger.f(
+                                                  'Raw MyID result: $success',
+                                                );
+
+                                                if (success) {
+                                                  AppRoute.go(
+                                                    FinalTestPage(
+                                                      courseId: widget.courseId,
+                                                      questionId: questionId,
+                                                      testType: testType,
+                                                    ),
+                                                  );
+                                                }
+                                                return;
+                                              }
+
+                                              AppRoute.go(
+                                                FinalTestPage(
+                                                  courseId: widget.courseId,
+                                                  questionId: questionId,
+                                                  testType: testType,
+                                                ),
+                                              );
                                             }
+                                            : null,
 
-                                            AppRoute.go(
-                                              FinalTestPage(
-                                                courseId: widget.courseId,
-                                                questionId: questionId,
-                                                testType: testType,
-                                              ),
-                                            );
-                                          }
-                                          : null,
-
-                                  contentPadding: EdgeInsets.zero,
-                                  leading: Stack(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: mainColor,
-                                            width: 3,
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: Stack(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(2),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: mainColor,
+                                              width: 3,
+                                            ),
+                                          ),
+                                          child: ClipOval(
+                                            child: Image.asset(
+                                              AppImages.finalTest,
+                                              height: 50,
+                                              width: 45,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                         ),
-                                        child: ClipOval(
-                                          child: Image.asset(
-                                            AppImages.finalTest,
-                                            height: 50,
-                                            width: 45,
-                                            fit: BoxFit.cover,
-                                          ),
+                                        BlocBuilder<
+                                          FinishFinalTestBloc,
+                                          FinishFinalTestState
+                                        >(
+                                          builder: (context, state) {
+                                            if (state
+                                                is FinishFinalTestLoaded) {
+                                              final isFinished =
+                                                  state.response.ok;
+                                              return isFinished
+                                                  ? Positioned(
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            AppColors.mainGreen,
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      padding: EdgeInsets.all(
+                                                        3,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.check,
+                                                        size: appH(12),
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  )
+                                                  : SizedBox.shrink();
+                                            }
+                                            return SizedBox.shrink();
+                                          },
                                         ),
+                                      ],
+                                    ),
+                                    title: Text(
+                                      'Yakuniy test',
+                                      style: AppTextStyles.source.medium(
+                                        color: textColor,
+                                        fontSize: 16,
                                       ),
-                                      BlocBuilder<
-                                        FinishFinalTestBloc,
-                                        FinishFinalTestState
-                                      >(
-                                        builder: (context, state) {
-                                          if (state is FinishFinalTestLoaded) {
-                                            final isFinished =
-                                                state.response.ok;
-                                            return isFinished
-                                                ? Positioned(
-                                                  right: 0,
-                                                  bottom: 0,
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      color:
-                                                          AppColors.mainGreen,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    padding: EdgeInsets.all(3),
-                                                    child: Icon(
-                                                      Icons.check,
-                                                      size: appH(12),
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                )
-                                                : SizedBox.shrink();
-                                          }
-                                          return SizedBox.shrink();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  title: Text(
-                                    'Yakuniy test',
-                                    style: AppTextStyles.source.medium(
-                                      color: textColor,
-                                      fontSize: 16,
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(height: appH(20)),
-                          ],
-                        );
-                      }
-                      return SizedBox.shrink();
-                    },
+                              SizedBox(height: appH(10)),
+                            ],
+                          );
+                        }
+                        return SizedBox.shrink();
+                      },
+                    ),
                   );
                 }
               },

@@ -34,4 +34,9 @@ class HomeRepoImpl implements HomeRepository {
   Future<BannersResponse> fetchBanners() {
     return remoteDataSource.getBanners();
   }
+
+  @override
+  Future<void> readOne({required int id}) {
+    return remoteDataSource.getReadOne(id: id);
+  }
 }

@@ -19,3 +19,9 @@ class NotifCountEvent extends HomeEvent {}
 class ReadAllEvent extends HomeEvent {}
 
 class BannersEvent extends HomeEvent {}
+
+class ReadOneEvent extends HomeEvent {
+  final int id;
+
+  ReadOneEvent(this.id);
+}

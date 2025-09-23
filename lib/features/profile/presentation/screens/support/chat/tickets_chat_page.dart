@@ -19,7 +19,6 @@ import 'package:skills_xorijdaish/features/profile/presentation/bloc/send_messag
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/send_message/send_message_state.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/tickets_message/tickets_message_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/tickets_message/tickets_message_state.dart';
-import 'package:web_socket_channel/status.dart' as status;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../../../../../core/services/token_storage/token_storage_service_impl.dart';
@@ -40,6 +39,7 @@ class _TicketsChatPageState extends State<TicketsChatPage> {
   final TextEditingController messageController = TextEditingController();
   final List<File> files = [];
   final tokenStorage = TokenStorageServiceImpl();
+  bool _showFakeLoading = true;
 
   @override
   void initState() {
@@ -50,6 +50,11 @@ class _TicketsChatPageState extends State<TicketsChatPage> {
     );
 
     _setupWebSocket();
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
+      setState(() => _showFakeLoading = false);
+    });
   }
 
   late WebSocketChannel channel;
@@ -101,7 +106,9 @@ class _TicketsChatPageState extends State<TicketsChatPage> {
 
   @override
   void dispose() {
-    channel.sink.close(status.goingAway);
+    try {
+      channel.sink.close();
+    } catch (_) {}
     super.dispose();
   }
 
@@ -110,225 +117,232 @@ class _TicketsChatPageState extends State<TicketsChatPage> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: CustomAppBar(titleText: "Qo'llab quvvatlash"),
-      body: BlocBuilder<TicketsMessageBloc, TicketsMessageState>(
-        builder: (context, state) {
-          if (state is TicketsMessageLoading) {
-            return Center(child: LinearProgressIndicator());
-          } else if (state is TicketsMessageLoaded) {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: appW(20)),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: ListView.builder(
-                      reverse: true,
-                      itemCount: state.response.data.length,
-                      itemBuilder: (context, index) {
-                        final message = state.response.data[index];
+      body: SafeArea(
+        child: BlocBuilder<TicketsMessageBloc, TicketsMessageState>(
+          builder: (context, state) {
+            if (_showFakeLoading) {
+              return const Center(child: LinearProgressIndicator());
+            }
+            if (state is TicketsMessageLoading) {
+              return Center(child: LinearProgressIndicator());
+            } else if (state is TicketsMessageLoaded) {
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: appW(20)),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        reverse: true,
+                        itemCount: state.response.data.length,
+                        itemBuilder: (context, index) {
+                          final message = state.response.data[index];
 
-                        final now = DateTime.now();
+                          final now = DateTime.now();
 
-                        final datePart = message.sentAt.split(',')[1].trim();
-                        final parts = datePart.split('.');
-                        final currentDate = DateTime(
-                          int.parse(parts[2]),
-                          int.parse(parts[1]),
-                          int.parse(parts[0]),
-                        );
-
-                        bool showDateLabel = true;
-                        if (index < state.response.data.length - 1) {
-                          final nextMessage = state.response.data[index + 1];
-                          final nextDatePart =
-                              nextMessage.sentAt.split(',')[1].trim();
-                          final nextParts = nextDatePart.split('.');
-                          final nextDate = DateTime(
-                            int.parse(nextParts[2]),
-                            int.parse(nextParts[1]),
-                            int.parse(nextParts[0]),
+                          final datePart = message.sentAt.split(',')[1].trim();
+                          final parts = datePart.split('.');
+                          final currentDate = DateTime(
+                            int.parse(parts[2]),
+                            int.parse(parts[1]),
+                            int.parse(parts[0]),
                           );
-                          showDateLabel = currentDate != nextDate;
-                        }
 
-                        final yesterday = now.subtract(const Duration(days: 1));
-                        String dateText;
-                        if (currentDate.year == now.year &&
-                            currentDate.month == now.month &&
-                            currentDate.day == now.day) {
-                          dateText = 'Bugun';
-                        } else if (currentDate.year == yesterday.year &&
-                            currentDate.month == yesterday.month &&
-                            currentDate.day == yesterday.day) {
-                          dateText = 'Kecha';
-                        } else {
-                          dateText =
-                              "${currentDate.day.toString().padLeft(2, '0')}.${currentDate.month.toString().padLeft(2, '0')}.${currentDate.year}";
-                        }
+                          bool showDateLabel = true;
+                          if (index < state.response.data.length - 1) {
+                            final nextMessage = state.response.data[index + 1];
+                            final nextDatePart =
+                                nextMessage.sentAt.split(',')[1].trim();
+                            final nextParts = nextDatePart.split('.');
+                            final nextDate = DateTime(
+                              int.parse(nextParts[2]),
+                              int.parse(nextParts[1]),
+                              int.parse(nextParts[0]),
+                            );
+                            showDateLabel = currentDate != nextDate;
+                          }
 
-                        final String onlyTime =
-                            message.sentAt.split(',')[0].trim();
-                        final files = message.files;
+                          final yesterday = now.subtract(
+                            const Duration(days: 1),
+                          );
+                          String dateText;
+                          if (currentDate.year == now.year &&
+                              currentDate.month == now.month &&
+                              currentDate.day == now.day) {
+                            dateText = 'Bugun';
+                          } else if (currentDate.year == yesterday.year &&
+                              currentDate.month == yesterday.month &&
+                              currentDate.day == yesterday.day) {
+                            dateText = 'Kecha';
+                          } else {
+                            dateText =
+                                "${currentDate.day.toString().padLeft(2, '0')}.${currentDate.month.toString().padLeft(2, '0')}.${currentDate.year}";
+                          }
 
-                        return Column(
-                          crossAxisAlignment:
-                              message.isAdmin
-                                  ? CrossAxisAlignment.start
-                                  : CrossAxisAlignment.end,
-                          children: [
-                            if (showDateLabel)
-                              Center(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: appH(10),
-                                  ),
-                                  child: Text(
-                                    dateText,
-                                    style: AppTextStyles.source.bold(
-                                      fontSize: 14,
-                                      color: AppColors.textGrey,
+                          final String onlyTime =
+                              message.sentAt.split(',')[0].trim();
+                          final files = message.files;
+
+                          return Column(
+                            crossAxisAlignment:
+                                message.isAdmin
+                                    ? CrossAxisAlignment.start
+                                    : CrossAxisAlignment.end,
+                            children: [
+                              if (showDateLabel)
+                                Center(
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: appH(10),
+                                    ),
+                                    child: Text(
+                                      dateText,
+                                      style: AppTextStyles.source.bold(
+                                        fontSize: 14,
+                                        color: AppColors.textGrey,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            message.isAdmin
-                                ? adminText(message, files, onlyTime)
-                                : userText(message, files, context, onlyTime),
-                          ],
-                        );
-                      },
+                              message.isAdmin
+                                  ? adminText(message, files, onlyTime)
+                                  : userText(message, files, context, onlyTime),
+                            ],
+                          );
+                        },
+                      ),
                     ),
-                  ),
 
-                  Container(
-                    padding: EdgeInsets.all(5),
-                    margin: EdgeInsets.only(bottom: appH(10)),
-                    decoration: BoxDecoration(
-                      color: Color(0xffF7F7F8),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      children: [
-                        if (files.isNotEmpty)
-                          SizedBox(
-                            height: 70,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: files.length,
-                              separatorBuilder: (_, __) => SizedBox(width: 8),
-                              itemBuilder: (context, index) {
-                                return Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.file(
-                                        files[index],
-                                        width: 60,
-                                        height: 60,
-                                        fit: BoxFit.cover,
+                    Container(
+                      padding: EdgeInsets.all(5),
+                      margin: EdgeInsets.only(bottom: appH(10)),
+                      decoration: BoxDecoration(
+                        color: Color(0xffF7F7F8),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        children: [
+                          if (files.isNotEmpty)
+                            SizedBox(
+                              height: 70,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: files.length,
+                                separatorBuilder: (_, __) => SizedBox(width: 8),
+                                itemBuilder: (context, index) {
+                                  return Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(
+                                          files[index],
+                                          width: 60,
+                                          height: 60,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
-                                    ),
-                                    Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            files.removeAt(index);
-                                          });
-                                        },
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.black54,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          padding: EdgeInsets.all(2),
-                                          child: Icon(
-                                            Icons.close,
-                                            size: 14,
-                                            color: Colors.white,
+                                      Positioned(
+                                        top: 0,
+                                        right: 0,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              files.removeAt(index);
+                                            });
+                                          },
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.black54,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            padding: EdgeInsets.all(2),
+                                            child: Icon(
+                                              Icons.close,
+                                              size: 14,
+                                              color: Colors.white,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                          ),
-
-                        TextField(
-                          controller: messageController,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.only(top: 12),
-                            border: InputBorder.none,
-                            hintText: 'Message',
-                            prefixIcon: IconButton(
-                              onPressed: () async {
-                                final XFile? pickedFile = await _picker
-                                    .pickImage(
-                                      source: ImageSource.gallery,
-                                      imageQuality: 80,
-                                    );
-                                if (pickedFile != null) {
-                                  setState(() {
-                                    files.add(File(pickedFile.path));
-                                  });
-                                }
-                              },
-                              icon: Icon(Icons.attach_file),
-                            ),
-                            suffixIcon: BlocListener<
-                              SendMessageBloc,
-                              SendMessageState
-                            >(
-                              listener: (context, state) {
-                                if (state is SendMessageLoaded) {
-                                  setState(() {
-                                    messageController.clear();
-                                    files.clear();
-                                  });
-                                  // context.read<TicketsMessageBloc>().add(
-                                  //   TicketsMessageEvent(widget.ticketId),
-                                  // );
-                                }
-                                if (state is SendMessageError) {
-                                  showErrorFlushbar(
-                                    context,
-                                    "Maydon bo'sh bolmasilig shart!",
-                                  );
-                                }
-                              },
-                              child: IconButton(
-                                onPressed: () {
-                                  final text = messageController.text.trim();
-                                  final filesToSend = List<File>.from(files);
-
-                                  context.read<SendMessageBloc>().add(
-                                    SendMessageEvent(
-                                      widget.ticketId,
-                                      text,
-                                      filesToSend,
-                                    ),
+                                    ],
                                   );
                                 },
-                                icon: SvgPicture.asset(
-                                  AppVectors.sendPlane,
-                                  width: appW(20),
-                                  height: appH(20),
+                              ),
+                            ),
+
+                          TextField(
+                            controller: messageController,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(top: 12),
+                              border: InputBorder.none,
+                              hintText: 'Message',
+                              prefixIcon: IconButton(
+                                onPressed: () async {
+                                  final XFile? pickedFile = await _picker
+                                      .pickImage(
+                                        source: ImageSource.gallery,
+                                        imageQuality: 80,
+                                      );
+                                  if (pickedFile != null) {
+                                    setState(() {
+                                      files.add(File(pickedFile.path));
+                                    });
+                                  }
+                                },
+                                icon: Icon(Icons.attach_file),
+                              ),
+                              suffixIcon: BlocListener<
+                                SendMessageBloc,
+                                SendMessageState
+                              >(
+                                listener: (context, state) {
+                                  if (state is SendMessageLoaded) {
+                                    setState(() {
+                                      messageController.clear();
+                                      files.clear();
+                                    });
+                                    // context.read<TicketsMessageBloc>().add(
+                                    //   TicketsMessageEvent(widget.ticketId),
+                                    // );
+                                  }
+                                  if (state is SendMessageError) {
+                                    showErrorFlushbar(
+                                      context,
+                                      "Maydon bo'sh bolmasilig shart!",
+                                    );
+                                  }
+                                },
+                                child: IconButton(
+                                  onPressed: () {
+                                    final text = messageController.text.trim();
+                                    final filesToSend = List<File>.from(files);
+
+                                    context.read<SendMessageBloc>().add(
+                                      SendMessageEvent(
+                                        widget.ticketId,
+                                        text,
+                                        filesToSend,
+                                      ),
+                                    );
+                                  },
+                                  icon: SvgPicture.asset(
+                                    AppVectors.sendPlane,
+                                    width: appW(20),
+                                    height: appH(20),
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          }
-          return SizedBox.shrink();
-        },
+                  ],
+                ),
+              );
+            }
+            return SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

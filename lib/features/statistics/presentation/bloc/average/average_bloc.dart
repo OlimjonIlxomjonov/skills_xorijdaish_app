@@ -9,7 +9,6 @@ class AverageBloc extends Bloc<StatsEvent, AverageState> {
 
   AverageBloc(this.useCase) : super(AverageInitial()) {
     on<AverageEvent>((event, emit) async {
-      emit(AverageLoading());
       if (appSession.averageResponse != null) {
         emit(AverageLoaded(appSession.averageResponse!));
         return;

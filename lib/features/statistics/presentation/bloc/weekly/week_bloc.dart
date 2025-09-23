@@ -9,14 +9,14 @@ class WeekBloc extends Bloc<StatsEvent, WeekStats> {
 
   WeekBloc(this.useCase) : super(WeekStatsInitial()) {
     on<WeekEvent>((event, emit) async {
-      if (appSession.weekResponse != null) {
-        emit(WeekStatsLoaded(appSession.weekResponse!));
-        return;
-      }
-      emit(WeekStatsLoading());
+      // if (appSession.weekResponse != null) {
+      //   emit(WeekStatsLoaded(appSession.weekResponse!));
+      //   return;
+      // }
+      // emit(WeekStatsLoading());
       try {
         final response = await useCase.call();
-        appSession.weekResponse = response;
+        // appSession.weekResponse = response;
         emit(WeekStatsLoaded(response));
       } catch (e) {
         emit(WeekStatsError(e.toString()));

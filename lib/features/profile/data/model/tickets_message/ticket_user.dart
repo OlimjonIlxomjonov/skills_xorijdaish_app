@@ -1,5 +1,7 @@
 import 'package:skills_xorijdaish/features/profile/domain/entity/tickets_message/ticket_user.dart';
 
+import '../../../../../core/utils/json_parsers.dart';
+
 class TicketUserModel extends TicketUser {
   TicketUserModel({
     required super.id,
@@ -31,33 +33,41 @@ class TicketUserModel extends TicketUser {
   });
 
   factory TicketUserModel.fromJson(Map<String, dynamic> json) {
-    return TicketUserModel(
-      id: json['id'] ?? 0,
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      emailVerifiedAt: json['email_verified_at'] ?? '',
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
-      isAdmin: json['is_admin'] ?? false,
-      phoneNumber: json['phone_number'] ?? '',
-      surName: json['sur_name'] ?? '',
-      pin: json['pin'] ?? '',
-      userId: json['user_id'] ?? '',
-      pportNo: json['pport_no'] ?? '',
-      midName: json['mid_name'] ?? '',
-      userType: json['user_type'] ?? '',
-      firstName: json['first_name'] ?? '',
-      fullName: json['full_name'] ?? '',
-      gender: json['gender'] ?? 0,
-      nationality: json['nationality'] ?? '',
-      birthDate: json['birth_date'] ?? '',
-      citizenship: json['citizenship'] ?? '',
-      pportIssuedBy: json['pport_issued_by'] ?? '',
-      pportIssuedDate: json['pport_issued_date'] ?? '',
-      pportExpiryDate: json['pport_expiry_date'] ?? '',
-      image: json['image'] ?? '',
-      fcmToken: json['fcm_token'] ?? '',
-      avatar: json['avatar'] ?? '',
-    );
+    try {
+      return TicketUserModel(
+        id: parseInt(json['id']),
+        // <- changed to string
+        name: parseString(json['name']),
+        email: parseString(json['email']),
+        emailVerifiedAt: parseString(json['email_verified_at']),
+        createdAt: parseString(json['created_at']),
+        updatedAt: parseString(json['updated_at']),
+        isAdmin: parseBool(json['is_admin']),
+        phoneNumber: parseString(json['phone_number']),
+        surName: parseString(json['sur_name']),
+        pin: parseString(json['pin']),
+        userId: parseString(json['user_id']),
+        pportNo: parseString(json['pport_no']),
+        midName: parseString(json['mid_name']),
+        userType:
+            json['user_type'] == null ? null : parseString(json['user_type']),
+        firstName: parseString(json['first_name']),
+        fullName: parseString(json['full_name']),
+        gender: parseString(json['gender']),
+        // keep as string (safer)
+        nationality: parseString(json['nationality']),
+        birthDate: parseString(json['birth_date']),
+        citizenship: parseString(json['citizenship']),
+        pportIssuedBy: parseString(json['pport_issued_by']),
+        pportIssuedDate: parseString(json['pport_issued_date']),
+        pportExpiryDate: parseString(json['pport_expiry_date']),
+        image: parseString(json['image']),
+        fcmToken: parseString(json['fcm_token']),
+        avatar: parseString(json['avatar']),
+      );
+    } catch (e, st) {
+      print('TicketUserModel.fromJson error: $e\n$json\n$st');
+      rethrow;
+    }
   }
 }

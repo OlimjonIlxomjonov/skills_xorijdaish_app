@@ -45,6 +45,7 @@ import 'package:skills_xorijdaish/features/home/presentation/block/banners/banne
 import 'package:skills_xorijdaish/features/home/presentation/block/notifications/notif_bloc.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/notifications/notif_count/notif_count_bloc.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/notifications/read_all/read_all_bloc.dart';
+import 'package:skills_xorijdaish/features/home/presentation/block/notifications/read_one/read_one_bloc.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/search/search_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/certificate/certificate_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/presentation/bloc/create_ticket/create_ticket_bloc.dart';
@@ -227,6 +228,7 @@ class MyBlocProvider extends StatelessWidget {
           create: (context) => sl<FaceRecognitionCompareBloc>(),
         ),
         BlocProvider<FaqsBloc>(create: (context) => sl<FaqsBloc>()),
+        BlocProvider<ReadOneBloc>(create: (context) => sl<ReadOneBloc>()),
       ],
       child: child,
     );

@@ -99,11 +99,13 @@ import 'package:skills_xorijdaish/features/home/domain/usecase/banners_use_case.
 import 'package:skills_xorijdaish/features/home/domain/usecase/notifications_count_use_case.dart';
 import 'package:skills_xorijdaish/features/home/domain/usecase/notifications_use_case.dart';
 import 'package:skills_xorijdaish/features/home/domain/usecase/read_all_use_case.dart';
+import 'package:skills_xorijdaish/features/home/domain/usecase/read_one_use_case.dart';
 import 'package:skills_xorijdaish/features/home/domain/usecase/serach_use_case.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/banners/banners_bloc.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/notifications/notif_bloc.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/notifications/notif_count/notif_count_bloc.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/notifications/read_all/read_all_bloc.dart';
+import 'package:skills_xorijdaish/features/home/presentation/block/notifications/read_one/read_one_bloc.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/search/search_bloc.dart';
 import 'package:skills_xorijdaish/features/profile/data/repo/profile_repo_impl.dart';
 import 'package:skills_xorijdaish/features/profile/data/source/profile_remote_data_source.dart';
@@ -251,6 +253,7 @@ Future<void> setup() async {
   sl.registerLazySingleton(() => NotificationsUseCase(sl()));
   sl.registerLazySingleton(() => NotificationsCountUseCase(sl()));
   sl.registerLazySingleton(() => ReadAllUseCase(sl()));
+  sl.registerLazySingleton(() => ReadOneUseCase(sl()));
 
   // search
   sl.registerLazySingleton(() => SearchUseCase(sl()));
@@ -350,6 +353,7 @@ Future<void> setup() async {
   sl.registerLazySingleton(() => NotifBloc(sl()));
   sl.registerLazySingleton(() => NotifCountBloc(sl()));
   sl.registerLazySingleton(() => ReadAllBloc(sl()));
+  sl.registerLazySingleton(() => ReadOneBloc(sl()));
 
   // search
   sl.registerLazySingleton(() => SearchBloc(sl()));

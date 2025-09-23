@@ -13,4 +13,6 @@ abstract class HomeRepository {
   Future<void> readAll();
 
   Future<BannersResponse> fetchBanners();
+
+  Future<void> readOne({required int id});
 }

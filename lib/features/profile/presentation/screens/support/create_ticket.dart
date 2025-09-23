@@ -252,32 +252,34 @@ class _CreateTicketState extends State<CreateTicket> {
             ),
           ),
         ),
-        bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: appH(24)),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            boxShadow: [
-              BoxShadow(
-                spreadRadius: 10,
-                blurRadius: 10,
-                color: Colors.grey.shade200,
+        bottomNavigationBar: SafeArea(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: appH(15)),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              boxShadow: [
+                BoxShadow(
+                  spreadRadius: 10,
+                  blurRadius: 10,
+                  color: Colors.grey.shade200,
+                ),
+              ],
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
               ),
-            ],
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
             ),
-          ),
-          child: BasicButtonWg(
-            text: 'Yaratish',
-            onTap: () {
-              final success = _createTicket();
-              if (success) {
-                AppRoute.close();
-                successFlushBar(context, 'Muvaffaqiyatl yaratildi!');
-                context.read<SupportBloc>().add(SupportEvent(1));
-              }
-            },
+            child: BasicButtonWg(
+              text: 'Yaratish',
+              onTap: () {
+                final success = _createTicket();
+                if (success) {
+                  AppRoute.close();
+                  successFlushBar(context, 'Muvaffaqiyatl yaratildi!');
+                  context.read<SupportBloc>().add(SupportEvent(1));
+                }
+              },
+            ),
           ),
         ),
       ),

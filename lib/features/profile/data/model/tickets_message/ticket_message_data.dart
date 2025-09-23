@@ -3,6 +3,9 @@ import 'package:skills_xorijdaish/features/profile/data/model/tickets_message/ti
 import 'package:skills_xorijdaish/features/profile/data/model/tickets_message/tickets_message_model.dart';
 import 'package:skills_xorijdaish/features/profile/domain/entity/tickets_message/ticket_message_data.dart';
 
+import '../../../../../core/utils/json_parsers.dart';
+import '../../../../../core/utils/logger/logger.dart';
+
 class TicketMessageDataModel extends MessageData {
   TicketMessageDataModel({
     required super.id,
@@ -16,22 +19,25 @@ class TicketMessageDataModel extends MessageData {
   });
 
   factory TicketMessageDataModel.fromJson(Map<String, dynamic> json) {
-    return TicketMessageDataModel(
-      id: json['id'] ?? 0,
-      text: json['text'] ?? '',
-      user: TicketUserModel.fromJson(json['user']),
-      ticket: TicketsMessageModel.fromJson(json['ticket']),
-      isAdmin: json['is_admin'] ?? false,
-      sentAt: json['sent_at'] ?? '',
-      sentAtHuman: json['sent_at_human'] ?? '',
-      files:
-          json['files'] != null
-              ? (json['files'] as List<dynamic>)
-                  .map(
-                    (e) => TicketFilesModel.fromJson(e as Map<String, dynamic>),
-                  )
-                  .toList()
-              : [],
-    );
+    try {
+      return TicketMessageDataModel(
+        id: parseInt(json['id']),
+        text: parseString(json['text']),
+        user: TicketUserModel.fromJson(json['user'] ?? <String, dynamic>{}),
+        ticket: TicketsMessageModel.fromJson(
+          json['ticket'] ?? <String, dynamic>{},
+        ),
+        isAdmin: parseBool(json['is_admin']),
+        sentAt: parseString(json['sent_at']),
+        sentAtHuman: parseString(json['sent_at_human']),
+        files: parseList<TicketFilesModel>(
+          json['files'],
+          (m) => TicketFilesModel.fromJson(m),
+        ),
+      );
+    } catch (e, st) {
+      logger.w('TicketMessageDataModel.fromJson error: $e\n$json\n$st');
+      rethrow;
+    }
   }
 }

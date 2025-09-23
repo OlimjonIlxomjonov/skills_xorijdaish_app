@@ -65,6 +65,7 @@ abstract class ApiUrls {
   static const notifications = '/api/notifications';
   static const notificationsCount = '/api/notifications/unread-count';
   static const readAll = '/api/notifications/read-all';
+  static const readOne = '/api/notifications/';
 
   /// Search
   static const search = '/api/search?search=';

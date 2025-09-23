@@ -30,6 +30,7 @@ import 'package:skills_xorijdaish/features/profile/presentation/screens/support/
 
 import '../../../../core/utils/logger/logger.dart';
 import '../../../../core/utils/responsiveness/app_responsive.dart';
+import '../../../courses/presentation/widgets/face_id_verif_wg.dart';
 import '../../data/repo/profile_repo_impl.dart';
 import '../../data/source/profile_remote_data_source_impl.dart';
 import '../../domain/usecase/session_use_case.dart';
@@ -98,57 +99,59 @@ class _ProfilePageState extends State<ProfilePage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            vertical: appH(20),
-            horizontal: appW(24),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Drag handle
-              Container(
-                margin: EdgeInsets.only(bottom: appH(16)),
-                width: 38,
-                height: appH(4),
-                decoration: BoxDecoration(
-                  color: AppColors.greyScale.grey300,
-                  borderRadius: BorderRadius.circular(100),
-                ),
-              ),
-
-              Text(
-                'Rasm tanlash',
-                style: AppTextStyles.source.semiBold(
-                  color: AppColors.black,
-                  fontSize: 18,
-                ),
-              ),
-              SizedBox(height: appH(20)),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildPickerOption(
-                    icon: IconlyLight.camera,
-                    label: 'Kamera',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickImage(ImageSource.camera);
-                    },
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: appH(20),
+              horizontal: appW(24),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Drag handle
+                Container(
+                  margin: EdgeInsets.only(bottom: appH(16)),
+                  width: 38,
+                  height: appH(4),
+                  decoration: BoxDecoration(
+                    color: AppColors.greyScale.grey300,
+                    borderRadius: BorderRadius.circular(100),
                   ),
-                  _buildPickerOption(
-                    icon: IconlyLight.image,
-                    label: 'Galereya',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _pickImage(ImageSource.gallery);
-                    },
+                ),
+
+                Text(
+                  'Rasm tanlash',
+                  style: AppTextStyles.source.semiBold(
+                    color: AppColors.black,
+                    fontSize: 18,
                   ),
-                ],
-              ),
-              SizedBox(height: appH(16)),
-            ],
+                ),
+                SizedBox(height: appH(20)),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildPickerOption(
+                      icon: IconlyLight.camera,
+                      label: 'Kamera',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _pickImage(ImageSource.camera);
+                      },
+                    ),
+                    _buildPickerOption(
+                      icon: IconlyLight.image,
+                      label: 'Galereya',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _pickImage(ImageSource.gallery);
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(height: appH(16)),
+              ],
+            ),
           ),
         );
       },
@@ -298,12 +301,27 @@ class _ProfilePageState extends State<ProfilePage> {
                               spacing: 10,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  'Shaxsingizni tasdiqlang',
-                                  style: AppTextStyles.source.medium(
-                                    color: AppColors.white,
-                                    fontSize: 14,
+                                GestureDetector(
+                                  child: Text(
+                                    'Shaxsingizni tasdiqlang',
+                                    style: AppTextStyles.source.medium(
+                                      color: AppColors.white,
+                                      fontSize: 14,
+                                    ),
                                   ),
+                                  onTap: () async {
+                                    final success = await startFaceVerification(
+                                      context,
+                                    );
+                                    logger.f('Raw MyID result: $success');
+
+                                    if (success) {
+                                      context.read<SelfInfoBloc>().add(
+                                        SelfInfoEvent(),
+                                      );
+                                    }
+                                    return;
+                                  },
                                 ),
                                 Icon(
                                   IconlyLight.arrow_right_2,

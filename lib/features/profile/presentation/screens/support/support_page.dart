@@ -46,12 +46,12 @@ class _SupportPageState extends State<SupportPage> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: appH(24)),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: appH(15)),
         decoration: BoxDecoration(
           color: AppColors.white,
           boxShadow: [
             BoxShadow(
-              spreadRadius: 10,
+              spreadRadius: 1,
               blurRadius: 10,
               color: Colors.grey.shade200,
             ),
@@ -61,11 +61,13 @@ class _SupportPageState extends State<SupportPage> {
             topRight: Radius.circular(24),
           ),
         ),
-        child: BasicButtonWg(
-          text: '+ Yangi tikket yaratish',
-          onTap: () {
-            AppRoute.go(CreateTicket());
-          },
+        child: SafeArea(
+          child: BasicButtonWg(
+            text: '+ Yangi tikket yaratish',
+            onTap: () {
+              AppRoute.go(CreateTicket());
+            },
+          ),
         ),
       ),
     );

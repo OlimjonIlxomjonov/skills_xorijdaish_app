@@ -134,32 +134,31 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                     ),
                   ),
-                  Spacer(),
-                  // SvgPicture.asset(AppVectors.poweredBy),
-                  Row(
-                    spacing: 12,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Powered by',
-                        style: AppTextStyles.source.medium(
-                          color: AppColors.black,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Image.asset(
-                        AppImages.poweredByRight,
-                        width: appW(96),
-                        height: appH(25),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: appH(30)),
                 ],
               ),
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Row(
+          spacing: 12,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Powered by',
+              style: AppTextStyles.source.medium(
+                color: AppColors.black,
+                fontSize: 12,
+              ),
+            ),
+            Image.asset(
+              AppImages.poweredByRight,
+              width: appW(96),
+              height: appH(25),
+            ),
+          ],
+        ),
       ),
     );
   }

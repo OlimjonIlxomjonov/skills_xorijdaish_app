@@ -100,4 +100,21 @@ class HomeRemoteDataSourceImpl implements HomeRemoteDataSource {
       rethrow;
     }
   }
+
+  @override
+  Future<void> getReadOne({required int id}) async {
+    try {
+      final response = await dioClient.put('${ApiUrls.readOne}$id/read');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        logger.i('Succes: ${response.data}');
+      } else {
+        throw Exception(
+          'Error: status code: ${response.statusCode}: ${response.data}',
+        );
+      }
+    } catch (e) {
+      logger.e('Error: $e');
+      rethrow;
+    }
+  }
 }

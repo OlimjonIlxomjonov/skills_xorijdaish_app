@@ -281,9 +281,11 @@ class _FinalTestPageState extends State<FinalTestPage> {
                       ),
                     ],
                   ),
-                  child: BasicButtonWg(
-                    text: 'Tasdiqlash',
-                    onTap: _submitAnswer,
+                  child: SafeArea(
+                    child: BasicButtonWg(
+                      text: 'Tasdiqlash',
+                      onTap: _submitAnswer,
+                    ),
                   ),
                 ),
       ),

@@ -8,11 +8,13 @@ import 'package:photo_view/photo_view.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:skills_xorijdaish/core/common/constants/colors/app_colors.dart';
 import 'package:skills_xorijdaish/core/common/textstyles/app_text_styles.dart';
+import 'package:skills_xorijdaish/core/page_route/route_generator.dart';
 import 'package:skills_xorijdaish/core/utils/responsiveness/app_responsive.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/home_event.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/notifications/notif_bloc.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/notifications/notif_state.dart';
 import 'package:skills_xorijdaish/features/home/presentation/block/notifications/read_all/read_all_bloc.dart';
+import 'package:skills_xorijdaish/features/home/presentation/block/notifications/read_one/read_one_bloc.dart';
 
 import '../../../block/notifications/notif_count/notif_count_bloc.dart';
 
@@ -41,6 +43,13 @@ class _AppNotificationsState extends State<AppNotifications> {
       appBar: AppBar(
         scrolledUnderElevation: 0,
         backgroundColor: AppColors.white,
+        leading: IconButton(
+          onPressed: () {
+            AppRoute.close();
+            context.read<NotifCountBloc>().add(NotifCountEvent());
+          },
+          icon: Icon(Icons.arrow_back),
+        ),
         title: Text(
           'Xabarnoma',
           style: AppTextStyles.source.medium(
@@ -242,6 +251,13 @@ class _AppNotificationsState extends State<AppNotifications> {
                                 expandedIndex = index;
                               }
                             });
+                            context.read<ReadOneBloc>().add(
+                              ReadOneEvent(notif.id),
+                            );
+
+                            context.read<NotifBloc>().add(
+                              NotificationsEvent(1),
+                            );
                           },
                           child: Container(
                             padding: EdgeInsets.symmetric(

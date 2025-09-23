@@ -14,4 +14,6 @@ abstract class HomeRemoteDataSource {
   Future<void> getReadAll();
 
   Future<BannersResponseModel> getBanners();
+
+  Future<void> getReadOne({required int id});
 }
