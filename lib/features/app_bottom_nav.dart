@@ -82,82 +82,83 @@ class _AppBottomNavState extends State<AppBottomNav> {
         Scaffold(
           backgroundColor: Colors.transparent,
           body: pages[_currentIndex],
-          bottomNavigationBar: Container(
-            padding: EdgeInsets.only(
-              bottom: appH(20),
-              left: appW(20),
-              right: appW(20),
-            ),
-            decoration: BoxDecoration(
-              color: _currentIndex == 3 ? Color(0xff1C1C25) : AppColors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+          bottomNavigationBar: SafeArea(
+            child: Container(
+              padding: EdgeInsets.only(left: appW(20), right: appW(20)),
+              decoration: BoxDecoration(
+                color: _currentIndex == 3 ? Color(0xff1C1C25) : AppColors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
               ),
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10)],
-            ),
-            child: GNav(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              iconSize: appH(24),
-              padding: EdgeInsets.symmetric(
-                horizontal: appW(16),
-                vertical: appH(12),
-              ),
-              tabMargin: EdgeInsets.symmetric(horizontal: appW(4)),
-              backgroundColor:
-                  _currentIndex == 3 ? Color(0xff1C1C25) : AppColors.white,
-              activeColor: AppColors.textBlue,
-              color: _currentIndex == 3 ? Color(0xff9E9E9E) : AppColors.black,
-              selectedIndex: _currentIndex,
-              onTabChange: (index) {
-                setState(() => _currentIndex = index);
-                if (index == 3) {
-                  SystemChrome.setSystemUIOverlayStyle(
-                    const SystemUiOverlayStyle(
-                      systemNavigationBarColor: Color(0xff1C1C25),
+              child: GNav(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                iconSize: appH(24),
+                padding: EdgeInsets.symmetric(
+                  horizontal: appW(16),
+                  vertical: appH(12),
+                ),
+                tabMargin: EdgeInsets.symmetric(horizontal: appW(4)),
+                backgroundColor:
+                    _currentIndex == 3 ? Color(0xff1C1C25) : AppColors.white,
+                activeColor: AppColors.textBlue,
+                color: _currentIndex == 3 ? Color(0xff9E9E9E) : AppColors.black,
+                selectedIndex: _currentIndex,
+                onTabChange: (index) {
+                  setState(() => _currentIndex = index);
+                  if (index == 3) {
+                    SystemChrome.setSystemUIOverlayStyle(
+                      const SystemUiOverlayStyle(
+                        systemNavigationBarColor: Color(0xff1C1C25),
 
-                      systemNavigationBarIconBrightness: Brightness.light,
-                    ),
-                  );
-                } else {
-                  SystemChrome.setSystemUIOverlayStyle(
-                    const SystemUiOverlayStyle(
-                      systemNavigationBarColor: Colors.white,
-                      systemNavigationBarIconBrightness: Brightness.dark,
-                    ),
-                  );
-                }
-              },
-              tabs: [
-                GButton(
-                  icon: _currentIndex == 0 ? IconlyBold.home : IconlyLight.home,
-                ),
-                GButton(
-                  icon:
-                      _currentIndex == 1 ? IconlyBold.chart : IconlyLight.chart,
-                ),
-                GButton(
-                  icon: IconlyBold.document,
-                  leading: Container(
-                    width: appW(44),
-                    height: appH(44),
-                    decoration: BoxDecoration(
-                      color: AppColors.appBg,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(IconlyBold.document, color: AppColors.white),
+                        systemNavigationBarIconBrightness: Brightness.light,
+                      ),
+                    );
+                  } else {
+                    SystemChrome.setSystemUIOverlayStyle(
+                      const SystemUiOverlayStyle(
+                        systemNavigationBarColor: Colors.white,
+                        systemNavigationBarIconBrightness: Brightness.dark,
+                      ),
+                    );
+                  }
+                },
+                tabs: [
+                  GButton(
+                    icon:
+                        _currentIndex == 0 ? IconlyBold.home : IconlyLight.home,
                   ),
-                ),
-                GButton(
-                  icon: _currentIndex == 3 ? IconlyBold.play : IconlyLight.play,
-                ),
-                GButton(
-                  icon:
-                      _currentIndex == 4
-                          ? IconlyBold.profile
-                          : IconlyLight.profile,
-                ),
-              ],
+                  GButton(
+                    icon:
+                        _currentIndex == 1
+                            ? IconlyBold.chart
+                            : IconlyLight.chart,
+                  ),
+                  GButton(
+                    icon: IconlyBold.document,
+                    leading: Container(
+                      width: appW(44),
+                      height: appH(44),
+                      decoration: BoxDecoration(
+                        color: AppColors.appBg,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(IconlyBold.document, color: AppColors.white),
+                    ),
+                  ),
+                  GButton(
+                    icon:
+                        _currentIndex == 3 ? IconlyBold.play : IconlyLight.play,
+                  ),
+                  GButton(
+                    icon:
+                        _currentIndex == 4
+                            ? IconlyBold.profile
+                            : IconlyLight.profile,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

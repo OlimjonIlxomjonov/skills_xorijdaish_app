@@ -10,14 +10,8 @@ class SelfInfoBloc extends Bloc<ProfileEvent, SelfInfoState> {
 
   SelfInfoBloc(this.useCase) : super(SelfInfoInitial()) {
     on<SelfInfoEvent>((event, emit) async {
-      emit(SelfInfoLoading());
-      if (appSession.selfInfo != null) {
-        emit(SelfInfoLoaded(appSession.selfInfo!));
-        return;
-      }
       try {
         final response = await useCase.call();
-        appSession.selfInfo = response;
         emit(SelfInfoLoaded(response));
       } catch (e) {
         emit(SelfInfoError(e.toString()));

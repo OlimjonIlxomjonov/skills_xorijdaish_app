@@ -8,7 +8,7 @@ class RateCourseBloc extends Bloc<CoursesEvent, RateCourseState> {
 
   RateCourseBloc(this.useCase) : super(RateCourseInitial()) {
     on<RateCourseEvent>((event, emit) async {
-      emit(RateCourseLoading());
+      // emit(RateCourseLoading());
       try {
         await useCase.call(
           courseId: event.courseId,

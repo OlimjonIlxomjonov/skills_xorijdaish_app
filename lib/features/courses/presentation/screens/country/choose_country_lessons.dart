@@ -167,30 +167,37 @@ class _ChooseCountryLessonsState extends State<ChooseCountryLessons> {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20, vertical: appH(24)),
-        decoration: BoxDecoration(
-          color: AppColors.white,
-          boxShadow: [
-            BoxShadow(
-              spreadRadius: 1,
-              blurRadius: 10,
-              color: Colors.grey.shade200,
-            ),
-          ],
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: EdgeInsets.only(
+            left: appW(24),
+            right: appW(24),
+            top: appH(15),
+            bottom: appH(10),
           ),
-        ),
-        child: BasicButtonWg(
-          text: AppStrings.contunie,
-          isEnabled: selectedCount != null,
-          onTap: () {
-            if (selectedCount != null) {
-              AppRoute.go(LessonsPage(countryId: selectedCount!));
-            }
-          },
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 5,
+                offset: Offset(0, -1),
+                color: Colors.grey.shade200,
+              ),
+            ],
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          child: BasicButtonWg(
+            text: AppStrings.contunie,
+            isEnabled: selectedCount != null,
+            onTap: () {
+              if (selectedCount != null) {
+                AppRoute.go(LessonsPage(countryId: selectedCount!));
+              }
+            },
+          ),
         ),
       ),
     );

@@ -9,7 +9,7 @@ class SoftSkillsBloc extends Bloc<CoursesEvent, SoftSkillsState> {
 
   SoftSkillsBloc(this.useCase) : super(SoftSkillsInitial()) {
     on<GetSoftSkillsEvent>((event, emit) async {
-      emit(SoftSkillsLoading());
+      // emit(SoftSkillsLoading());
       // if (appSession.softSkillsInfo != null) {
       //   emit(SoftSkillsLoaded(appSession.softSkillsInfo!));
       // }

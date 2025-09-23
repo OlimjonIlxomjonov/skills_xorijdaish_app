@@ -18,7 +18,7 @@ class QuestionPage extends StatefulWidget {
 }
 
 class _QuestionPageState extends State<QuestionPage> {
-  bool isVisible = false;
+  int? expandedIndex;
 
   @override
   void initState() {
@@ -40,7 +40,10 @@ class _QuestionPageState extends State<QuestionPage> {
                 itemCount: state.response.data.length,
                 itemBuilder: (context, index) {
                   final faq = state.response.data[index];
+                  final isExpanded = expandedIndex == index;
+
                   return Container(
+                    margin: EdgeInsets.only(bottom: 20),
                     padding: EdgeInsets.symmetric(
                       horizontal: appW(20),
                       vertical: appH(20),
@@ -51,7 +54,7 @@ class _QuestionPageState extends State<QuestionPage> {
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.inputGreyColor.withValues(
-                            alpha: 0.3,
+                            alpha: 0.2,
                           ),
                           spreadRadius: 1,
                           blurRadius: 10,
@@ -59,45 +62,59 @@ class _QuestionPageState extends State<QuestionPage> {
                       ],
                     ),
                     child: Column(
-                      spacing: isVisible ? 10 : 0,
                       children: [
                         GestureDetector(
                           onTap: () {
                             setState(() {
-                              isVisible = !isVisible;
+                              expandedIndex = isExpanded ? null : index;
                             });
                           },
                           behavior: HitTestBehavior.opaque,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                faq.title,
-                                style: AppTextStyles.source.semiBold(
-                                  color: AppColors.black,
-                                  fontSize: 18,
+                              Expanded(
+                                child: Text(
+                                  faq.title,
+                                  style: AppTextStyles.source.semiBold(
+                                    color: AppColors.black,
+                                    fontSize: 16,
+                                  ),
                                 ),
                               ),
                               Icon(
-                                !isVisible
-                                    ? IconlyBold.arrow_down_2
-                                    : IconlyBold.arrow_up_2,
+                                isExpanded
+                                    ? IconlyBold.arrow_up_2
+                                    : IconlyBold.arrow_down_2,
                                 color: AppColors.appBg,
                                 size: appW(24),
                               ),
                             ],
                           ),
                         ),
-                        Visibility(
-                          visible: isVisible,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 10,
-                            children: [
-                              Divider(color: AppColors.greyScale.grey200),
-                              Text(faq.description),
-                            ],
+                        AnimatedCrossFade(
+                          firstChild: const SizedBox.shrink(),
+                          secondChild: Padding(
+                            padding: EdgeInsets.only(top: appH(10)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Divider(color: AppColors.greyScale.grey200),
+                                Text(
+                                  faq.description,
+                                  style: AppTextStyles.source.regular(
+                                    color: AppColors.black,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                          crossFadeState:
+                              isExpanded
+                                  ? CrossFadeState.showSecond
+                                  : CrossFadeState.showFirst,
+                          duration: const Duration(milliseconds: 200),
                         ),
                       ],
                     ),
@@ -105,7 +122,7 @@ class _QuestionPageState extends State<QuestionPage> {
                 },
               );
             }
-            return SizedBox.shrink();
+            return const SizedBox.shrink();
           },
         ),
       ),

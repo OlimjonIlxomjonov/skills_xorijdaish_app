@@ -9,7 +9,7 @@ class PreTripBloc extends Bloc<CoursesEvent, PreTripState> {
 
   PreTripBloc(this.useCase) : super(PreTripInitial()) {
     on<PreTripEvent>((event, emit) async {
-      emit(PreTripLoading());
+      // emit(PreTripLoading());
       if (appSession.preTripInfo != null) {
         emit(PreTripLoaded(appSession.preTripInfo!));
         return;

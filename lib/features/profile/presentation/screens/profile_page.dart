@@ -400,97 +400,101 @@ class _ProfilePageState extends State<ProfilePage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Wrap(
-            children: [
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(top: appH(8), bottom: appH(24)),
-                    width: 38,
-                    height: appH(3),
-                    decoration: BoxDecoration(
-                      color: Color(0xffE0E0E0),
-                      borderRadius: BorderRadius.circular(100),
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Wrap(
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: appH(8), bottom: appH(24)),
+                      width: 38,
+                      height: appH(3),
+                      decoration: BoxDecoration(
+                        color: Color(0xffE0E0E0),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Akkauntdan chiqish',
-                    style: AppTextStyles.source.medium(
-                      color: AppColors.red,
-                      fontSize: 24,
+                    Text(
+                      'Akkauntdan chiqish',
+                      style: AppTextStyles.source.medium(
+                        color: AppColors.red,
+                        fontSize: 24,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: appH(24)),
-                  Divider(color: AppColors.greyScale.grey300),
-                  SizedBox(height: appH(24)),
-                  Text(
-                    'Siz rostdan ham akkauntdan chiqmoqchimisiz?',
-                    style: AppTextStyles.source.regular(
-                      color: AppColors.black,
-                      fontSize: 20,
+                    SizedBox(height: appH(24)),
+                    Divider(color: AppColors.greyScale.grey300),
+                    SizedBox(height: appH(24)),
+                    Text(
+                      'Siz rostdan ham akkauntdan chiqmoqchimisiz?',
+                      style: AppTextStyles.source.regular(
+                        color: AppColors.black,
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: appW(24),
-                      vertical: appH(24),
-                    ),
-                    child: Row(
-                      spacing: 12,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () => AppRoute.close(),
-                            style: ElevatedButton.styleFrom(
-                              minimumSize: Size(double.infinity, appH(51)),
-                              backgroundColor: AppColors.white,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: appW(24),
+                        vertical: appH(24),
+                      ),
+                      child: Row(
+                        spacing: 12,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () => AppRoute.close(),
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size(double.infinity, appH(51)),
+                                backgroundColor: AppColors.white,
+                                shadowColor: Colors.transparent,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(
+                                    color: Color(0xff5B7BFE),
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                'Bekor qilish',
+                                style: AppTextStyles.source.medium(
                                   color: Color(0xff5B7BFE),
-                                  width: 2,
+                                  fontSize: 16,
                                 ),
                               ),
                             ),
-                            child: Text(
-                              'Bekor qilish',
-                              style: AppTextStyles.source.medium(
-                                color: Color(0xff5B7BFE),
-                                fontSize: 16,
-                              ),
+                          ),
+                          Expanded(
+                            child: BasicButtonWg(
+                              text: 'Tasdiqlash',
+                              onTap: () {
+                                if (userInfo.sessionId != null) {
+                                  context.read<RevokeSessionBloc>().add(
+                                    RevokeSessionEvent(
+                                      userInfo.sessionId ?? '',
+                                    ),
+                                  );
+                                  logger.f(userInfo.sessionId ?? '');
+                                  AppRoute.open(AuthPage());
+                                  successFlushBar(context, 'Muvaffaqiyat!');
+                                } else {
+                                  showErrorFlushbar(context, 'Xato!');
+                                }
+                              },
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: BasicButtonWg(
-                            text: 'Tasdiqlash',
-                            onTap: () {
-                              if (userInfo.sessionId != null) {
-                                context.read<RevokeSessionBloc>().add(
-                                  RevokeSessionEvent(userInfo.sessionId ?? ''),
-                                );
-                                logger.f(userInfo.sessionId ?? '');
-                                AppRoute.open(AuthPage());
-                                successFlushBar(context, 'Muvaffaqiyat!');
-                              } else {
-                                showErrorFlushbar(context, 'Xato!');
-                              }
-                            },
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },

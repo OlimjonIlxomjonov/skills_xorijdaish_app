@@ -9,7 +9,7 @@ class ForeignBloc extends Bloc<CoursesEvent, ForeignState> {
 
   ForeignBloc(this.useCase) : super(ForeignInitial()) {
     on<GetForeignLanguageEvent>((event, emit) async {
-      emit(ForeignLoading());
+      // emit(ForeignLoading());
       if (appSession.foreignLanguageInfo != null) {
         emit(ForeignLoaded(appSession.foreignLanguageInfo!));
         return;
